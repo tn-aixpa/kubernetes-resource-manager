@@ -1,0 +1,13 @@
+# local database config
+spring:
+  datasource:
+    url: ${JDBC_URL:jdbc:h2:file:./data/db}
+    driverClassName: ${JDBC_DRIVER:org.h2.Driver}
+    username: ${JDBC_USER:sa}
+    password: ${JDBC_PASS:password}
+  jpa:
+    database-platform: ${JDBC_DIALECT:org.hibernate.dialect.H2Dialect}
+    hibernate.ddl-auto: update
+
+# server
+server.port: ${HTTP_PORT:8080}
