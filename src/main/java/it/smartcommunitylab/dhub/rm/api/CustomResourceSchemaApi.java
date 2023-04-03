@@ -1,7 +1,7 @@
 package it.smartcommunitylab.dhub.rm.api;
 
 import it.smartcommunitylab.dhub.rm.SystemKeys;
-import it.smartcommunitylab.dhub.rm.model.CustomResourceSchema;
+import it.smartcommunitylab.dhub.rm.model.dto.CustomResourceSchemaDTO;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
 
 import java.util.List;
@@ -31,22 +31,22 @@ public class CustomResourceSchemaApi {
     private CustomResourceSchemaService service;
 
     @GetMapping
-    public List<CustomResourceSchema> find() {
+    public List<CustomResourceSchemaDTO> find() {
         return service.findCustomResourceSchemas();
     }
 
     @GetMapping("/{id}")
-    public CustomResourceSchema findById(@PathVariable String id) {
+    public CustomResourceSchemaDTO findById(@PathVariable String id) {
         return service.findById(id);
     }
 
     @PostMapping
-    public CustomResourceSchema create(@RequestBody CustomResourceSchema request) {
+    public CustomResourceSchemaDTO create(@RequestBody CustomResourceSchemaDTO request) {
         return service.create(request);
     }
 
     @PutMapping("/{id}")
-    public CustomResourceSchema update(@PathVariable String id, @RequestBody CustomResourceSchema request) {
+    public CustomResourceSchemaDTO update(@PathVariable String id, @RequestBody CustomResourceSchemaDTO request) {
         return service.update(id, request);
     }
 
