@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,22 +36,22 @@ public class CustomResourceSchemaApi {
     }
 
     @GetMapping("/{id}")
-    public String findById(@PathVariable String id) {
-        return "This is a test";
+    public CustomResourceSchema findById(@PathVariable String id) {
+        return service.findById(id);
     }
 
     @PostMapping
-    public String create() {
-        return "This is a test";
+    public CustomResourceSchema create(@RequestBody CustomResourceSchema request) {
+        return service.create(request);
     }
 
     @PutMapping("/{id}")
-    public String update(@PathVariable String id) {
-        return "This is a test";
+    public CustomResourceSchema update(@PathVariable String id, @RequestBody CustomResourceSchema request) {
+        return service.update(id, request);
     }
 
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable String id) {
-        return "This is a test";
+    public void delete(@PathVariable String id) {
+        service.delete(id);
     }
 }
