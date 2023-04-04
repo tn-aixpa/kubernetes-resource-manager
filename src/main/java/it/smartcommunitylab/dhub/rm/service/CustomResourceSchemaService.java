@@ -35,7 +35,7 @@ public class CustomResourceSchemaService {
     public CustomResourceSchemaDTO findById(String id) {
         Optional<CustomResourceSchema> result = fetchById(id);
         if(!result.isPresent()) {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException("No schema with this ID");
         }
         return CustomResourceSchemaDTO.from(result.get());
     }
@@ -47,7 +47,7 @@ public class CustomResourceSchemaService {
     public CustomResourceSchemaDTO findByCrdIdAndVersion(String crdId, String version) {
         Optional<CustomResourceSchema> result = fetchByCrdIdAndVersion(crdId, version);
         if(!result.isPresent()) {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException("No schema with this CRD ID and version");
         }
         return CustomResourceSchemaDTO.from(result.get());
     }
@@ -81,7 +81,7 @@ public class CustomResourceSchemaService {
     public CustomResourceSchemaDTO update(String id, CustomResourceSchemaDTO request) {
         Optional<CustomResourceSchema> result = fetchById(id);
         if (!result.isPresent()) {
-            throw new NoSuchElementException();
+            throw new NoSuchElementException("No schema with this ID");
         }
         CustomResourceSchema schema = CustomResourceSchemaDTO.to(request);
         schema.setId(id);
