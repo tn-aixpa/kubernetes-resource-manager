@@ -14,25 +14,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(SystemKeys.API_PATH + "/crs")
 public class CustomResourceSchemaApi {
-    /*
-        GET /crs/ => list / search + pagination (come query param)
-        GET /crs/{id} => get ONE by id
-        POST /crs => create new (opt id)
-        PUT /crs/{id} => update/create with id
-        DELETE /crs/{id} => delete ONE by id
-     */
+    //TODO add calls to findByCrdId and findByCrdIdAndVersion ?
 
     @Autowired
     private CustomResourceSchemaService service;
 
     @GetMapping
-    public List<CustomResourceSchemaDTO> find() {
-        return service.findCustomResourceSchemas();
+    public List<CustomResourceSchemaDTO> findAll() {
+        return service.findAll();
     }
 
     @GetMapping("/{id}")
@@ -41,8 +36,8 @@ public class CustomResourceSchemaApi {
     }
 
     @PostMapping
-    public CustomResourceSchemaDTO create(@RequestBody CustomResourceSchemaDTO request) {
-        return service.create(request);
+    public CustomResourceSchemaDTO add(@RequestParam(required = false) String id, @RequestBody CustomResourceSchemaDTO request) {
+        return service.add(id, request);
     }
 
     @PutMapping("/{id}")

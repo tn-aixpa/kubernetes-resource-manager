@@ -11,18 +11,18 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
 
-public abstract class MapConverter<T extends Serializable> implements AttributeConverter<Map<String, T>, String> {
+public class HashMapConverter implements AttributeConverter<Map<String, Serializable>, String> {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final MapType typeRef;
     
-    protected MapConverter(Class<?> targetClass) {
-        typeRef = objectMapper.getTypeFactory().constructMapType(HashMap.class, String.class, targetClass);
+    protected HashMapConverter() {
+        typeRef = objectMapper.getTypeFactory().constructMapType(HashMap.class, String.class, Serializable.class);
     }
     
 
     @Override
-    public String convertToDatabaseColumn(Map<String, T> map) {
+    public String convertToDatabaseColumn(Map<String, Serializable> map) {
         String json = null;
         
         if (map != null) {
@@ -36,9 +36,9 @@ public abstract class MapConverter<T extends Serializable> implements AttributeC
     }
 
     @Override
-    public Map<String, T> convertToEntityAttribute(String json) {
+    public Map<String, Serializable> convertToEntityAttribute(String json) {
 
-        Map<String, T> map = null;
+        Map<String, Serializable> map = null;
         if (json != null) {
             try {
                 map = objectMapper.readValue(json, typeRef);
