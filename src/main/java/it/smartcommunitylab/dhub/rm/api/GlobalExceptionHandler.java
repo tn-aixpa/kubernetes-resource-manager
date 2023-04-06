@@ -2,6 +2,7 @@ package it.smartcommunitylab.dhub.rm.api;
 
 import java.util.NoSuchElementException;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,6 +22,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     String illegalArgumentHandler(IllegalArgumentException ex) {
+        return ex.getMessage();
+    }
+    
+    @ResponseBody
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    String dataIntegrityViolationHandler(DataIntegrityViolationException ex) {
         return ex.getMessage();
     }
 }

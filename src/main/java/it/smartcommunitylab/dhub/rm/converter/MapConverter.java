@@ -2,7 +2,6 @@ package it.smartcommunitylab.dhub.rm.converter;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 
 import jakarta.persistence.AttributeConverter;
@@ -11,13 +10,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
 
-public class HashMapConverter implements AttributeConverter<Map<String, Serializable>, String> {
+public class MapConverter implements AttributeConverter<Map<String, Serializable>, String> {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final MapType typeRef;
     
-    protected HashMapConverter() {
-        typeRef = objectMapper.getTypeFactory().constructMapType(HashMap.class, String.class, Serializable.class);
+    protected MapConverter() {
+        typeRef = objectMapper.getTypeFactory().constructMapType(Map.class, String.class, Serializable.class);
     }
     
 

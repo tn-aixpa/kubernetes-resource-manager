@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import it.smartcommunitylab.dhub.rm.converter.EntityDTOConverter;
 import it.smartcommunitylab.dhub.rm.model.CustomResourceSchema;
 import it.smartcommunitylab.dhub.rm.model.dto.CustomResourceSchemaDTO;
 import it.smartcommunitylab.dhub.rm.repository.CustomResourceSchemaRepository;
@@ -24,7 +25,7 @@ public class CustomResourceSchemaService {
     public List<CustomResourceSchemaDTO> findAll() {
         return customResourceSchemaRepository.findAll()
                 .stream()
-                .map(schema -> CustomResourceSchemaDTO.from(schema))
+                .map(schema -> EntityDTOConverter.fromEntity(schema))
                 .collect(Collectors.toList());
     }
 
@@ -37,7 +38,7 @@ public class CustomResourceSchemaService {
         if(!result.isPresent()) {
             throw new NoSuchElementException("No schema with this ID");
         }
-        return CustomResourceSchemaDTO.from(result.get());
+        return EntityDTOConverter.fromEntity(result.get());
     }
 
     public Optional<CustomResourceSchema> fetchByCrdIdAndVersion(String crdId, String version) {
@@ -49,13 +50,13 @@ public class CustomResourceSchemaService {
         if(!result.isPresent()) {
             throw new NoSuchElementException("No schema with this CRD ID and version");
         }
-        return CustomResourceSchemaDTO.from(result.get());
+        return EntityDTOConverter.fromEntity(result.get());
     }
 
     public List<CustomResourceSchemaDTO> findByCrdId(String crdId) {
         return customResourceSchemaRepository.findByCrdId(crdId)
                 .stream()
-                .map(schema -> CustomResourceSchemaDTO.from(schema))
+                .map(schema -> EntityDTOConverter.fromEntity(schema))
                 .collect(Collectors.toList());
     }
 
@@ -65,7 +66,7 @@ public class CustomResourceSchemaService {
     }
 
     public CustomResourceSchemaDTO add(@Nullable String id, CustomResourceSchemaDTO request) {
-        CustomResourceSchema result = CustomResourceSchemaDTO.to(request);
+        CustomResourceSchema result = EntityDTOConverter.fromDTO(request);
         if(id != null) {
             if (fetchById(id).isPresent()) {
                 throw new IllegalArgumentException("Schema with this ID already exists");
@@ -75,7 +76,7 @@ public class CustomResourceSchemaService {
             result.setId(UUID.randomUUID().toString());
         }
         
-        return CustomResourceSchemaDTO.from(customResourceSchemaRepository.save(result));
+        return EntityDTOConverter.fromEntity(customResourceSchemaRepository.save(result));
     }
 
     public CustomResourceSchemaDTO update(String id, CustomResourceSchemaDTO request) {
@@ -83,9 +84,13 @@ public class CustomResourceSchemaService {
         if (!result.isPresent()) {
             throw new NoSuchElementException("No schema with this ID");
         }
-        CustomResourceSchema schema = CustomResourceSchemaDTO.to(request);
+        CustomResourceSchema schema = EntityDTOConverter.fromDTO(request);
+        // TODO
+        // Consentire solo modifica di schema? O anche di crdId e version (che però dovrebbero essere una chiave univoca?
+        // Se consentiamo solo la modifica dello schema, creare un metodo pubic in EntityDTOConverter per conversione JsonNode->Map?
+        // Fare classe a parte per questa conversione (per non mescolare DTO<->Entity)? Package a parte per non mescolare converter DB?
         schema.setId(id);
-        return CustomResourceSchemaDTO.from(customResourceSchemaRepository.save(schema));
+        return EntityDTOConverter.fromEntity(customResourceSchemaRepository.save(schema));
     }
 
     public void delete(String id) {
