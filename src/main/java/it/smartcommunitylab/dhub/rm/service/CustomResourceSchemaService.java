@@ -8,6 +8,9 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinition;
+import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinitionVersion;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import it.smartcommunitylab.dhub.rm.converter.DTOToSchemaConverter;
 import it.smartcommunitylab.dhub.rm.converter.SchemaToDTOConverter;
 import it.smartcommunitylab.dhub.rm.model.CustomResourceSchema;
@@ -18,11 +21,13 @@ import jakarta.annotation.Nullable;
 @Service
 public class CustomResourceSchemaService {
     private final CustomResourceSchemaRepository customResourceSchemaRepository;
+    private final KubernetesClient client;
     private final DTOToSchemaConverter dtoToSchemaConverter;
     private final SchemaToDTOConverter schemaToDTOConverter;
 
-    public CustomResourceSchemaService(CustomResourceSchemaRepository customResourceSchemaRepository) {
+    public CustomResourceSchemaService(CustomResourceSchemaRepository customResourceSchemaRepository, KubernetesClient client) {
         this.customResourceSchemaRepository = customResourceSchemaRepository;
+        this.client = client;
         this.dtoToSchemaConverter = new DTOToSchemaConverter();
         this.schemaToDTOConverter = new SchemaToDTOConverter();
     }
@@ -66,8 +71,15 @@ public class CustomResourceSchemaService {
     }
 
     public CustomResourceSchemaDTO findLatest(String crdId) {
-        //TODO get active version from kubernetes, check if we have a schema for that, if we have it we replace with ours
-        return null;
+        CustomResourceDefinition crd = client.apiextensions().v1().customResourceDefinitions().withName(crdId).get();
+        String servedVersion = null;
+        for (CustomResourceDefinitionVersion version : crd.getSpec().getVersions()) {
+            if (version.getServed()) {
+                servedVersion = version.getName();
+                break;
+            }
+        }
+        return findByCrdIdAndVersion(crdId, servedVersion);
     }
 
     public CustomResourceSchemaDTO add(@Nullable String id, CustomResourceSchemaDTO request) {

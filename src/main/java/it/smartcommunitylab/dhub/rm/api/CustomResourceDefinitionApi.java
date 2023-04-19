@@ -2,7 +2,9 @@ package it.smartcommunitylab.dhub.rm.api;
 
 import it.smartcommunitylab.dhub.rm.SystemKeys;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResourceDefinition;
+import it.smartcommunitylab.dhub.rm.model.dto.CustomResourceSchemaDTO;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceDefinitionService;
+import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
 
 import java.util.List;
 
@@ -26,6 +28,8 @@ public class CustomResourceDefinitionApi {
 
     @Autowired
     private CustomResourceDefinitionService service;
+    @Autowired
+    private CustomResourceSchemaService schemaService;
 
     @GetMapping
     public List<IdAwareCustomResourceDefinition> findAll() {
@@ -37,9 +41,8 @@ public class CustomResourceDefinitionApi {
         return service.findById(id);
     }
 
-    //TODO recuperare schema da Kubernetes o tramite CustomResourceSchemaService?
     @GetMapping("/{id}/schema")
-    public String findSchemaForId(@PathVariable String id) {
-        return null;
+    public CustomResourceSchemaDTO findSchemaForId(@PathVariable String id) {
+        return schemaService.findLatest(id);
     }
 }
