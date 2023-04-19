@@ -22,9 +22,9 @@ public class CustomResourceDefinitionApi {
         GET /crd/{id}/schema => get schema for CRD
 
         id: [metadata.name] === [spec.names.plural+"."+spec.group]
-     */
+    */
 
-     @Autowired
+    @Autowired
     private CustomResourceDefinitionService service;
 
     @GetMapping
@@ -37,6 +37,7 @@ public class CustomResourceDefinitionApi {
         return service.findById(id);
     }
 
+    //TODO recuperare schema da Kubernetes o tramite CustomResourceSchemaService?
     @GetMapping("/{id}/schema")
     public String findSchemaForId(@PathVariable String id) {
         return null;
