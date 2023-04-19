@@ -1,7 +1,7 @@
 package it.smartcommunitylab.dhub.rm.api;
 
 import it.smartcommunitylab.dhub.rm.SystemKeys;
-import it.smartcommunitylab.dhub.rm.model.CustomResourceDefinitionPOJO;
+import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResourceDefinition;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceDefinitionService;
 
 import java.util.List;
@@ -28,12 +28,12 @@ public class CustomResourceDefinitionApi {
     private CustomResourceDefinitionService service;
 
     @GetMapping
-    public List<CustomResourceDefinitionPOJO> findAll() {
+    public List<IdAwareCustomResourceDefinition> findAll() {
         return service.findAll();
     }
 
     @GetMapping("/{id}")
-    public CustomResourceDefinitionPOJO findById(@PathVariable String id) {
+    public IdAwareCustomResourceDefinition findById(@PathVariable String id) {
         return service.findById(id);
     }
 
