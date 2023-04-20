@@ -32,15 +32,34 @@ public class CustomResourceSchemaService {
         this.schemaToDTOConverter = new SchemaToDTOConverter();
     }
 
+    public Optional<CustomResourceSchema> fetchById(String id) {
+        return customResourceSchemaRepository.findById(id);
+    }
+
+    public Optional<CustomResourceSchema> fetchByCrdIdAndVersion(String crdId, String version) {
+        return customResourceSchemaRepository.findByCrdIdAndVersion(crdId, version);
+    }
+
+    public String fetchStoredVersion(String crdId) {
+        CustomResourceDefinition crd = client.apiextensions().v1().customResourceDefinitions().withName(crdId).get();
+        if(crd == null) {
+            throw new NoSuchElementException("No CRD with this ID");
+        }
+        String storedVersion = null;
+        for (CustomResourceDefinitionVersion version : crd.getSpec().getVersions()) {
+            if (version.getStorage()) {
+                storedVersion = version.getName();
+                break;
+            }
+        }
+        return storedVersion;
+    }
+
     public List<CustomResourceSchemaDTO> findAll() {
         return customResourceSchemaRepository.findAll()
                 .stream()
                 .map(schema -> schemaToDTOConverter.convert(schema))
                 .collect(Collectors.toList());
-    }
-
-    public Optional<CustomResourceSchema> fetchById(String id) {
-        return customResourceSchemaRepository.findById(id);
     }
 
     public CustomResourceSchemaDTO findById(String id) {
@@ -49,10 +68,6 @@ public class CustomResourceSchemaService {
             throw new NoSuchElementException("No schema with this ID");
         }
         return schemaToDTOConverter.convert(result.get());
-    }
-
-    public Optional<CustomResourceSchema> fetchByCrdIdAndVersion(String crdId, String version) {
-        return customResourceSchemaRepository.findByCrdIdAndVersion(crdId, version);
     }
 
     public CustomResourceSchemaDTO findByCrdIdAndVersion(String crdId, String version) {
@@ -71,15 +86,7 @@ public class CustomResourceSchemaService {
     }
 
     public CustomResourceSchemaDTO findLatest(String crdId) {
-        CustomResourceDefinition crd = client.apiextensions().v1().customResourceDefinitions().withName(crdId).get();
-        String servedVersion = null;
-        for (CustomResourceDefinitionVersion version : crd.getSpec().getVersions()) {
-            if (version.getServed()) {
-                servedVersion = version.getName();
-                break;
-            }
-        }
-        return findByCrdIdAndVersion(crdId, servedVersion);
+        return findByCrdIdAndVersion(crdId, fetchStoredVersion(crdId));
     }
 
     public CustomResourceSchemaDTO add(@Nullable String id, CustomResourceSchemaDTO request) {
@@ -102,10 +109,7 @@ public class CustomResourceSchemaService {
             throw new NoSuchElementException("No schema with this ID");
         }
         CustomResourceSchema schema = dtoToSchemaConverter.convert(request);
-        // TODO
-        // Consentire solo modifica di schema? O anche di crdId e version (che però dovrebbero essere una chiave univoca?
-        // Se consentiamo solo la modifica dello schema, creare un metodo pubic in EntityDTOConverter per conversione JsonNode->Map?
-        // Fare classe a parte per questa conversione (per non mescolare DTO<->Entity)? Package a parte per non mescolare converter DB?
+        // TODO Consentire solo modifica di schema? O anche di crdId e version (che però dovrebbero essere una chiave univoca?
         schema.setId(id);
         return schemaToDTOConverter.convert(customResourceSchemaRepository.save(schema));
     }

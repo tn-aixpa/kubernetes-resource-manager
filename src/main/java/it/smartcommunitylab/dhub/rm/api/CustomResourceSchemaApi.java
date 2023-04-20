@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(SystemKeys.API_PATH + "/crs")
 public class CustomResourceSchemaApi {
-    //TODO add calls to findByCrdId and findByCrdIdAndVersion ?
 
     @Autowired
     private CustomResourceSchemaService service;
@@ -37,6 +36,7 @@ public class CustomResourceSchemaApi {
 
     @PostMapping
     public CustomResourceSchemaDTO add(@RequestParam(required = false) String id, @RequestBody CustomResourceSchemaDTO request) {
+        //TODO se request è vuota, leggere CRD e generare il nostro schema
         return service.add(id, request);
     }
 

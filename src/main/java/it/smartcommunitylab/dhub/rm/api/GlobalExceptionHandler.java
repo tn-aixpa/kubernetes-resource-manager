@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import io.fabric8.kubernetes.client.KubernetesClientException;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ResponseBody
@@ -29,6 +31,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     String dataIntegrityViolationHandler(DataIntegrityViolationException ex) {
+        return ex.getMessage();
+    }
+
+    @ResponseBody
+    @ExceptionHandler(KubernetesClientException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    String kubernetesClientHandler(KubernetesClientException ex) {
         return ex.getMessage();
     }
 }
