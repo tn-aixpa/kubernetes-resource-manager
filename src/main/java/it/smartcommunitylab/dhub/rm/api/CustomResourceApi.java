@@ -8,6 +8,7 @@ import it.smartcommunitylab.dhub.rm.service.CustomResourceService;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,30 +36,32 @@ public class CustomResourceApi {
     private CustomResourceService service;
     @Autowired
     private CustomResourceDefinitionService crdService;
+    @Value("${namespace}")
+    private String namespace;
 
     @GetMapping
     public List<IdAwareCustomResource> findAll(@PathVariable String crdId) {
-        return service.findAll(crdId, crdService.fetchStoredVersion(crdId));
+        return service.findAll(crdId, crdService.fetchStoredVersion(crdId), namespace);
     }
 
     @GetMapping("/{id}")
     public IdAwareCustomResource findById(@PathVariable String crdId, @PathVariable String id) {
-        return service.findById(crdId, id, crdService.fetchStoredVersion(crdId));
+        return service.findById(crdId, id, crdService.fetchStoredVersion(crdId), namespace);
     }
 
     @PostMapping
     public IdAwareCustomResource add(@PathVariable String crdId, @RequestBody GenericKubernetesResource request) {
         //TODO per usare IdAwareCustomResource come RequestBody serve clonarlo in GenericKubernetesResource nel service, altrimenti il client cerca l'endpoint /IdAwareCustomResource
-        return service.add(crdId, request, crdService.fetchStoredVersion(crdId));
+        return service.add(crdId, request, crdService.fetchStoredVersion(crdId), namespace);
     }
 
     @PutMapping("/{id}")
     public IdAwareCustomResource update(@PathVariable String crdId, @PathVariable String id, @RequestBody GenericKubernetesResource request) {
-        return service.update(crdId, id, request, crdService.fetchStoredVersion(crdId));
+        return service.update(crdId, id, request, crdService.fetchStoredVersion(crdId), namespace);
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable String crdId, @PathVariable String id) {
-        service.delete(crdId, id, crdService.fetchStoredVersion(crdId));
+        service.delete(crdId, id, crdService.fetchStoredVersion(crdId), namespace);
     }
 }
