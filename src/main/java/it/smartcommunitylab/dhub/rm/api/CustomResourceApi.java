@@ -2,7 +2,7 @@ package it.smartcommunitylab.dhub.rm.api;
 
 import it.smartcommunitylab.dhub.rm.SystemKeys;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResource;
-import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
+import it.smartcommunitylab.dhub.rm.service.CustomResourceDefinitionService;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceService;
 
 import java.util.List;
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 
+//TODO usare regex per le path variables? (es. {crdId:" + SystemKeys.REGEX_CRD_ID + "}"), NOTA: producono 404 se non matched
 @RestController
 @RequestMapping(SystemKeys.API_PATH + "/cr/{crdId}")
 public class CustomResourceApi {
@@ -33,32 +34,31 @@ public class CustomResourceApi {
     @Autowired
     private CustomResourceService service;
     @Autowired
-    private CustomResourceSchemaService schemaService;
+    private CustomResourceDefinitionService crdService;
 
     @GetMapping
     public List<IdAwareCustomResource> findAll(@PathVariable String crdId) {
-        //TODO verificare se fetchStoredVersion deve essere dichiarato in una classe a parte o se chiamarlo direttamente nel service
-        return service.findAll(crdId, schemaService.fetchStoredVersion(crdId));
+        return service.findAll(crdId, crdService.fetchStoredVersion(crdId));
     }
 
     @GetMapping("/{id}")
     public IdAwareCustomResource findById(@PathVariable String crdId, @PathVariable String id) {
-        return service.findById(crdId, id, schemaService.fetchStoredVersion(crdId));
+        return service.findById(crdId, id, crdService.fetchStoredVersion(crdId));
     }
 
     @PostMapping
     public IdAwareCustomResource add(@PathVariable String crdId, @RequestBody GenericKubernetesResource request) {
-        //TODO using IdAwareCustomResource as RequestBody gives error
-        return service.add(crdId, request, schemaService.fetchStoredVersion(crdId));
+        //TODO per usare IdAwareCustomResource come RequestBody serve clonarlo in GenericKubernetesResource nel service, altrimenti il client cerca l'endpoint /IdAwareCustomResource
+        return service.add(crdId, request, crdService.fetchStoredVersion(crdId));
     }
 
     @PutMapping("/{id}")
     public IdAwareCustomResource update(@PathVariable String crdId, @PathVariable String id, @RequestBody GenericKubernetesResource request) {
-        return service.update(crdId, id, request, schemaService.fetchStoredVersion(crdId));
+        return service.update(crdId, id, request, crdService.fetchStoredVersion(crdId));
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable String crdId, @PathVariable String id) {
-        service.delete(crdId, id, schemaService.fetchStoredVersion(crdId));
+        service.delete(crdId, id, crdService.fetchStoredVersion(crdId));
     }
 }

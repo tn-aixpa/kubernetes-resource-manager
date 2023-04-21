@@ -8,9 +8,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinition;
-import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinitionVersion;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import it.smartcommunitylab.dhub.rm.converter.DTOToSchemaConverter;
 import it.smartcommunitylab.dhub.rm.converter.SchemaToDTOConverter;
 import it.smartcommunitylab.dhub.rm.model.CustomResourceSchema;
@@ -21,13 +18,11 @@ import jakarta.annotation.Nullable;
 @Service
 public class CustomResourceSchemaService {
     private final CustomResourceSchemaRepository customResourceSchemaRepository;
-    private final KubernetesClient client;
     private final DTOToSchemaConverter dtoToSchemaConverter;
     private final SchemaToDTOConverter schemaToDTOConverter;
 
-    public CustomResourceSchemaService(CustomResourceSchemaRepository customResourceSchemaRepository, KubernetesClient client) {
+    public CustomResourceSchemaService(CustomResourceSchemaRepository customResourceSchemaRepository) {
         this.customResourceSchemaRepository = customResourceSchemaRepository;
-        this.client = client;
         this.dtoToSchemaConverter = new DTOToSchemaConverter();
         this.schemaToDTOConverter = new SchemaToDTOConverter();
     }
@@ -38,21 +33,6 @@ public class CustomResourceSchemaService {
 
     public Optional<CustomResourceSchema> fetchByCrdIdAndVersion(String crdId, String version) {
         return customResourceSchemaRepository.findByCrdIdAndVersion(crdId, version);
-    }
-
-    public String fetchStoredVersion(String crdId) {
-        CustomResourceDefinition crd = client.apiextensions().v1().customResourceDefinitions().withName(crdId).get();
-        if(crd == null) {
-            throw new NoSuchElementException("No CRD with this ID");
-        }
-        String storedVersion = null;
-        for (CustomResourceDefinitionVersion version : crd.getSpec().getVersions()) {
-            if (version.getStorage()) {
-                storedVersion = version.getName();
-                break;
-            }
-        }
-        return storedVersion;
     }
 
     public List<CustomResourceSchemaDTO> findAll() {
@@ -85,10 +65,6 @@ public class CustomResourceSchemaService {
                 .collect(Collectors.toList());
     }
 
-    public CustomResourceSchemaDTO findLatest(String crdId) {
-        return findByCrdIdAndVersion(crdId, fetchStoredVersion(crdId));
-    }
-
     public CustomResourceSchemaDTO add(@Nullable String id, CustomResourceSchemaDTO request) {
         CustomResourceSchema result = dtoToSchemaConverter.convert(request);
         if(id != null) {
@@ -108,10 +84,10 @@ public class CustomResourceSchemaService {
         if (!result.isPresent()) {
             throw new NoSuchElementException("No schema with this ID");
         }
-        CustomResourceSchema schema = dtoToSchemaConverter.convert(request);
-        // TODO Consentire solo modifica di schema? O anche di crdId e version (che però dovrebbero essere una chiave univoca?
-        schema.setId(id);
-        return schemaToDTOConverter.convert(customResourceSchemaRepository.save(schema));
+        CustomResourceSchema currentSchema = result.get();
+        CustomResourceSchema newSchema = dtoToSchemaConverter.convert(request);
+        currentSchema.setSchema(newSchema.getSchema());
+        return schemaToDTOConverter.convert(customResourceSchemaRepository.save(currentSchema));
     }
 
     public void delete(String id) {

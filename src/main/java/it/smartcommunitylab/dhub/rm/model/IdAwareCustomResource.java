@@ -1,12 +1,17 @@
 package it.smartcommunitylab.dhub.rm.model;
 
+import org.springframework.util.Assert;
+
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 
 public class IdAwareCustomResource extends GenericKubernetesResource {
-    String id;
+    //TODO annotare come required con regex
+    private String id;
+
+    protected IdAwareCustomResource(){}
 
     public IdAwareCustomResource(GenericKubernetesResource cr) {
-        super();
+        Assert.notNull(cr, "CR is required");
         this.setApiVersion(cr.getApiVersion());
         this.setKind(cr.getKind());
         this.setMetadata(cr.getMetadata());

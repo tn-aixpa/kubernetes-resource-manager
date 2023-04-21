@@ -43,6 +43,6 @@ public class CustomResourceDefinitionApi {
 
     @GetMapping("/{id}/schema")
     public CustomResourceSchemaDTO findSchemaForId(@PathVariable String id) {
-        return schemaService.findLatest(id);
+        return schemaService.findByCrdIdAndVersion(id, service.fetchStoredVersion(id));
     }
 }
