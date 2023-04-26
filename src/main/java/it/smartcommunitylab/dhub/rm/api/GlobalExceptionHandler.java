@@ -38,6 +38,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(KubernetesClientException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     String kubernetesClientHandler(KubernetesClientException ex) {
-        return ex.getMessage();
+        System.out.println("Exception code: " + ex.getCode());
+        System.out.println("Exception message: " + ex.getMessage());
+        System.out.println("Exception status message: " + ex.getStatus().getMessage());
+        return ex.getStatus().getMessage();
     }
 }

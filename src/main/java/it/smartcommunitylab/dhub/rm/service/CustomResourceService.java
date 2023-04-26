@@ -2,17 +2,30 @@ package it.smartcommunitylab.dhub.rm.service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.networknt.schema.JsonSchema;
+import com.networknt.schema.JsonSchemaFactory;
+import com.networknt.schema.SpecVersionDetector;
+import com.networknt.schema.ValidationMessage;
 
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.GenericKubernetesResourceList;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.NamespaceableResource;
 import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
+import it.smartcommunitylab.dhub.rm.model.CustomResourceSchema;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResource;
+
+//TODO in ogni metodo, prima di chiamare il client, verificare che sia richiesta una CRD che gestiamo, aka di cui abbiamo uno schema
+//TODO per ogni operazione di scrittura incluso delete, verificare per prima cosa la consistenza
 
 @Service
 public class CustomResourceService {
@@ -63,27 +76,67 @@ public class CustomResourceService {
         CustomResourceDefinitionContext context = createCrdContext(crdId, version);
         NamespaceableResource<GenericKubernetesResource> cr = fetchCustomResource(context, id, namespace);
         if(cr == null) {
-            throw new NoSuchElementException("No CR with this ID");
+            throw new NoSuchElementException("No CR with this ID, CRD ID and version");
         }
         return new IdAwareCustomResource(cr.get());
     }
 
-    public IdAwareCustomResource add(String crdId, GenericKubernetesResource request, String version, String namespace) {
+    public Set<ValidationMessage> validateCR(CustomResourceSchema schema, GenericKubernetesResource cr){
+        //1. get CR spec as JsonNode
+        JsonNode crAdditionalProps = cr.getAdditionalPropertiesNode();
+        System.out.println("crSpec: " + crAdditionalProps);
+
+        //2. get schema as JsonSchema
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode schemaNode = mapper.valueToTree(schema.getSchema());
+        JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersionDetector.detect(schemaNode));
+        JsonSchema jsonSchema = factory.getSchema(schemaNode);
+        System.out.println("jsonSchema: " + jsonSchema);
+        return jsonSchema.validate(crAdditionalProps);
+    }
+
+    public IdAwareCustomResource add(String crdId, IdAwareCustomResource request, String version, String namespace, Optional<CustomResourceSchema> schema) {
         // GenericKubernetesResource cr = new GenericKubernetesResource();
         // cr.setApiVersion(request.getApiVersion());
         // cr.setKind(request.getKind());
         // cr.setMetadata(request.getMetadata());
         // cr.setAdditionalProperties(request.getAdditionalProperties());
         // return new IdAwareCustomResource(client.resource(cr).create());
-        //TODO implement validation
-        return new IdAwareCustomResource(client.resource(request).inNamespace(namespace).create());
+
+        //schema validation
+        if (!schema.isPresent()) {
+            throw new NoSuchElementException("No schema found for this CRD and version");
+        }
+
+        Set<ValidationMessage> errors = validateCR(schema.get(), request.getCr());
+
+        if (!errors.isEmpty()) {
+            System.out.println(errors);
+            throw new IllegalArgumentException("CR spec does not match the corresponding schema");
+        }
+
+        return new IdAwareCustomResource(client.resource(request.getCr()).inNamespace(namespace).create());
     }
 
-    public IdAwareCustomResource update(String crdId, String id, GenericKubernetesResource request, String version, String namespace) {
+    public IdAwareCustomResource update(String crdId, String id, IdAwareCustomResource request, String version, String namespace, Optional<CustomResourceSchema> schema) {
         CustomResourceDefinitionContext context = createCrdContext(crdId, version);
-        GenericKubernetesResource cr = fetchCustomResource(context, id, namespace).get();
-        return new IdAwareCustomResource(client.resource(cr).edit(object -> {
-            object.setAdditionalProperties(request.getAdditionalProperties());
+        NamespaceableResource<GenericKubernetesResource> cr = fetchCustomResource(context, id, namespace);
+        if(cr == null) {
+            throw new NoSuchElementException("No CR with this ID, CRD ID and version");
+        }
+        
+        //schema validation
+        if (!schema.isPresent()) {
+            throw new NoSuchElementException("No schema found for this CRD and version");
+        }
+        Set<ValidationMessage> errors = validateCR(schema.get(), request.getCr());
+        if (!errors.isEmpty()) {
+            System.out.println(errors);
+            throw new IllegalArgumentException("CR spec does not match the corresponding schema");
+        }
+
+        return new IdAwareCustomResource(client.resource(cr.get()).edit(object -> {
+            object.setAdditionalProperties(request.getCr().getAdditionalProperties());
             System.out.println(object.getAdditionalPropertiesNode());
             return object;
         }));

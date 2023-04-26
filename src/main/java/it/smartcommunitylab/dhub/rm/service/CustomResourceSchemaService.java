@@ -15,6 +15,8 @@ import it.smartcommunitylab.dhub.rm.model.dto.CustomResourceSchemaDTO;
 import it.smartcommunitylab.dhub.rm.repository.CustomResourceSchemaRepository;
 import jakarta.annotation.Nullable;
 
+//TODO per ogni operazione di scrittura tranne delete, verificare per prima cosa la consistenza (che crdId+versione esistano in Kubernetes)
+
 @Service
 public class CustomResourceSchemaService {
     private final CustomResourceSchemaRepository customResourceSchemaRepository;

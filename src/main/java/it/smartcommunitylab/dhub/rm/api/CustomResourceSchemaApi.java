@@ -3,10 +3,12 @@ package it.smartcommunitylab.dhub.rm.api;
 import it.smartcommunitylab.dhub.rm.SystemKeys;
 import it.smartcommunitylab.dhub.rm.model.dto.CustomResourceSchemaDTO;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
+import jakarta.validation.constraints.Pattern;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(SystemKeys.API_PATH + "/crs")
+@Validated
 public class CustomResourceSchemaApi {
 
     @Autowired
@@ -30,7 +33,7 @@ public class CustomResourceSchemaApi {
     }
 
     @GetMapping("/{id}")
-    public CustomResourceSchemaDTO findById(@PathVariable String id) {
+    public CustomResourceSchemaDTO findById(@PathVariable @Pattern(regexp = SystemKeys.REGEX_SCHEMA_ID) String id) {
         return service.findById(id);
     }
 
@@ -41,12 +44,12 @@ public class CustomResourceSchemaApi {
     }
 
     @PutMapping("/{id}")
-    public CustomResourceSchemaDTO update(@PathVariable String id, @RequestBody CustomResourceSchemaDTO request) {
+    public CustomResourceSchemaDTO update(@PathVariable @Pattern(regexp = SystemKeys.REGEX_SCHEMA_ID) String id, @RequestBody CustomResourceSchemaDTO request) {
         return service.update(id, request);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable String id) {
+    public void delete(@PathVariable @Pattern(regexp = SystemKeys.REGEX_SCHEMA_ID) String id) {
         service.delete(id);
     }
 }

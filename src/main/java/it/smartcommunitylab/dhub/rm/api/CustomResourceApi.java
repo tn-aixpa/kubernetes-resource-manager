@@ -3,12 +3,15 @@ package it.smartcommunitylab.dhub.rm.api;
 import it.smartcommunitylab.dhub.rm.SystemKeys;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResource;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceDefinitionService;
+import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceService;
+import jakarta.validation.constraints.Pattern;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,11 +21,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
-
-//TODO usare regex per le path variables? (es. {crdId:" + SystemKeys.REGEX_CRD_ID + "}"), NOTA: producono 404 se non matched
 @RestController
-@RequestMapping(SystemKeys.API_PATH + "/cr/{crdId}")
+@RequestMapping(SystemKeys.API_PATH + "/cr")
+@Validated
 public class CustomResourceApi {
     /*
     GET /cr/{crdId} => list / search + pagination (come query param)
@@ -36,32 +37,44 @@ public class CustomResourceApi {
     private CustomResourceService service;
     @Autowired
     private CustomResourceDefinitionService crdService;
+    @Autowired
+    private CustomResourceSchemaService schemaService;
     @Value("${namespace}")
     private String namespace;
 
-    @GetMapping
-    public List<IdAwareCustomResource> findAll(@PathVariable String crdId) {
+    @GetMapping("/{crdId}")
+    public List<IdAwareCustomResource> findAll(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CRD_ID) String crdId) {
         return service.findAll(crdId, crdService.fetchStoredVersion(crdId), namespace);
     }
 
-    @GetMapping("/{id}")
-    public IdAwareCustomResource findById(@PathVariable String crdId, @PathVariable String id) {
+    @GetMapping("/{crdId}/{id}")
+    public IdAwareCustomResource findById(
+            @PathVariable @Pattern(regexp = SystemKeys.REGEX_CRD_ID) String crdId,
+            @PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String id) {
         return service.findById(crdId, id, crdService.fetchStoredVersion(crdId), namespace);
     }
 
-    @PostMapping
-    public IdAwareCustomResource add(@PathVariable String crdId, @RequestBody GenericKubernetesResource request) {
-        //TODO per usare IdAwareCustomResource come RequestBody serve clonarlo in GenericKubernetesResource nel service, altrimenti il client cerca l'endpoint /IdAwareCustomResource
-        return service.add(crdId, request, crdService.fetchStoredVersion(crdId), namespace);
+    @PostMapping("/{crdId}")
+    public IdAwareCustomResource add(
+            @PathVariable @Pattern(regexp = SystemKeys.REGEX_CRD_ID) String crdId,
+            @RequestBody IdAwareCustomResource request) {
+        String version = crdService.fetchStoredVersion(crdId);
+        return service.add(crdId, request, version, namespace, schemaService.fetchByCrdIdAndVersion(crdId, version));
     }
 
-    @PutMapping("/{id}")
-    public IdAwareCustomResource update(@PathVariable String crdId, @PathVariable String id, @RequestBody GenericKubernetesResource request) {
-        return service.update(crdId, id, request, crdService.fetchStoredVersion(crdId), namespace);
+    @PutMapping("/{crdId}/{id}")
+    public IdAwareCustomResource update(
+            @PathVariable @Pattern(regexp = SystemKeys.REGEX_CRD_ID) String crdId,
+            @PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String id,
+            @RequestBody IdAwareCustomResource request) {
+        String version = crdService.fetchStoredVersion(crdId);
+        return service.update(crdId, id, request, version, namespace, schemaService.fetchByCrdIdAndVersion(crdId, version));
     }
 
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable String crdId, @PathVariable String id) {
+    @DeleteMapping("/{crdId}/{id}")
+    public void delete(
+            @PathVariable @Pattern(regexp = SystemKeys.REGEX_CRD_ID) String crdId,
+            @PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String id) {
         service.delete(crdId, id, crdService.fetchStoredVersion(crdId), namespace);
     }
 }

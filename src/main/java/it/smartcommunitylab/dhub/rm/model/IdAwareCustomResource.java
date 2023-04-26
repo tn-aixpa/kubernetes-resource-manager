@@ -2,21 +2,21 @@ package it.smartcommunitylab.dhub.rm.model;
 
 import org.springframework.util.Assert;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 
-public class IdAwareCustomResource extends GenericKubernetesResource {
-    //TODO annotare come required con regex
+public class IdAwareCustomResource {
     private String id;
+    @JsonUnwrapped
+    private GenericKubernetesResource cr;
 
     protected IdAwareCustomResource(){}
 
     public IdAwareCustomResource(GenericKubernetesResource cr) {
         Assert.notNull(cr, "CR is required");
-        this.setApiVersion(cr.getApiVersion());
-        this.setKind(cr.getKind());
-        this.setMetadata(cr.getMetadata());
-        this.setAdditionalProperties(cr.getAdditionalProperties());
         this.id = cr.getMetadata().getName();
+        this.cr = cr;
     }
 
     public String getId() {
@@ -26,4 +26,14 @@ public class IdAwareCustomResource extends GenericKubernetesResource {
     public void setId(String id) {
         this.id = id;
     }
+
+    public GenericKubernetesResource getCr() {
+        return cr;
+    }
+
+    public void setCr(GenericKubernetesResource cr) {
+        this.cr = cr;
+    }
+
+    
 }
