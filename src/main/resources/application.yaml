@@ -18,5 +18,7 @@ namespace: default
 kubernetes:
   config: /Users/erica/.kube/config
   crd:
-    allowed: []
-    denied: []
+    allowed: >
+      myplatforms.contoso.com
+    denied: >
+      foo

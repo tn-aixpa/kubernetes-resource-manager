@@ -2,8 +2,6 @@ package it.smartcommunitylab.dhub.rm.api;
 
 import it.smartcommunitylab.dhub.rm.SystemKeys;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResource;
-import it.smartcommunitylab.dhub.rm.service.CustomResourceDefinitionService;
-import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceService;
 import jakarta.validation.constraints.Pattern;
 
@@ -35,31 +33,26 @@ public class CustomResourceApi {
 
     @Autowired
     private CustomResourceService service;
-    @Autowired
-    private CustomResourceDefinitionService crdService;
-    @Autowired
-    private CustomResourceSchemaService schemaService;
     @Value("${namespace}")
     private String namespace;
 
     @GetMapping("/{crdId}")
     public List<IdAwareCustomResource> findAll(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CRD_ID) String crdId) {
-        return service.findAll(crdId, crdService.fetchStoredVersion(crdId), namespace);
+        return service.findAll(crdId, namespace);
     }
 
     @GetMapping("/{crdId}/{id}")
     public IdAwareCustomResource findById(
             @PathVariable @Pattern(regexp = SystemKeys.REGEX_CRD_ID) String crdId,
             @PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String id) {
-        return service.findById(crdId, id, crdService.fetchStoredVersion(crdId), namespace);
+        return service.findById(crdId, id, namespace);
     }
 
     @PostMapping("/{crdId}")
     public IdAwareCustomResource add(
             @PathVariable @Pattern(regexp = SystemKeys.REGEX_CRD_ID) String crdId,
             @RequestBody IdAwareCustomResource request) {
-        String version = crdService.fetchStoredVersion(crdId);
-        return service.add(crdId, request, version, namespace, schemaService.fetchByCrdIdAndVersion(crdId, version));
+        return service.add(crdId, request, namespace);
     }
 
     @PutMapping("/{crdId}/{id}")
@@ -67,14 +60,13 @@ public class CustomResourceApi {
             @PathVariable @Pattern(regexp = SystemKeys.REGEX_CRD_ID) String crdId,
             @PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String id,
             @RequestBody IdAwareCustomResource request) {
-        String version = crdService.fetchStoredVersion(crdId);
-        return service.update(crdId, id, request, version, namespace, schemaService.fetchByCrdIdAndVersion(crdId, version));
+        return service.update(crdId, id, request, namespace);
     }
 
     @DeleteMapping("/{crdId}/{id}")
     public void delete(
             @PathVariable @Pattern(regexp = SystemKeys.REGEX_CRD_ID) String crdId,
             @PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String id) {
-        service.delete(crdId, id, crdService.fetchStoredVersion(crdId), namespace);
+        service.delete(crdId, id, namespace);
     }
 }

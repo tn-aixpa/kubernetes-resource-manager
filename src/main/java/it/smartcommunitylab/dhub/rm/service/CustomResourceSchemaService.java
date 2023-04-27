@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import it.smartcommunitylab.dhub.rm.converter.DTOToSchemaConverter;
@@ -15,21 +16,21 @@ import it.smartcommunitylab.dhub.rm.model.dto.CustomResourceSchemaDTO;
 import it.smartcommunitylab.dhub.rm.repository.CustomResourceSchemaRepository;
 import jakarta.annotation.Nullable;
 
-//TODO per ogni operazione di scrittura tranne delete, verificare per prima cosa la consistenza (che crdId+versione esistano in Kubernetes)
-
 @Service
 public class CustomResourceSchemaService {
     private final CustomResourceSchemaRepository customResourceSchemaRepository;
     private final DTOToSchemaConverter dtoToSchemaConverter;
     private final SchemaToDTOConverter schemaToDTOConverter;
+    private final CustomResourceDefinitionService crdService;
 
-    public CustomResourceSchemaService(CustomResourceSchemaRepository customResourceSchemaRepository) {
+    public CustomResourceSchemaService(CustomResourceSchemaRepository customResourceSchemaRepository, CustomResourceDefinitionService crdService) {
         this.customResourceSchemaRepository = customResourceSchemaRepository;
         this.dtoToSchemaConverter = new DTOToSchemaConverter();
         this.schemaToDTOConverter = new SchemaToDTOConverter();
+        this.crdService = crdService;
     }
 
-    public Optional<CustomResourceSchema> fetchById(String id) {
+    private Optional<CustomResourceSchema> fetchById(String id) {
         return customResourceSchemaRepository.findById(id);
     }
 
@@ -60,14 +61,18 @@ public class CustomResourceSchemaService {
         return schemaToDTOConverter.convert(result.get());
     }
 
-    public List<CustomResourceSchemaDTO> findByCrdId(String crdId) {
-        return customResourceSchemaRepository.findByCrdId(crdId)
-                .stream()
-                .map(schema -> schemaToDTOConverter.convert(schema))
-                .collect(Collectors.toList());
-    }
+    // public List<CustomResourceSchemaDTO> findByCrdId(String crdId) {
+    //     return customResourceSchemaRepository.findByCrdId(crdId)
+    //             .stream()
+    //             .map(schema -> schemaToDTOConverter.convert(schema))
+    //             .collect(Collectors.toList());
+    // }
 
     public CustomResourceSchemaDTO add(@Nullable String id, CustomResourceSchemaDTO request) {
+        if(!crdService.isCrdAllowed(request.getCrdId())) {
+            throw new AccessDeniedException("Access to this CRD is not allowed");
+        }
+
         CustomResourceSchema result = dtoToSchemaConverter.convert(request);
         if(id != null) {
             if (fetchById(id).isPresent()) {
@@ -76,6 +81,14 @@ public class CustomResourceSchemaService {
             result.setId(id);
         } else {
             result.setId(UUID.randomUUID().toString());
+        }
+
+        if(!crdService.crdExists(request.getCrdId(), request.getVersion())) {
+            throw new IllegalArgumentException("No such CRD exists in Kubernetes");
+        }
+
+        if(result.getSchema() == null || result.getSchema().isEmpty()) {
+            result.setSchema(crdService.getCrdSchema(result.getCrdId()));
         }
         
         return schemaToDTOConverter.convert(customResourceSchemaRepository.save(result));
@@ -87,8 +100,18 @@ public class CustomResourceSchemaService {
             throw new NoSuchElementException("No schema with this ID");
         }
         CustomResourceSchema currentSchema = result.get();
+
+        if(!crdService.crdExists(currentSchema.getCrdId(), currentSchema.getVersion())) {
+            throw new IllegalArgumentException("No such CRD exists in Kubernetes");
+        }
+
         CustomResourceSchema newSchema = dtoToSchemaConverter.convert(request);
         currentSchema.setSchema(newSchema.getSchema());
+
+        if(currentSchema.getSchema() == null || currentSchema.getSchema().isEmpty()) {
+            currentSchema.setSchema(crdService.getCrdSchema(currentSchema.getCrdId()));
+        }
+
         return schemaToDTOConverter.convert(customResourceSchemaRepository.save(currentSchema));
     }
 

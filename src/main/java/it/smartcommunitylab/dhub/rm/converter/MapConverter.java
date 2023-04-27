@@ -10,6 +10,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
 
+import it.smartcommunitylab.dhub.rm.exception.ParsingException;
+
 public class MapConverter implements AttributeConverter<Map<String, Serializable>, String> {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -28,6 +30,7 @@ public class MapConverter implements AttributeConverter<Map<String, Serializable
             try {
                 json = objectMapper.writeValueAsString(map);
             } catch (final JsonProcessingException e) {
+                throw new ParsingException("Parsing failed: " + e.getMessage());
             }
         }
         
@@ -42,6 +45,7 @@ public class MapConverter implements AttributeConverter<Map<String, Serializable
             try {
                 map = objectMapper.readValue(json, typeRef);
             } catch (final IOException e) {
+                throw new ParsingException("Parsing failed: " + e.getMessage());
             }
 
         }

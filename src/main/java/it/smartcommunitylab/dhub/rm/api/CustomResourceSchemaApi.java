@@ -39,7 +39,6 @@ public class CustomResourceSchemaApi {
 
     @PostMapping
     public CustomResourceSchemaDTO add(@RequestParam(required = false) String id, @RequestBody CustomResourceSchemaDTO request) {
-        //TODO se request è vuota, leggere CRD e generare il nostro schema
         return service.add(id, request);
     }
 

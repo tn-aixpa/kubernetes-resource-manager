@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -24,19 +25,29 @@ import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
 import it.smartcommunitylab.dhub.rm.model.CustomResourceSchema;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResource;
 
-//TODO in ogni metodo, prima di chiamare il client, verificare che sia richiesta una CRD che gestiamo, aka di cui abbiamo uno schema
-//TODO per ogni operazione di scrittura incluso delete, verificare per prima cosa la consistenza
-
 @Service
 public class CustomResourceService {
     private final KubernetesClient client;
+    private final CustomResourceDefinitionService crdService;
+    private final CustomResourceSchemaService schemaService;
 
-    public CustomResourceService(KubernetesClient client) {
+    public CustomResourceService(KubernetesClient client, CustomResourceDefinitionService crdService, CustomResourceSchemaService schemaService) {
         Assert.notNull(client, "Client required");
         this.client = client;
+        this.crdService = crdService;
+        this.schemaService = schemaService;
     }
 
-    public CustomResourceDefinitionContext createCrdContext(String crdId, String version) {
+    private CustomResourceSchema checkSchema(String crdId, String version) {
+        Optional<CustomResourceSchema> schema = schemaService.fetchByCrdIdAndVersion(crdId, version);
+
+        if (!schema.isPresent()) {
+            throw new NoSuchElementException("No schema found for this CRD and version");
+        }
+        return schema.get();
+    }
+
+    private CustomResourceDefinitionContext createCrdContext(String crdId, String version) {
         String[] crdMeta = crdId.split("\\.", 2);
         String plural = crdMeta[0];
         String group = crdMeta[1];
@@ -52,7 +63,7 @@ public class CustomResourceService {
         return context;
     }
 
-    public NamespaceableResource<GenericKubernetesResource> fetchCustomResource(CustomResourceDefinitionContext context, String id, String namespace) {
+    private NamespaceableResource<GenericKubernetesResource> fetchCustomResource(CustomResourceDefinitionContext context, String id, String namespace) {
         GenericKubernetesResourceList customResourceObjectList = client.genericKubernetesResources(context).inNamespace(namespace).list();
         for (GenericKubernetesResource cr : customResourceObjectList.getItems()) {
             if (cr.getMetadata().getName().equals(id)) {
@@ -62,7 +73,26 @@ public class CustomResourceService {
         return null;
     }
 
-    public List<IdAwareCustomResource> findAll(String crdId, String version, String namespace) {
+    private Set<ValidationMessage> validateCR(CustomResourceSchema schema, GenericKubernetesResource cr){
+        //1. get CR spec as JsonNode
+        JsonNode crAdditionalProps = cr.getAdditionalPropertiesNode();
+
+        //2. get schema as JsonSchema
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode schemaNode = mapper.valueToTree(schema.getSchema());
+        JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersionDetector.detect(schemaNode));
+        JsonSchema jsonSchema = factory.getSchema(schemaNode);
+        return jsonSchema.validate(crAdditionalProps);
+    }
+
+    public List<IdAwareCustomResource> findAll(String crdId, String namespace) {
+        if(!crdService.isCrdAllowed(crdId)) {
+            throw new AccessDeniedException("Access to this CRD is not allowed");
+        }
+
+        String version = crdService.fetchStoredVersionName(crdId);
+        checkSchema(crdId, version);
+
         CustomResourceDefinitionContext context = createCrdContext(crdId, version);
         GenericKubernetesResourceList list = client.genericKubernetesResources(context).inNamespace(namespace).list();
 
@@ -72,7 +102,14 @@ public class CustomResourceService {
             .collect(Collectors.toList());
     }
 
-    public IdAwareCustomResource findById(String crdId, String id, String version, String namespace) {
+    public IdAwareCustomResource findById(String crdId, String id, String namespace) {
+        if(!crdService.isCrdAllowed(crdId)) {
+            throw new AccessDeniedException("Access to this CRD is not allowed");
+        }
+
+        String version = crdService.fetchStoredVersionName(crdId);
+        checkSchema(crdId, version);
+
         CustomResourceDefinitionContext context = createCrdContext(crdId, version);
         NamespaceableResource<GenericKubernetesResource> cr = fetchCustomResource(context, id, namespace);
         if(cr == null) {
@@ -81,34 +118,17 @@ public class CustomResourceService {
         return new IdAwareCustomResource(cr.get());
     }
 
-    public Set<ValidationMessage> validateCR(CustomResourceSchema schema, GenericKubernetesResource cr){
-        //1. get CR spec as JsonNode
-        JsonNode crAdditionalProps = cr.getAdditionalPropertiesNode();
-        System.out.println("crSpec: " + crAdditionalProps);
-
-        //2. get schema as JsonSchema
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode schemaNode = mapper.valueToTree(schema.getSchema());
-        JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersionDetector.detect(schemaNode));
-        JsonSchema jsonSchema = factory.getSchema(schemaNode);
-        System.out.println("jsonSchema: " + jsonSchema);
-        return jsonSchema.validate(crAdditionalProps);
-    }
-
-    public IdAwareCustomResource add(String crdId, IdAwareCustomResource request, String version, String namespace, Optional<CustomResourceSchema> schema) {
-        // GenericKubernetesResource cr = new GenericKubernetesResource();
-        // cr.setApiVersion(request.getApiVersion());
-        // cr.setKind(request.getKind());
-        // cr.setMetadata(request.getMetadata());
-        // cr.setAdditionalProperties(request.getAdditionalProperties());
-        // return new IdAwareCustomResource(client.resource(cr).create());
-
-        //schema validation
-        if (!schema.isPresent()) {
-            throw new NoSuchElementException("No schema found for this CRD and version");
+    public IdAwareCustomResource add(String crdId, IdAwareCustomResource request, String namespace) {
+        if(!crdService.isCrdAllowed(crdId)) {
+            throw new AccessDeniedException("Access to this CRD is not allowed");
         }
 
-        Set<ValidationMessage> errors = validateCR(schema.get(), request.getCr());
+        //if version and schema are not found, these CRD and version do not exist in Kubernetes and an error is thrown
+        String version = crdService.fetchStoredVersionName(crdId);
+        CustomResourceSchema schema = checkSchema(crdId, version);
+
+        //schema validation
+        Set<ValidationMessage> errors = validateCR(schema, request.getCr());
 
         if (!errors.isEmpty()) {
             System.out.println(errors);
@@ -118,7 +138,15 @@ public class CustomResourceService {
         return new IdAwareCustomResource(client.resource(request.getCr()).inNamespace(namespace).create());
     }
 
-    public IdAwareCustomResource update(String crdId, String id, IdAwareCustomResource request, String version, String namespace, Optional<CustomResourceSchema> schema) {
+    public IdAwareCustomResource update(String crdId, String id, IdAwareCustomResource request, String namespace) {
+        if(!crdService.isCrdAllowed(crdId)) {
+            throw new AccessDeniedException("Access to this CRD is not allowed");
+        }
+
+        //if version and schema are not found, these CRD and version do not exist in Kubernetes and an error is thrown
+        String version = crdService.fetchStoredVersionName(crdId);
+        CustomResourceSchema schema = checkSchema(crdId, version);
+
         CustomResourceDefinitionContext context = createCrdContext(crdId, version);
         NamespaceableResource<GenericKubernetesResource> cr = fetchCustomResource(context, id, namespace);
         if(cr == null) {
@@ -126,10 +154,7 @@ public class CustomResourceService {
         }
         
         //schema validation
-        if (!schema.isPresent()) {
-            throw new NoSuchElementException("No schema found for this CRD and version");
-        }
-        Set<ValidationMessage> errors = validateCR(schema.get(), request.getCr());
+        Set<ValidationMessage> errors = validateCR(schema, request.getCr());
         if (!errors.isEmpty()) {
             System.out.println(errors);
             throw new IllegalArgumentException("CR spec does not match the corresponding schema");
@@ -140,10 +165,17 @@ public class CustomResourceService {
             System.out.println(object.getAdditionalPropertiesNode());
             return object;
         }));
-        // return new IdAwareCustomResource(client.resource(cr).patch(request));
     }
 
-    public void delete(String crdId, String id, String version, String namespace) {
+    public void delete(String crdId, String id, String namespace) {
+        if(!crdService.isCrdAllowed(crdId)) {
+            throw new AccessDeniedException("Access to this CRD is not allowed");
+        }
+
+        //if version is not found, these CRD and version do not exist in Kubernetes and an error is thrown
+        String version = crdService.fetchStoredVersionName(crdId);
+        checkSchema(crdId, version);
+
         CustomResourceDefinitionContext context = createCrdContext(crdId, version);
         NamespaceableResource<GenericKubernetesResource> cr = fetchCustomResource(context, id, namespace);
         if(cr != null) {
