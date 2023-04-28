@@ -6,6 +6,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
@@ -20,8 +24,13 @@ public class SecurityConfig {
         http
             .securityMatcher(new AntPathRequestMatcher(SystemKeys.API_PATH + "/**"))
             // public access for now
-            // TODO jwt auth
-            .authorizeHttpRequests(requests -> requests.anyRequest().permitAll())
+            .oauth2ResourceServer(oauth2 -> oauth2.jwt())
+            .httpBasic()
+            .and()
+            .requestCache((requestCache) -> requestCache.disable())
+            .authorizeHttpRequests(requests -> {
+                requests.anyRequest().authenticated();
+            })
             // allow cors
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             // disable csrf
@@ -30,6 +39,16 @@ public class SecurityConfig {
             .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        UserDetails user = User.withDefaultPasswordEncoder()
+            .username("user")
+            .password("password")
+            .roles("USER")
+            .build();
+        return new InMemoryUserDetailsManager(user);
     }
 
     private CorsConfigurationSource corsConfigurationSource() {
