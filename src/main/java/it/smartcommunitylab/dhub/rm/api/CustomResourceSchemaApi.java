@@ -3,6 +3,7 @@ package it.smartcommunitylab.dhub.rm.api;
 import it.smartcommunitylab.dhub.rm.SystemKeys;
 import it.smartcommunitylab.dhub.rm.model.dto.CustomResourceSchemaDTO;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 
 import java.util.List;
@@ -38,12 +39,12 @@ public class CustomResourceSchemaApi {
     }
 
     @PostMapping
-    public CustomResourceSchemaDTO add(@RequestParam(required = false) String id, @RequestBody CustomResourceSchemaDTO request) {
+    public CustomResourceSchemaDTO add(@RequestParam(required = false) String id, @Valid @RequestBody CustomResourceSchemaDTO request) {
         return service.add(id, request);
     }
 
     @PutMapping("/{id}")
-    public CustomResourceSchemaDTO update(@PathVariable @Pattern(regexp = SystemKeys.REGEX_SCHEMA_ID) String id, @RequestBody CustomResourceSchemaDTO request) {
+    public CustomResourceSchemaDTO update(@PathVariable @Pattern(regexp = SystemKeys.REGEX_SCHEMA_ID) String id, @Valid @RequestBody CustomResourceSchemaDTO request) {
         return service.update(id, request);
     }
 

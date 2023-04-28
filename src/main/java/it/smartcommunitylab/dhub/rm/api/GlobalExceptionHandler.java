@@ -5,12 +5,14 @@ import java.util.NoSuchElementException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import io.fabric8.kubernetes.client.KubernetesClientException;
+import it.smartcommunitylab.dhub.rm.exception.ValidationException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -50,5 +52,19 @@ public class GlobalExceptionHandler {
         System.out.println("Exception message: " + ex.getMessage());
         System.out.println("Exception status message: " + ex.getStatus().getMessage());
         return ex.getStatus().getMessage();
+    }
+    
+    @ResponseBody
+    @ExceptionHandler(ValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    String validationHandler(ValidationException ex) {
+        return ex.getMessage();
+    }
+    
+    @ResponseBody
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    String methodArgumentNotValidHandler(MethodArgumentNotValidException ex) {
+        return ex.getAllErrors().toString();
     }
 }

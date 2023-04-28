@@ -39,7 +39,25 @@ public class CustomResourceDefinitionService {
         return allowedCrds.contains(crdId) || (allowedCrds.isEmpty() && !deniedCrds.contains(crdId));
     }
 
-    private CustomResourceDefinitionVersion fetchStoredVersion(String crdId) {
+    private CustomResourceDefinitionVersion fetchVersion(String crdId, String versionName) {
+        CustomResourceDefinition crd = client.apiextensions().v1().customResourceDefinitions().withName(crdId).get();
+        if(crd == null) {
+            throw new NoSuchElementException("No CRD with this ID");
+        }
+
+        Optional<CustomResourceDefinitionVersion> storedVersion = crd.getSpec().getVersions()
+                .stream()
+                .filter(version -> version.getName().equals(versionName))
+                .findAny();
+
+        if(!storedVersion.isPresent()) {
+            throw new NoSuchElementException("No version stored for this CRD");
+        }
+
+        return storedVersion.get();
+    }
+
+    public String fetchStoredVersionName(String crdId) {
         CustomResourceDefinition crd = client.apiextensions().v1().customResourceDefinitions().withName(crdId).get();
         if(crd == null) {
             throw new NoSuchElementException("No CRD with this ID");
@@ -54,15 +72,11 @@ public class CustomResourceDefinitionService {
             throw new NoSuchElementException("No version stored for this CRD");
         }
 
-        return storedVersion.get();
+        return storedVersion.get().getName();
     }
 
-    public String fetchStoredVersionName(String crdId) {
-        return fetchStoredVersion(crdId).getName();
-    }
-
-    public Map<String, Serializable> getCrdSchema(String crdId) {
-        CustomResourceDefinitionVersion version = fetchStoredVersion(crdId);
+    public Map<String, Serializable> getCrdSchema(String crdId, String versionName) {
+        CustomResourceDefinitionVersion version = fetchVersion(crdId, versionName);
         Map<String, Serializable> map = null;
 
         //convert stored CRD schema to map

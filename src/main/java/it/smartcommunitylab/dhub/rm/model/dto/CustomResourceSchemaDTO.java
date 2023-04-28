@@ -2,9 +2,13 @@ package it.smartcommunitylab.dhub.rm.model.dto;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class CustomResourceSchemaDTO {
     private String id;
+    @NotBlank
     private String crdId;
+    @NotBlank
     private String version;
     private JsonNode schema;
 

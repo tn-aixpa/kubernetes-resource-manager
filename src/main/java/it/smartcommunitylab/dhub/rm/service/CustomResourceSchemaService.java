@@ -88,7 +88,8 @@ public class CustomResourceSchemaService {
         }
 
         if(result.getSchema() == null || result.getSchema().isEmpty()) {
-            result.setSchema(crdService.getCrdSchema(result.getCrdId()));
+            //TODO al momento va aggiunto a mano il campo $schema per la validazione con la libreria
+            result.setSchema(crdService.getCrdSchema(result.getCrdId(), result.getVersion()));
         }
         
         return schemaToDTOConverter.convert(customResourceSchemaRepository.save(result));
@@ -109,7 +110,7 @@ public class CustomResourceSchemaService {
         currentSchema.setSchema(newSchema.getSchema());
 
         if(currentSchema.getSchema() == null || currentSchema.getSchema().isEmpty()) {
-            currentSchema.setSchema(crdService.getCrdSchema(currentSchema.getCrdId()));
+            currentSchema.setSchema(crdService.getCrdSchema(currentSchema.getCrdId(), currentSchema.getVersion()));
         }
 
         return schemaToDTOConverter.convert(customResourceSchemaRepository.save(currentSchema));

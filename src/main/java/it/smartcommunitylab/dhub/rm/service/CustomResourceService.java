@@ -22,6 +22,7 @@ import io.fabric8.kubernetes.api.model.GenericKubernetesResourceList;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.NamespaceableResource;
 import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
+import it.smartcommunitylab.dhub.rm.exception.ValidationException;
 import it.smartcommunitylab.dhub.rm.model.CustomResourceSchema;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResource;
 
@@ -86,6 +87,7 @@ public class CustomResourceService {
     }
 
     public List<IdAwareCustomResource> findAll(String crdId, String namespace) {
+        //TODO nel caso in cui in Kubernetes ci siano CR con versioni di cui non abbiamo lo schema, vanno filtrate dalla lista? Cosa fare con checkSchema?
         if(!crdService.isCrdAllowed(crdId)) {
             throw new AccessDeniedException("Access to this CRD is not allowed");
         }
@@ -103,6 +105,7 @@ public class CustomResourceService {
     }
 
     public IdAwareCustomResource findById(String crdId, String id, String namespace) {
+        //TODO nel caso in cui in Kubernetes ci siano CR con versioni di cui non abbiamo lo schema, vanno filtrate dalla lista? Cosa fare con checkSchema?
         if(!crdService.isCrdAllowed(crdId)) {
             throw new AccessDeniedException("Access to this CRD is not allowed");
         }
@@ -123,8 +126,8 @@ public class CustomResourceService {
             throw new AccessDeniedException("Access to this CRD is not allowed");
         }
 
-        //if version and schema are not found, these CRD and version do not exist in Kubernetes and an error is thrown
-        String version = crdService.fetchStoredVersionName(crdId);
+        //if schema is not found in the DB, an error is thrown
+        String version = request.getCr().getApiVersion().split("/")[1];
         CustomResourceSchema schema = checkSchema(crdId, version);
 
         //schema validation
@@ -132,7 +135,7 @@ public class CustomResourceService {
 
         if (!errors.isEmpty()) {
             System.out.println(errors);
-            throw new IllegalArgumentException("CR spec does not match the corresponding schema");
+            throw new ValidationException(errors);
         }
 
         return new IdAwareCustomResource(client.resource(request.getCr()).inNamespace(namespace).create());
@@ -143,8 +146,8 @@ public class CustomResourceService {
             throw new AccessDeniedException("Access to this CRD is not allowed");
         }
 
-        //if version and schema are not found, these CRD and version do not exist in Kubernetes and an error is thrown
-        String version = crdService.fetchStoredVersionName(crdId);
+        //if schema is not found in the DB, an error is thrown
+        String version = request.getCr().getApiVersion().split("/")[1];
         CustomResourceSchema schema = checkSchema(crdId, version);
 
         CustomResourceDefinitionContext context = createCrdContext(crdId, version);
@@ -157,7 +160,7 @@ public class CustomResourceService {
         Set<ValidationMessage> errors = validateCR(schema, request.getCr());
         if (!errors.isEmpty()) {
             System.out.println(errors);
-            throw new IllegalArgumentException("CR spec does not match the corresponding schema");
+            throw new ValidationException(errors);
         }
 
         return new IdAwareCustomResource(client.resource(cr.get()).edit(object -> {
@@ -168,6 +171,7 @@ public class CustomResourceService {
     }
 
     public void delete(String crdId, String id, String namespace) {
+        //TODO nel caso in cui in Kubernetes ci siano CR con versioni di cui non abbiamo lo schema, vanno elimiate? Cosa fare con checkSchema?
         if(!crdService.isCrdAllowed(crdId)) {
             throw new AccessDeniedException("Access to this CRD is not allowed");
         }
