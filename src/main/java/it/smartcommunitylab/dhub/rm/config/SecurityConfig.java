@@ -2,13 +2,25 @@ package it.smartcommunitylab.dhub.rm.config;
 
 import it.smartcommunitylab.dhub.rm.SystemKeys;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -17,14 +29,18 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
+
+    @Autowired
+    AuthenticationProperties authProps;
 
     @Bean("apiSecurityFilterChain")
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .securityMatcher(new AntPathRequestMatcher(SystemKeys.API_PATH + "/**"))
             // public access for now
-            .oauth2ResourceServer(oauth2 -> oauth2.jwt())
+            .oauth2ResourceServer(oauth2 -> oauth2.jwt().jwtAuthenticationConverter(jwtAuthenticationConverter()))
             .httpBasic()
             .and()
             .requestCache((requestCache) -> requestCache.disable())
@@ -44,11 +60,34 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         UserDetails user = User.withDefaultPasswordEncoder()
-            .username("user")
-            .password("password")
-            .roles("USER")
+            .username(authProps.getBasicUsername())
+            .password(authProps.getBasicPassword())
+            .roles(authProps.getRole())
             .build();
         return new InMemoryUserDetailsManager(user);
+    }
+
+    @Bean
+    public Converter<Jwt, AbstractAuthenticationToken> jwtAuthenticationConverter() {
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(new Converter<Jwt, Collection<GrantedAuthority>>() {
+            @Override
+            public Collection<GrantedAuthority> convert(Jwt source) {
+                if (source == null)
+                    return null;
+
+                List<String> roles = source.getClaimAsStringList(authProps.getJwtRoleClaim());
+
+                if (roles != null) {
+                    return roles.stream()
+                            .map(r -> new SimpleGrantedAuthority(r))
+                            .collect(Collectors.toList());
+                }
+                return null;
+            }
+
+        });
+        return converter;
     }
 
     private CorsConfigurationSource corsConfigurationSource() {

@@ -21,7 +21,7 @@ server.port: ${HTTP_PORT:8080}
 
 namespace: default
 
-#kubernetes
+# kubernetes
 kubernetes:
   config: path_to_kube_config
   crd:
@@ -29,3 +29,11 @@ kubernetes:
       foo
     denied: >
       bar
+
+# authentication and authorization config
+auth-config:
+  basic-username: user
+  basic-password: password
+  prefix: ROLE_
+  role: USER
+  jwt-role-claim: resource-manager-role
