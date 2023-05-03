@@ -8,7 +8,6 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -26,17 +25,11 @@ import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResourceDefinition;
 @Service
 public class CustomResourceDefinitionService {
     private final KubernetesClient client;
-    @Value("${kubernetes.crd.allowed}")
-    private List<String> allowedCrds;
-    @Value("${kubernetes.crd.denied}")
-    private List<String> deniedCrds;
+    private final AuthorizationService authService;
 
-    public CustomResourceDefinitionService(KubernetesClient client) {
+    public CustomResourceDefinitionService(KubernetesClient client, AuthorizationService authService) {
         this.client = client;
-    }
-
-    public boolean isCrdAllowed(String crdId) {
-        return allowedCrds.contains(crdId) || (allowedCrds.isEmpty() && !deniedCrds.contains(crdId));
+        this.authService = authService;
     }
 
     private CustomResourceDefinitionVersion fetchVersion(String crdId, String versionName) {
@@ -120,13 +113,13 @@ public class CustomResourceDefinitionService {
 
         return crdList.getItems()
                 .stream()
-                .filter(crd -> isCrdAllowed(crd.getMetadata().getName()))
+                .filter(crd -> authService.isCrdAllowed(crd.getMetadata().getName()))
                 .map(crd -> new IdAwareCustomResourceDefinition(crd))
                 .collect(Collectors.toList());
     }
 
     public IdAwareCustomResourceDefinition findById(String id) {
-        if(!isCrdAllowed(id)) {
+        if(!authService.isCrdAllowed(id)) {
             throw new AccessDeniedException("Access to this CRD is not allowed");
         }
 

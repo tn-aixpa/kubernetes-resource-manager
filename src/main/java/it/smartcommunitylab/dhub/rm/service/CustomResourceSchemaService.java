@@ -22,12 +22,14 @@ public class CustomResourceSchemaService {
     private final DTOToSchemaConverter dtoToSchemaConverter;
     private final SchemaToDTOConverter schemaToDTOConverter;
     private final CustomResourceDefinitionService crdService;
+    private final AuthorizationService authService;
 
-    public CustomResourceSchemaService(CustomResourceSchemaRepository customResourceSchemaRepository, CustomResourceDefinitionService crdService) {
+    public CustomResourceSchemaService(CustomResourceSchemaRepository customResourceSchemaRepository, CustomResourceDefinitionService crdService, AuthorizationService authService) {
         this.customResourceSchemaRepository = customResourceSchemaRepository;
         this.dtoToSchemaConverter = new DTOToSchemaConverter();
         this.schemaToDTOConverter = new SchemaToDTOConverter();
         this.crdService = crdService;
+        this.authService = authService;
     }
 
     private Optional<CustomResourceSchema> fetchById(String id) {
@@ -69,7 +71,7 @@ public class CustomResourceSchemaService {
     // }
 
     public CustomResourceSchemaDTO add(@Nullable String id, CustomResourceSchemaDTO request) {
-        if(!crdService.isCrdAllowed(request.getCrdId())) {
+        if(!authService.isCrdAllowed(request.getCrdId())) {
             throw new AccessDeniedException("Access to this CRD is not allowed");
         }
 

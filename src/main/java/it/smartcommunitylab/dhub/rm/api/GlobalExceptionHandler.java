@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import it.smartcommunitylab.dhub.rm.exception.ValidationException;
+import jakarta.validation.ConstraintViolationException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -66,5 +67,12 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     String methodArgumentNotValidHandler(MethodArgumentNotValidException ex) {
         return ex.getAllErrors().toString();
+    }
+
+    @ResponseBody
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    String constraintViolationHandler(ConstraintViolationException ex) {
+        return ex.getMessage();
     }
 }

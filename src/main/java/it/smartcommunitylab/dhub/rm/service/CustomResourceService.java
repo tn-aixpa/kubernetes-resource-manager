@@ -31,12 +31,14 @@ public class CustomResourceService {
     private final KubernetesClient client;
     private final CustomResourceDefinitionService crdService;
     private final CustomResourceSchemaService schemaService;
+    private final AuthorizationService authService;
 
-    public CustomResourceService(KubernetesClient client, CustomResourceDefinitionService crdService, CustomResourceSchemaService schemaService) {
+    public CustomResourceService(KubernetesClient client, CustomResourceDefinitionService crdService, CustomResourceSchemaService schemaService, AuthorizationService authService) {
         Assert.notNull(client, "Client required");
         this.client = client;
         this.crdService = crdService;
         this.schemaService = schemaService;
+        this.authService = authService;
     }
 
     private CustomResourceSchema checkSchema(String crdId, String version) {
@@ -48,6 +50,13 @@ public class CustomResourceService {
         return schema.get();
     }
 
+    /**
+     * Create CRD context based on CRD ID and a version. Note that version parameter does not act as a filter,
+     * because method withVersion() does not seem to filter for the given version (it might be a bug in the client code).
+     * @param crdId
+     * @param version if not provided, v1 is used by default but if it does not exist an error is thrown
+     * @return CustomResourceDefinitionContext
+     */
     private CustomResourceDefinitionContext createCrdContext(String crdId, String version) {
         String[] crdMeta = crdId.split("\\.", 2);
         String plural = crdMeta[0];
@@ -87,8 +96,7 @@ public class CustomResourceService {
     }
 
     public List<IdAwareCustomResource> findAll(String crdId, String namespace) {
-        //TODO nel caso in cui in Kubernetes ci siano CR con versioni di cui non abbiamo lo schema, vanno filtrate dalla lista? Cosa fare con checkSchema?
-        if(!crdService.isCrdAllowed(crdId)) {
+        if(!authService.isCrdAllowed(crdId)) {
             throw new AccessDeniedException("Access to this CRD is not allowed");
         }
 
@@ -105,24 +113,24 @@ public class CustomResourceService {
     }
 
     public IdAwareCustomResource findById(String crdId, String id, String namespace) {
-        //TODO nel caso in cui in Kubernetes ci siano CR con versioni di cui non abbiamo lo schema, vanno filtrate dalla lista? Cosa fare con checkSchema?
-        if(!crdService.isCrdAllowed(crdId)) {
+        if(!authService.isCrdAllowed(crdId)) {
             throw new AccessDeniedException("Access to this CRD is not allowed");
         }
 
-        String version = crdService.fetchStoredVersionName(crdId);
-        checkSchema(crdId, version);
+        String storedVersion = crdService.fetchStoredVersionName(crdId);
+        checkSchema(crdId, storedVersion);
 
-        CustomResourceDefinitionContext context = createCrdContext(crdId, version);
+        CustomResourceDefinitionContext context = createCrdContext(crdId, storedVersion);
         NamespaceableResource<GenericKubernetesResource> cr = fetchCustomResource(context, id, namespace);
         if(cr == null) {
-            throw new NoSuchElementException("No CR with this ID, CRD ID and version");
+            throw new NoSuchElementException("No CR with this ID and CRD ID");
         }
+
         return new IdAwareCustomResource(cr.get());
     }
 
     public IdAwareCustomResource add(String crdId, IdAwareCustomResource request, String namespace) {
-        if(!crdService.isCrdAllowed(crdId)) {
+        if(!authService.isCrdAllowed(crdId)) {
             throw new AccessDeniedException("Access to this CRD is not allowed");
         }
 
@@ -134,7 +142,6 @@ public class CustomResourceService {
         Set<ValidationMessage> errors = validateCR(schema, request.getCr());
 
         if (!errors.isEmpty()) {
-            System.out.println(errors);
             throw new ValidationException(errors);
         }
 
@@ -142,7 +149,7 @@ public class CustomResourceService {
     }
 
     public IdAwareCustomResource update(String crdId, String id, IdAwareCustomResource request, String namespace) {
-        if(!crdService.isCrdAllowed(crdId)) {
+        if(!authService.isCrdAllowed(crdId)) {
             throw new AccessDeniedException("Access to this CRD is not allowed");
         }
 
@@ -150,7 +157,8 @@ public class CustomResourceService {
         String version = request.getCr().getApiVersion().split("/")[1];
         CustomResourceSchema schema = checkSchema(crdId, version);
 
-        CustomResourceDefinitionContext context = createCrdContext(crdId, version);
+        String storedVersion = crdService.fetchStoredVersionName(crdId);
+        CustomResourceDefinitionContext context = createCrdContext(crdId, storedVersion);
         NamespaceableResource<GenericKubernetesResource> cr = fetchCustomResource(context, id, namespace);
         if(cr == null) {
             throw new NoSuchElementException("No CR with this ID, CRD ID and version");
@@ -171,17 +179,17 @@ public class CustomResourceService {
     }
 
     public void delete(String crdId, String id, String namespace) {
-        //TODO nel caso in cui in Kubernetes ci siano CR con versioni di cui non abbiamo lo schema, vanno elimiate? Cosa fare con checkSchema?
-        if(!crdService.isCrdAllowed(crdId)) {
+        if(!authService.isCrdAllowed(crdId)) {
             throw new AccessDeniedException("Access to this CRD is not allowed");
         }
 
-        //if version is not found, these CRD and version do not exist in Kubernetes and an error is thrown
-        String version = crdService.fetchStoredVersionName(crdId);
-        checkSchema(crdId, version);
+        String storedVersion = crdService.fetchStoredVersionName(crdId);
+        checkSchema(crdId, storedVersion);
 
-        CustomResourceDefinitionContext context = createCrdContext(crdId, version);
+        CustomResourceDefinitionContext context = createCrdContext(crdId, storedVersion);
         NamespaceableResource<GenericKubernetesResource> cr = fetchCustomResource(context, id, namespace);
+
+        //if version is not found, these CRD and version do not exist in Kubernetes and an error is thrown
         if(cr != null) {
             cr.delete();
         }
