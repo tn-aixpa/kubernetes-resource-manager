@@ -1,25 +1,24 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import simpleRestProvider from 'ra-data-simple-rest';
+import { Admin, Resource, fetchUtils } from 'react-admin';
+import { SchemaList } from './resources/crs';
+
+const httpClient = function(url:any, options:any) {
+  options.user = {
+    authenticated: true,
+    token: 'Bearer ' + process.env.REACT_APP_TOKEN
+  }
+  return fetchUtils.fetchJson(url, options);
+}
+
+const dataProvider = simpleRestProvider('http://localhost:8080/api', httpClient);
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Admin dataProvider={dataProvider}>
+        <Resource name="crs" list={SchemaList} />
+    </Admin>
   );
 }
 

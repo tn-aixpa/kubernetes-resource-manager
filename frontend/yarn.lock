@@ -7865,6 +7865,13 @@ ra-core@^4.10.1:
     react-is "^17.0.2"
     react-query "^3.32.1"
 
+ra-data-simple-rest@^4.10.1:
+  version "4.10.1"
+  resolved "https://registry.yarnpkg.com/ra-data-simple-rest/-/ra-data-simple-rest-4.10.1.tgz#4dbd747fcb9f8a94f5a22158dfaaf9b2b76b04b1"
+  integrity sha512-7opfaUNkVjUeuEQk5PxOHC/54zJ9q+Gw+D535wtk3xPbeCyX6KT9VujJrnEQezTolYirhX8nP/+yd3ury7Xbfg==
+  dependencies:
+    query-string "^7.1.1"
+
 ra-i18n-polyglot@^4.10.1:
   version "4.10.1"
   resolved "https://registry.yarnpkg.com/ra-i18n-polyglot/-/ra-i18n-polyglot-4.10.1.tgz#b2892ba47fc9eb228efcf4a194e80ffb4fbd5d0f"

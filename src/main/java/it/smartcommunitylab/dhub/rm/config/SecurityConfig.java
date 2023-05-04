@@ -39,11 +39,9 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .securityMatcher(new AntPathRequestMatcher(SystemKeys.API_PATH + "/**"))
-            // public access for now
             .oauth2ResourceServer(oauth2 -> oauth2.jwt().jwtAuthenticationConverter(jwtAuthenticationConverter()))
             .httpBasic()
             .and()
-            .requestCache((requestCache) -> requestCache.disable())
             .authorizeHttpRequests(requests -> {
                 requests.anyRequest().authenticated();
             })
@@ -51,6 +49,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             // disable csrf
             .csrf(csrf -> csrf.disable())
+            .requestCache((requestCache) -> requestCache.disable())
             // we don't want a session for these endpoints
             .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
@@ -92,10 +91,10 @@ public class SecurityConfig {
 
     private CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("*"));
+        config.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
         config.setAllowedMethods(Arrays.asList("POST", "GET", "PUT", "OPTIONS", "DELETE"));
-        config.setAllowedHeaders(Arrays.asList("Content-Type", "X-Total-Count", "Authorization"));
-        config.setExposedHeaders(Arrays.asList("X-Total-Count"));
+        config.setAllowedHeaders(Arrays.asList("Content-Type", "X-Total-Count", "Authorization", "Range"));
+        config.setExposedHeaders(Arrays.asList("X-Total-Count", "Access-Control-Allow-Origin", "Content-Range"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
