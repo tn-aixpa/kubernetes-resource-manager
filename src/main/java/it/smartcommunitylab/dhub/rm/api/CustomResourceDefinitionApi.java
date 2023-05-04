@@ -7,9 +7,9 @@ import it.smartcommunitylab.dhub.rm.service.CustomResourceDefinitionService;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
 import jakarta.validation.constraints.Pattern;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,8 +37,8 @@ public class CustomResourceDefinitionApi {
     private CustomResourceSchemaService schemaService;
 
     @GetMapping
-    public List<IdAwareCustomResourceDefinition> findAll() {
-        return service.findAll();
+    public Page<IdAwareCustomResourceDefinition> findAll(Pageable pageable) {
+        return service.findAll(pageable);
     }
 
     @GetMapping("/{id}")

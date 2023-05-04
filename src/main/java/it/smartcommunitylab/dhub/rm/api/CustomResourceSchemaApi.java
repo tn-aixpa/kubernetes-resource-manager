@@ -6,9 +6,9 @@ import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,8 +31,8 @@ public class CustomResourceSchemaApi {
     private CustomResourceSchemaService service;
 
     @GetMapping
-    public List<CustomResourceSchemaDTO> findAll() {
-        return service.findAll();
+    public Page<CustomResourceSchemaDTO> findAll(Pageable pageable) {
+        return service.findAll(pageable);
     }
 
     @GetMapping("/{id}")

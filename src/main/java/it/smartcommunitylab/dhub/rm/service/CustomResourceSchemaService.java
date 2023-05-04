@@ -6,6 +6,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -40,11 +43,12 @@ public class CustomResourceSchemaService {
         return customResourceSchemaRepository.findByCrdIdAndVersion(crdId, version);
     }
 
-    public List<CustomResourceSchemaDTO> findAll() {
-        return customResourceSchemaRepository.findAll()
-                .stream()
+    public Page<CustomResourceSchemaDTO> findAll(Pageable pageable) {
+        Page<CustomResourceSchema> schemas = customResourceSchemaRepository.findAll(pageable);
+        List<CustomResourceSchemaDTO> dtos = schemas.stream()
                 .map(schema -> schemaToDTOConverter.convert(schema))
                 .collect(Collectors.toList());
+        return new PageImpl<>(dtos, pageable, dtos.size());
     }
 
     public CustomResourceSchemaDTO findById(String id) {

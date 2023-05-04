@@ -8,6 +8,9 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -108,14 +111,21 @@ public class CustomResourceDefinitionService {
         return kubeVersion.isPresent();
     }
 
-    public List<IdAwareCustomResourceDefinition> findAll() {
+    public Page<IdAwareCustomResourceDefinition> findAll(Pageable pageable) {
         CustomResourceDefinitionList crdList = client.apiextensions().v1().customResourceDefinitions().list();
-
-        return crdList.getItems()
+        List<IdAwareCustomResourceDefinition> crds = crdList.getItems()
                 .stream()
                 .filter(crd -> authService.isCrdAllowed(crd.getMetadata().getName()))
                 .map(crd -> new IdAwareCustomResourceDefinition(crd))
                 .collect(Collectors.toList());
+
+        //sort by CRD ID and provide pagination
+        crds.sort((IdAwareCustomResourceDefinition h1, IdAwareCustomResourceDefinition h2) -> h1.getId().compareTo(h2.getId()));
+        int offset = (int)pageable.getOffset();
+        int pageSize = Math.min(pageable.getPageSize(), crds.size());
+        int toIndex = Math.min(offset + pageSize, crds.size());
+
+        return new PageImpl<>(crds.subList(offset, toIndex), pageable, crds.size());
     }
 
     public IdAwareCustomResourceDefinition findById(String id) {

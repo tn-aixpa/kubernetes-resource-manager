@@ -6,6 +6,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -95,7 +98,7 @@ public class CustomResourceService {
         return jsonSchema.validate(crAdditionalProps);
     }
 
-    public List<IdAwareCustomResource> findAll(String crdId, String namespace) {
+    public Page<IdAwareCustomResource> findAll(String crdId, String namespace, Pageable pageable) {
         if(!authService.isCrdAllowed(crdId)) {
             throw new AccessDeniedException("Access to this CRD is not allowed");
         }
@@ -106,10 +109,18 @@ public class CustomResourceService {
         CustomResourceDefinitionContext context = createCrdContext(crdId, version);
         GenericKubernetesResourceList list = client.genericKubernetesResources(context).inNamespace(namespace).list();
 
-        return list.getItems()
+        List <IdAwareCustomResource> crs = list.getItems()
             .stream()
             .map(cr -> new IdAwareCustomResource(cr))
             .collect(Collectors.toList());
+
+        //sort by ID and provide pagination
+        crs.sort((IdAwareCustomResource h1, IdAwareCustomResource h2) -> h1.getId().compareTo(h2.getId()));
+        int offset = (int)pageable.getOffset();
+        int pageSize = Math.min(pageable.getPageSize(), crs.size());
+        int toIndex = Math.min(offset + pageSize, crs.size());
+
+        return new PageImpl<>(crs.subList(offset, toIndex), pageable, crs.size());
     }
 
     public IdAwareCustomResource findById(String crdId, String id, String namespace) {

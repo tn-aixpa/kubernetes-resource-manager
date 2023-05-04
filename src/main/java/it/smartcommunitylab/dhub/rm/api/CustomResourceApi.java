@@ -5,10 +5,10 @@ import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResource;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceService;
 import jakarta.validation.constraints.Pattern;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,8 +31,8 @@ public class CustomResourceApi {
     private String namespace;
 
     @GetMapping("/{crdId}")
-    public List<IdAwareCustomResource> findAll(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CRD_ID) String crdId) {
-        return service.findAll(crdId, namespace);
+    public Page<IdAwareCustomResource> findAll(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CRD_ID) String crdId, Pageable pageable) {
+        return service.findAll(crdId, namespace, pageable);
     }
 
     @GetMapping("/{crdId}/{id}")
