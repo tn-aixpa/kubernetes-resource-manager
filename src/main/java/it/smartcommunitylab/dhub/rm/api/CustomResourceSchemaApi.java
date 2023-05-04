@@ -21,8 +21,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 @RestController
 @PreAuthorize("hasAuthority(@authenticationProperties.getPrefix() + @authenticationProperties.getRole())")
+@SecurityRequirement(name = "basicAuth")
+@SecurityRequirement(name = "jwtAuth")
 @RequestMapping(SystemKeys.API_PATH + "/crs")
 @Validated
 public class CustomResourceSchemaApi {
