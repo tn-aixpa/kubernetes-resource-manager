@@ -1,25 +1,19 @@
 import React from 'react';
 import './App.css';
-import simpleRestProvider from 'ra-data-simple-rest';
-import { Admin, Resource, fetchUtils } from 'react-admin';
-import { SchemaList } from './resources/crs';
+import appDataProvider from './dataProvider';
+import { Admin, Resource } from 'react-admin';
+import { SchemaList, SchemaEdit, SchemaCreate } from './resources/crs';
 
-const httpClient = function(url:any, options:any) {
-  options.user = {
-    authenticated: true,
-    token: 'Bearer ' + process.env.REACT_APP_TOKEN
-  }
-  return fetchUtils.fetchJson(url, options);
-}
+const API_URL: string = process.env.REACT_APP_API_URL as string;
 
-const dataProvider = simpleRestProvider('http://localhost:8080/api', httpClient);
+const dataProvider = appDataProvider(API_URL);
 
 function App() {
-  return (
-    <Admin dataProvider={dataProvider}>
-        <Resource name="crs" list={SchemaList} />
-    </Admin>
-  );
+    return (
+        <Admin dataProvider={dataProvider}>
+            <Resource name="crs" list={SchemaList} edit={SchemaEdit} create={SchemaCreate} options={{ label: 'Schemas' }} />
+        </Admin>
+    );
 }
 
 export default App;
