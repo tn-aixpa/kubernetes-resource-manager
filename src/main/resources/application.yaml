@@ -8,27 +8,17 @@ spring:
   jpa:
     database-platform: ${JDBC_DIALECT:org.hibernate.dialect.H2Dialect}
     hibernate.ddl-auto: update
-  # authentication
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: your_issuer_uri
-        client-id: your_client_id
 
 # server
 server.port: ${HTTP_PORT:8080}
 
 namespace: default
 
-# kubernetes
+#kubernetes
 kubernetes:
-  config: path_to_kube_config
   crd:
     allowed: >
-      foo
     denied: >
-      bar
 
 # authentication and authorization config
 auth-config:

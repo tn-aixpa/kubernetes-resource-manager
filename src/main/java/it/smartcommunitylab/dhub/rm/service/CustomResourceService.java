@@ -147,6 +147,10 @@ public class CustomResourceService {
 
         //if schema is not found in the DB, an error is thrown
         String version = request.getCr().getApiVersion().split("/")[1];
+        String storedVersion = crdService.fetchStoredVersionName(crdId);
+        if(!version.equals(storedVersion)) {
+            throw new IllegalArgumentException(String.format("Version %s is not stored", version));
+        }
         CustomResourceSchema schema = checkSchema(crdId, version);
 
         //schema validation
@@ -166,9 +170,12 @@ public class CustomResourceService {
 
         //if schema is not found in the DB, an error is thrown
         String version = request.getCr().getApiVersion().split("/")[1];
+        String storedVersion = crdService.fetchStoredVersionName(crdId);
+        if(!version.equals(storedVersion)) {
+            throw new IllegalArgumentException(String.format("Version %s is not stored", version));
+        }
         CustomResourceSchema schema = checkSchema(crdId, version);
 
-        String storedVersion = crdService.fetchStoredVersionName(crdId);
         CustomResourceDefinitionContext context = createCrdContext(crdId, storedVersion);
         NamespaceableResource<GenericKubernetesResource> cr = fetchCustomResource(context, id, namespace);
         if(cr == null) {
