@@ -1,18 +1,17 @@
 package it.smartcommunitylab.dhub.rm.config;
 
 import it.smartcommunitylab.dhub.rm.SystemKeys;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -42,12 +41,6 @@ public class SecurityConfig {
     @Autowired
     AuthenticationProperties authProps;
 
-    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
-    String issuerUri;
-
-    @Value("${spring.security.oauth2.resourceserver.client-id}")
-    String clientId;
-
     @Bean("apiSecurityFilterChain")
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -57,14 +50,12 @@ public class SecurityConfig {
             )
             .httpBasic()
             .and()
-            .authorizeHttpRequests(requests -> {
-                requests.anyRequest().authenticated();
-            })
+            .authorizeHttpRequests(requests -> requests.anyRequest().authenticated())
             // allow cors
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             // disable csrf
             .csrf(csrf -> csrf.disable())
-            .requestCache(requestCache -> requestCache.disable())
+            .requestCache(AbstractHttpConfigurer::disable)
             // we don't want a session for these endpoints
             .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
@@ -83,13 +74,13 @@ public class SecurityConfig {
     }
 
     private JwtDecoder jwtDecoder() {
-        NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder) JwtDecoders.fromIssuerLocation(issuerUri);
+        NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder) JwtDecoders.fromIssuerLocation(authProps.getOauth2IssuerUri());
 
         OAuth2TokenValidator<Jwt> audienceValidator = new JwtClaimValidator<List<String>>(
             SystemKeys.AUD,
-            aud -> aud.contains(clientId)
+            aud -> aud.contains(authProps.getOauth2Audience())
         );
-        OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(issuerUri);
+        OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(authProps.getOauth2IssuerUri());
         OAuth2TokenValidator<Jwt> withAudience = new DelegatingOAuth2TokenValidator<>(withIssuer, audienceValidator);
 
         jwtDecoder.setJwtValidator(withAudience);
@@ -99,22 +90,14 @@ public class SecurityConfig {
 
     private Converter<Jwt, AbstractAuthenticationToken> jwtAuthenticationConverter() {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter(
-            new Converter<Jwt, Collection<GrantedAuthority>>() {
-                @Override
-                public Collection<GrantedAuthority> convert(Jwt source) {
-                    if (source == null) return null;
+        converter.setJwtGrantedAuthoritiesConverter((Jwt source) -> {
+            if (source == null) return null;
 
-                    //TODO hard-code role ROLE_USER invece di leggere dal token e togliere dalla configurazione
-                    List<String> roles = source.getClaimAsStringList(authProps.getJwtRoleClaim());
+            List<GrantedAuthority> roles = new ArrayList<GrantedAuthority>();
+            roles.add(new SimpleGrantedAuthority("ROLE_USER"));
 
-                    if (roles != null) {
-                        return roles.stream().map(r -> new SimpleGrantedAuthority(r)).collect(Collectors.toList());
-                    }
-                    return null;
-                }
-            }
-        );
+            return roles;
+        });
         return converter;
     }
 

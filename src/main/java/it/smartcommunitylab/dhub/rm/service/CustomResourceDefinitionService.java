@@ -7,6 +7,7 @@ import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinition
 import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinitionList;
 import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinitionVersion;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import it.smartcommunitylab.dhub.rm.SystemKeys;
 import it.smartcommunitylab.dhub.rm.exception.ParsingException;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResourceDefinition;
 import java.io.IOException;
@@ -36,7 +37,7 @@ public class CustomResourceDefinitionService {
     private CustomResourceDefinitionVersion fetchVersion(String crdId, String versionName) {
         CustomResourceDefinition crd = client.apiextensions().v1().customResourceDefinitions().withName(crdId).get();
         if (crd == null) {
-            throw new NoSuchElementException("No CRD with this ID");
+            throw new NoSuchElementException(SystemKeys.ERROR_NO_CRD);
         }
 
         Optional<CustomResourceDefinitionVersion> storedVersion = crd
@@ -47,7 +48,7 @@ public class CustomResourceDefinitionService {
             .findAny();
 
         if (!storedVersion.isPresent()) {
-            throw new NoSuchElementException("No version stored for this CRD");
+            throw new NoSuchElementException(SystemKeys.ERROR_NO_STORED_VERSION);
         }
 
         return storedVersion.get();
@@ -56,7 +57,7 @@ public class CustomResourceDefinitionService {
     public String fetchStoredVersionName(String crdId) {
         CustomResourceDefinition crd = client.apiextensions().v1().customResourceDefinitions().withName(crdId).get();
         if (crd == null) {
-            throw new NoSuchElementException("No CRD with this ID");
+            throw new NoSuchElementException(SystemKeys.ERROR_NO_CRD);
         }
 
         Optional<CustomResourceDefinitionVersion> storedVersion = crd
@@ -67,7 +68,7 @@ public class CustomResourceDefinitionService {
             .findAny();
 
         if (!storedVersion.isPresent()) {
-            throw new NoSuchElementException("No version stored for this CRD");
+            throw new NoSuchElementException(SystemKeys.ERROR_NO_STORED_VERSION);
         }
 
         return storedVersion.get().getName();
@@ -121,7 +122,7 @@ public class CustomResourceDefinitionService {
             .getItems()
             .stream()
             .filter(crd -> authService.isCrdAllowed(crd.getMetadata().getName()))
-            .map(crd -> new IdAwareCustomResourceDefinition(crd))
+            .map(IdAwareCustomResourceDefinition::new)
             .collect(Collectors.toList());
 
         //sort by CRD ID and provide pagination
@@ -137,13 +138,13 @@ public class CustomResourceDefinitionService {
 
     public IdAwareCustomResourceDefinition findById(String id) {
         if (!authService.isCrdAllowed(id)) {
-            throw new AccessDeniedException("Access to this CRD is not allowed");
+            throw new AccessDeniedException(SystemKeys.ERROR_CRD_NOT_ALLOWED);
         }
 
         CustomResourceDefinition crd = client.apiextensions().v1().customResourceDefinitions().withName(id).get();
 
         if (crd == null) {
-            throw new NoSuchElementException("No CRD with this ID");
+            throw new NoSuchElementException(SystemKeys.ERROR_NO_CRD);
         }
         return new IdAwareCustomResourceDefinition(crd);
     }

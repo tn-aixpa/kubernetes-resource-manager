@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.constraints.NotBlank;
@@ -64,7 +63,7 @@ public class CustomResourceSchemaDTO {
     }
 
     @JsonSetter("schema")
-    public void setSchemaAsString(String schema) throws JsonMappingException, JsonProcessingException {
+    public void setSchemaAsString(String schema) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         if (schema != null) {
             this.schema = objectMapper.readValue(schema, JsonNode.class);

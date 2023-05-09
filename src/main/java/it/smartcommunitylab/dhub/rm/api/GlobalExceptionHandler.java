@@ -4,6 +4,8 @@ import io.fabric8.kubernetes.client.KubernetesClientException;
 import it.smartcommunitylab.dhub.rm.exception.ValidationException;
 import jakarta.validation.ConstraintViolationException;
 import java.util.NoSuchElementException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ResponseBody
     @ExceptionHandler(NoSuchElementException.class)
@@ -48,9 +52,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(KubernetesClientException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     String kubernetesClientHandler(KubernetesClientException ex) {
-        System.out.println("Exception code: " + ex.getCode());
-        System.out.println("Exception message: " + ex.getMessage());
-        System.out.println("Exception status message: " + ex.getStatus().getMessage());
+        logger.info("Exception code: {}", ex.getCode());
+        logger.info("Exception message: {}", ex.getMessage());
+        logger.info("Exception status message: {}", ex.getStatus().getMessage());
         return ex.getStatus().getMessage();
     }
 

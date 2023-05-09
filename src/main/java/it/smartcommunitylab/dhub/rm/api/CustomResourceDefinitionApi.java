@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@PreAuthorize("hasAuthority(@authenticationProperties.getPrefix() + @authenticationProperties.getRole())")
+@PreAuthorize("hasAuthority('ROLE_USER')")
 @SecurityRequirement(name = "basicAuth")
 @SecurityRequirement(name = "jwtAuth")
 @RequestMapping(SystemKeys.API_PATH + "/crd")

@@ -1,5 +1,6 @@
 package it.smartcommunitylab.dhub.rm.service;
 
+import it.smartcommunitylab.dhub.rm.SystemKeys;
 import it.smartcommunitylab.dhub.rm.converter.DTOToSchemaConverter;
 import it.smartcommunitylab.dhub.rm.converter.SchemaToDTOConverter;
 import it.smartcommunitylab.dhub.rm.model.CustomResourceSchema;
@@ -50,7 +51,7 @@ public class CustomResourceSchemaService {
         Page<CustomResourceSchema> schemas = customResourceSchemaRepository.findAll(pageable);
         List<CustomResourceSchemaDTO> dtos = schemas
             .stream()
-            .map(schema -> schemaToDTOConverter.convert(schema))
+            .map(schemaToDTOConverter::convert)
             .collect(Collectors.toList());
         return new PageImpl<>(dtos, pageable, dtos.size());
     }
@@ -58,7 +59,7 @@ public class CustomResourceSchemaService {
     public CustomResourceSchemaDTO findById(String id) {
         Optional<CustomResourceSchema> result = fetchById(id);
         if (!result.isPresent()) {
-            throw new NoSuchElementException("No schema with this ID");
+            throw new NoSuchElementException(SystemKeys.ERROR_NO_SCHEMA);
         }
         return schemaToDTOConverter.convert(result.get());
     }
@@ -66,7 +67,7 @@ public class CustomResourceSchemaService {
     public CustomResourceSchemaDTO findByCrdIdAndVersion(String crdId, String version) {
         Optional<CustomResourceSchema> result = fetchByCrdIdAndVersion(crdId, version);
         if (!result.isPresent()) {
-            throw new NoSuchElementException("No schema with this CRD ID and version");
+            throw new NoSuchElementException(SystemKeys.ERROR_NO_SCHEMA_WITH_VERSION);
         }
         return schemaToDTOConverter.convert(result.get());
     }
@@ -80,13 +81,16 @@ public class CustomResourceSchemaService {
 
     public CustomResourceSchemaDTO add(@Nullable String id, CustomResourceSchemaDTO request) {
         if (!authService.isCrdAllowed(request.getCrdId())) {
-            throw new AccessDeniedException("Access to this CRD is not allowed");
+            throw new AccessDeniedException(SystemKeys.ERROR_CRD_NOT_ALLOWED);
         }
 
         CustomResourceSchema result = dtoToSchemaConverter.convert(request);
+        if (result == null) {
+            throw new IllegalArgumentException(SystemKeys.ERROR_NULL_INPUT);
+        }
         if (id != null) {
             if (fetchById(id).isPresent()) {
-                throw new IllegalArgumentException("Schema with this ID already exists");
+                throw new IllegalArgumentException(SystemKeys.ERROR_SCHEMA_EXISTS);
             }
             result.setId(id);
         } else {
@@ -94,7 +98,7 @@ public class CustomResourceSchemaService {
         }
 
         if (!crdService.crdExists(request.getCrdId(), request.getVersion())) {
-            throw new IllegalArgumentException("No such CRD exists in Kubernetes");
+            throw new IllegalArgumentException(SystemKeys.ERROR_K8S_NO_CRD);
         }
 
         if (result.getSchema() == null || result.getSchema().isEmpty()) {
@@ -108,15 +112,18 @@ public class CustomResourceSchemaService {
     public CustomResourceSchemaDTO update(String id, CustomResourceSchemaDTO request) {
         Optional<CustomResourceSchema> result = fetchById(id);
         if (!result.isPresent()) {
-            throw new NoSuchElementException("No schema with this ID");
+            throw new NoSuchElementException(SystemKeys.ERROR_NO_SCHEMA);
         }
         CustomResourceSchema currentSchema = result.get();
 
         if (!crdService.crdExists(currentSchema.getCrdId(), currentSchema.getVersion())) {
-            throw new IllegalArgumentException("No such CRD exists in Kubernetes");
+            throw new IllegalArgumentException(SystemKeys.ERROR_K8S_NO_CRD);
         }
 
         CustomResourceSchema newSchema = dtoToSchemaConverter.convert(request);
+        if (newSchema == null) {
+            throw new IllegalArgumentException(SystemKeys.ERROR_NULL_INPUT);
+        }
         currentSchema.setSchema(newSchema.getSchema());
 
         if (currentSchema.getSchema() == null || currentSchema.getSchema().isEmpty()) {

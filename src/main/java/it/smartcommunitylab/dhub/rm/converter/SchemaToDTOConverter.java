@@ -11,6 +11,9 @@ public class SchemaToDTOConverter implements Converter<CustomResourceSchema, Cus
 
     @Override
     public CustomResourceSchemaDTO convert(CustomResourceSchema source) {
+        if (source == null) {
+            return null;
+        }
         CustomResourceSchemaDTO dto = new CustomResourceSchemaDTO();
 
         dto.setId(source.getId());

@@ -16,14 +16,14 @@ namespace: default
 
 #kubernetes
 kubernetes:
+  config:
   crd:
     allowed: >
     denied: >
 
 # authentication and authorization config
-auth-config:
+auth:
   basic-username: user
   basic-password: password
-  prefix: ROLE_
-  role: USER
-  jwt-role-claim: resource-manager-role
+  oauth2-issuer-uri:
+  oauth2-audience:
