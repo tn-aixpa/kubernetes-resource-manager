@@ -6,6 +6,7 @@ import it.smartcommunitylab.dhub.rm.model.dto.CustomResourceSchemaDTO;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
+import java.util.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,9 +34,12 @@ public class CustomResourceSchemaApi {
     private CustomResourceSchemaService service;
 
     @GetMapping
-    public Page<CustomResourceSchemaDTO> findAll(Pageable pageable) {
-        //TODO aggiungere parametri di ricerca per crdId e per keyword
-        return service.findAll(pageable);
+    public Page<CustomResourceSchemaDTO> findAll(
+        @RequestParam(required = false) Collection<String> ids,
+        Pageable pageable
+    ) {
+        //TODO aggiungere parametri di ricerca per keyword
+        return service.findAll(ids, pageable);
     }
 
     @GetMapping("/{id}")

@@ -7,6 +7,7 @@ import it.smartcommunitylab.dhub.rm.model.CustomResourceSchema;
 import it.smartcommunitylab.dhub.rm.model.dto.CustomResourceSchemaDTO;
 import it.smartcommunitylab.dhub.rm.repository.CustomResourceSchemaRepository;
 import jakarta.annotation.Nullable;
+import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -47,8 +48,13 @@ public class CustomResourceSchemaService {
         return customResourceSchemaRepository.findByCrdIdAndVersion(crdId, version);
     }
 
-    public Page<CustomResourceSchemaDTO> findAll(Pageable pageable) {
-        Page<CustomResourceSchema> schemas = customResourceSchemaRepository.findAll(pageable);
+    public Page<CustomResourceSchemaDTO> findAll(Collection<String> ids, Pageable pageable) {
+        Page<CustomResourceSchema> schemas;
+        if (ids == null) {
+            schemas = customResourceSchemaRepository.findAll(pageable);
+        } else {
+            schemas = customResourceSchemaRepository.findByIdIn(ids, pageable);
+        }
         List<CustomResourceSchemaDTO> dtos = schemas
             .stream()
             .map(schemaToDTOConverter::convert)
@@ -72,12 +78,14 @@ public class CustomResourceSchemaService {
         return schemaToDTOConverter.convert(result.get());
     }
 
-    // public List<CustomResourceSchemaDTO> findByCrdId(String crdId) {
-    //     return customResourceSchemaRepository.findByCrdId(crdId)
-    //             .stream()
-    //             .map(schema -> schemaToDTOConverter.convert(schema))
-    //             .collect(Collectors.toList());
-    // }
+    public Page<CustomResourceSchemaDTO> findByCrdId(String crdId, Pageable pageable) {
+        Page<CustomResourceSchema> schemas = customResourceSchemaRepository.findByCrdId(crdId, pageable);
+        List<CustomResourceSchemaDTO> dtos = schemas
+            .stream()
+            .map(schemaToDTOConverter::convert)
+            .collect(Collectors.toList());
+        return new PageImpl<>(dtos, pageable, dtos.size());
+    }
 
     public CustomResourceSchemaDTO add(@Nullable String id, CustomResourceSchemaDTO request) {
         if (!authService.isCrdAllowed(request.getCrdId())) {

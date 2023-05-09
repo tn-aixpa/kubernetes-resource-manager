@@ -7,6 +7,7 @@ import it.smartcommunitylab.dhub.rm.model.dto.CustomResourceSchemaDTO;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceDefinitionService;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
 import jakarta.validation.constraints.Pattern;
+import java.util.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -41,8 +43,11 @@ public class CustomResourceDefinitionApi {
     private CustomResourceSchemaService schemaService;
 
     @GetMapping
-    public Page<IdAwareCustomResourceDefinition> findAll(Pageable pageable) {
-        return service.findAll(pageable);
+    public Page<IdAwareCustomResourceDefinition> findAll(
+        @RequestParam(required = false) Collection<String> ids,
+        Pageable pageable
+    ) {
+        return service.findAll(ids, pageable);
     }
 
     @GetMapping("/{id}")
@@ -55,5 +60,13 @@ public class CustomResourceDefinitionApi {
     @GetMapping("/{id}/schema")
     public CustomResourceSchemaDTO findSchemaForId(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CRD_ID) String id) {
         return schemaService.findByCrdIdAndVersion(id, service.fetchStoredVersionName(id));
+    }
+
+    @GetMapping("/{id}/schemas")
+    public Page<CustomResourceSchemaDTO> findSchemasForId(
+        @PathVariable @Pattern(regexp = SystemKeys.REGEX_CRD_ID) String id,
+        Pageable pageable
+    ) {
+        return schemaService.findByCrdId(id, pageable);
     }
 }

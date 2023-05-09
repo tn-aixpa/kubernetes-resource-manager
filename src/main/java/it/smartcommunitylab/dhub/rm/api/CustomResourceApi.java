@@ -5,6 +5,7 @@ import it.smartcommunitylab.dhub.rm.SystemKeys;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResource;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceService;
 import jakarta.validation.constraints.Pattern;
+import java.util.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -37,9 +39,10 @@ public class CustomResourceApi {
     @GetMapping("/{crdId}")
     public Page<IdAwareCustomResource> findAll(
         @PathVariable @Pattern(regexp = SystemKeys.REGEX_CRD_ID) String crdId,
+        @RequestParam(required = false) Collection<String> ids,
         Pageable pageable
     ) {
-        return service.findAll(crdId, namespace, pageable);
+        return service.findAll(crdId, namespace, ids, pageable);
     }
 
     @GetMapping("/{crdId}/{id}")

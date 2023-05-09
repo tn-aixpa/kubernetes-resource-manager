@@ -15,6 +15,8 @@ import it.smartcommunitylab.dhub.rm.SystemKeys;
 import it.smartcommunitylab.dhub.rm.exception.ValidationException;
 import it.smartcommunitylab.dhub.rm.model.CustomResourceSchema;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResource;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -110,7 +112,7 @@ public class CustomResourceService {
         return jsonSchema.validate(crAdditionalProps);
     }
 
-    public Page<IdAwareCustomResource> findAll(String crdId, String namespace, Pageable pageable) {
+    public Page<IdAwareCustomResource> findAll(String crdId, String namespace, Collection<String> ids, Pageable pageable) {
         if (!authService.isCrdAllowed(crdId)) {
             throw new AccessDeniedException(SystemKeys.ERROR_CRD_NOT_ALLOWED);
         }
@@ -119,13 +121,26 @@ public class CustomResourceService {
         checkSchema(crdId, version);
 
         CustomResourceDefinitionContext context = createCrdContext(crdId, version);
-        GenericKubernetesResourceList list = client.genericKubernetesResources(context).inNamespace(namespace).list();
 
-        List<IdAwareCustomResource> crs = list
-            .getItems()
-            .stream()
-            .map(IdAwareCustomResource::new)
-            .collect(Collectors.toList());
+        List<IdAwareCustomResource> crs;
+        if (ids == null) {
+            GenericKubernetesResourceList list = client.genericKubernetesResources(context).inNamespace(namespace).list();
+            crs = list
+                .getItems()
+                .stream()
+                .map(IdAwareCustomResource::new)
+                .collect(Collectors.toList());
+        } else {
+            crs = new ArrayList<IdAwareCustomResource>();
+            ids
+                .stream()
+                .forEach(id -> {
+                    NamespaceableResource<GenericKubernetesResource> cr = fetchCustomResource(context, id, namespace);
+                    if (cr != null) {
+                        crs.add(new IdAwareCustomResource(cr.get()));
+                    }
+                });
+        }
 
         //sort by ID and provide pagination
         crs.sort((IdAwareCustomResource h1, IdAwareCustomResource h2) -> h1.getId().compareTo(h2.getId()));

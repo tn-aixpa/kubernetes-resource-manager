@@ -12,6 +12,8 @@ import it.smartcommunitylab.dhub.rm.exception.ParsingException;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResourceDefinition;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -116,14 +118,34 @@ public class CustomResourceDefinitionService {
         return kubeVersion.isPresent();
     }
 
-    public Page<IdAwareCustomResourceDefinition> findAll(Pageable pageable) {
-        CustomResourceDefinitionList crdList = client.apiextensions().v1().customResourceDefinitions().list();
-        List<IdAwareCustomResourceDefinition> crds = crdList
-            .getItems()
-            .stream()
-            .filter(crd -> authService.isCrdAllowed(crd.getMetadata().getName()))
-            .map(IdAwareCustomResourceDefinition::new)
-            .collect(Collectors.toList());
+    public Page<IdAwareCustomResourceDefinition> findAll(Collection<String> ids, Pageable pageable) {
+        List<IdAwareCustomResourceDefinition> crds;
+        if (ids == null) {
+            CustomResourceDefinitionList crdList = client.apiextensions().v1().customResourceDefinitions().list();
+            crds =
+                crdList
+                    .getItems()
+                    .stream()
+                    .filter(crd -> authService.isCrdAllowed(crd.getMetadata().getName()))
+                    .map(IdAwareCustomResourceDefinition::new)
+                    .collect(Collectors.toList());
+        } else {
+            crds = new ArrayList<IdAwareCustomResourceDefinition>();
+            ids
+                .stream()
+                .filter(authService::isCrdAllowed)
+                .forEach(id -> {
+                    CustomResourceDefinition crd = client
+                        .apiextensions()
+                        .v1()
+                        .customResourceDefinitions()
+                        .withName(id)
+                        .get();
+                    if (crd != null) {
+                        crds.add(new IdAwareCustomResourceDefinition(crd));
+                    }
+                });
+        }
 
         //sort by CRD ID and provide pagination
         crds.sort((IdAwareCustomResourceDefinition h1, IdAwareCustomResourceDefinition h2) ->
