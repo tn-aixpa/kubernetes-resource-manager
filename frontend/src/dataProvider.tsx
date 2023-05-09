@@ -39,7 +39,6 @@ const dataProvider = (baseUrl: string, httpClient = fetchJson): DataProvider => 
             const url = `${apiUrl}/${resource}?${stringify(query)}`;
 
             return httpClient(url).then(({ headers, json }) => {
-                console.log(json)
                 if (!json.content) {
                     throw new Error('the response must match page<> model');
                 }
@@ -52,7 +51,22 @@ const dataProvider = (baseUrl: string, httpClient = fetchJson): DataProvider => 
         getOne: (resource, params) => provider.getOne(resource, params),
         getMany: (resource, params) => provider.getMany(resource, params),
         getManyReference: (resource, params) => {
-            const url = `${apiUrl}/${resource}`;
+            const { page, perPage } = params.pagination;
+            const { field, order } = params.sort;
+            const query = {
+                sort: field + ',' + order,
+                page: page - 1,
+                size: perPage,
+            };
+
+            let url = `${apiUrl}`
+            if (resource === 'crs') {
+                url += `/crd/${params.id}/schemas`;
+            } else {
+                url += `/${resource}`;
+            }
+
+            url += `?${stringify(query)}`;
 
             return httpClient(url).then(({ headers, json }) => {
                 if (!json.content) {

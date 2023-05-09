@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.constraints.NotBlank;
+import org.springframework.util.StringUtils;
 
 public class CustomResourceSchemaDTO {
 
@@ -65,7 +66,7 @@ public class CustomResourceSchemaDTO {
 
     @JsonSetter("schema")
     public void setSchemaAsString(String schema) throws JsonProcessingException {
-        if (schema != null) {
+        if (StringUtils.hasText(schema)) {
             this.schema = objectMapper.readValue(schema, JsonNode.class);
         } else {
             this.schema = null;
