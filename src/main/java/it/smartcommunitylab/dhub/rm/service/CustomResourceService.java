@@ -1,25 +1,11 @@
 package it.smartcommunitylab.dhub.rm.service;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.networknt.schema.JsonSchema;
 import com.networknt.schema.JsonSchemaFactory;
 import com.networknt.schema.SpecVersionDetector;
 import com.networknt.schema.ValidationMessage;
-
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.GenericKubernetesResourceList;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -28,15 +14,32 @@ import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
 import it.smartcommunitylab.dhub.rm.exception.ValidationException;
 import it.smartcommunitylab.dhub.rm.model.CustomResourceSchema;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResource;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 @Service
 public class CustomResourceService {
+
     private final KubernetesClient client;
     private final CustomResourceDefinitionService crdService;
     private final CustomResourceSchemaService schemaService;
     private final AuthorizationService authService;
 
-    public CustomResourceService(KubernetesClient client, CustomResourceDefinitionService crdService, CustomResourceSchemaService schemaService, AuthorizationService authService) {
+    public CustomResourceService(
+        KubernetesClient client,
+        CustomResourceDefinitionService crdService,
+        CustomResourceSchemaService schemaService,
+        AuthorizationService authService
+    ) {
         Assert.notNull(client, "Client required");
         this.client = client;
         this.crdService = crdService;
@@ -65,8 +68,7 @@ public class CustomResourceService {
         String plural = crdMeta[0];
         String group = crdMeta[1];
 
-        CustomResourceDefinitionContext context = new CustomResourceDefinitionContext
-            .Builder()
+        CustomResourceDefinitionContext context = new CustomResourceDefinitionContext.Builder()
             .withGroup(group)
             .withName(crdId)
             .withPlural(plural)
@@ -76,8 +78,15 @@ public class CustomResourceService {
         return context;
     }
 
-    private NamespaceableResource<GenericKubernetesResource> fetchCustomResource(CustomResourceDefinitionContext context, String id, String namespace) {
-        GenericKubernetesResourceList customResourceObjectList = client.genericKubernetesResources(context).inNamespace(namespace).list();
+    private NamespaceableResource<GenericKubernetesResource> fetchCustomResource(
+        CustomResourceDefinitionContext context,
+        String id,
+        String namespace
+    ) {
+        GenericKubernetesResourceList customResourceObjectList = client
+            .genericKubernetesResources(context)
+            .inNamespace(namespace)
+            .list();
         for (GenericKubernetesResource cr : customResourceObjectList.getItems()) {
             if (cr.getMetadata().getName().equals(id)) {
                 return client.resource(cr);
@@ -86,7 +95,7 @@ public class CustomResourceService {
         return null;
     }
 
-    private Set<ValidationMessage> validateCR(CustomResourceSchema schema, GenericKubernetesResource cr){
+    private Set<ValidationMessage> validateCR(CustomResourceSchema schema, GenericKubernetesResource cr) {
         //1. get CR spec as JsonNode
         JsonNode crAdditionalProps = cr.getAdditionalPropertiesNode();
 
@@ -99,7 +108,7 @@ public class CustomResourceService {
     }
 
     public Page<IdAwareCustomResource> findAll(String crdId, String namespace, Pageable pageable) {
-        if(!authService.isCrdAllowed(crdId)) {
+        if (!authService.isCrdAllowed(crdId)) {
             throw new AccessDeniedException("Access to this CRD is not allowed");
         }
 
@@ -109,14 +118,15 @@ public class CustomResourceService {
         CustomResourceDefinitionContext context = createCrdContext(crdId, version);
         GenericKubernetesResourceList list = client.genericKubernetesResources(context).inNamespace(namespace).list();
 
-        List <IdAwareCustomResource> crs = list.getItems()
+        List<IdAwareCustomResource> crs = list
+            .getItems()
             .stream()
             .map(cr -> new IdAwareCustomResource(cr))
             .collect(Collectors.toList());
 
         //sort by ID and provide pagination
         crs.sort((IdAwareCustomResource h1, IdAwareCustomResource h2) -> h1.getId().compareTo(h2.getId()));
-        int offset = (int)pageable.getOffset();
+        int offset = (int) pageable.getOffset();
         int pageSize = Math.min(pageable.getPageSize(), crs.size());
         int toIndex = Math.min(offset + pageSize, crs.size());
 
@@ -124,7 +134,7 @@ public class CustomResourceService {
     }
 
     public IdAwareCustomResource findById(String crdId, String id, String namespace) {
-        if(!authService.isCrdAllowed(crdId)) {
+        if (!authService.isCrdAllowed(crdId)) {
             throw new AccessDeniedException("Access to this CRD is not allowed");
         }
 
@@ -133,7 +143,7 @@ public class CustomResourceService {
 
         CustomResourceDefinitionContext context = createCrdContext(crdId, storedVersion);
         NamespaceableResource<GenericKubernetesResource> cr = fetchCustomResource(context, id, namespace);
-        if(cr == null) {
+        if (cr == null) {
             throw new NoSuchElementException("No CR with this ID and CRD ID");
         }
 
@@ -141,14 +151,14 @@ public class CustomResourceService {
     }
 
     public IdAwareCustomResource add(String crdId, IdAwareCustomResource request, String namespace) {
-        if(!authService.isCrdAllowed(crdId)) {
+        if (!authService.isCrdAllowed(crdId)) {
             throw new AccessDeniedException("Access to this CRD is not allowed");
         }
 
         //if schema is not found in the DB, an error is thrown
         String version = request.getCr().getApiVersion().split("/")[1];
         String storedVersion = crdService.fetchStoredVersionName(crdId);
-        if(!version.equals(storedVersion)) {
+        if (!version.equals(storedVersion)) {
             throw new IllegalArgumentException(String.format("Version %s is not stored", version));
         }
         CustomResourceSchema schema = checkSchema(crdId, version);
@@ -164,24 +174,24 @@ public class CustomResourceService {
     }
 
     public IdAwareCustomResource update(String crdId, String id, IdAwareCustomResource request, String namespace) {
-        if(!authService.isCrdAllowed(crdId)) {
+        if (!authService.isCrdAllowed(crdId)) {
             throw new AccessDeniedException("Access to this CRD is not allowed");
         }
 
         //if schema is not found in the DB, an error is thrown
         String version = request.getCr().getApiVersion().split("/")[1];
         String storedVersion = crdService.fetchStoredVersionName(crdId);
-        if(!version.equals(storedVersion)) {
+        if (!version.equals(storedVersion)) {
             throw new IllegalArgumentException(String.format("Version %s is not stored", version));
         }
         CustomResourceSchema schema = checkSchema(crdId, version);
 
         CustomResourceDefinitionContext context = createCrdContext(crdId, storedVersion);
         NamespaceableResource<GenericKubernetesResource> cr = fetchCustomResource(context, id, namespace);
-        if(cr == null) {
+        if (cr == null) {
             throw new NoSuchElementException("No CR with this ID, CRD ID and version");
         }
-        
+
         //schema validation
         Set<ValidationMessage> errors = validateCR(schema, request.getCr());
         if (!errors.isEmpty()) {
@@ -189,15 +199,19 @@ public class CustomResourceService {
             throw new ValidationException(errors);
         }
 
-        return new IdAwareCustomResource(client.resource(cr.get()).edit(object -> {
-            object.setAdditionalProperties(request.getCr().getAdditionalProperties());
-            System.out.println(object.getAdditionalPropertiesNode());
-            return object;
-        }));
+        return new IdAwareCustomResource(
+            client
+                .resource(cr.get())
+                .edit(object -> {
+                    object.setAdditionalProperties(request.getCr().getAdditionalProperties());
+                    System.out.println(object.getAdditionalPropertiesNode());
+                    return object;
+                })
+        );
     }
 
     public void delete(String crdId, String id, String namespace) {
-        if(!authService.isCrdAllowed(crdId)) {
+        if (!authService.isCrdAllowed(crdId)) {
             throw new AccessDeniedException("Access to this CRD is not allowed");
         }
 
@@ -208,7 +222,7 @@ public class CustomResourceService {
         NamespaceableResource<GenericKubernetesResource> cr = fetchCustomResource(context, id, namespace);
 
         //if version is not found, these CRD and version do not exist in Kubernetes and an error is thrown
-        if(cr != null) {
+        if (cr != null) {
             cr.delete();
         }
     }

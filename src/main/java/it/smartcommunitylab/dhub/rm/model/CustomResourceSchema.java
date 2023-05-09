@@ -1,20 +1,20 @@
 package it.smartcommunitylab.dhub.rm.model;
 
-import java.io.Serializable;
-import java.util.Map;
-
+import it.smartcommunitylab.dhub.rm.converter.MapConverter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Column;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import jakarta.persistence.Convert;
-import it.smartcommunitylab.dhub.rm.converter.MapConverter;
+import java.io.Serializable;
+import java.util.Map;
 
 @Entity
 @Table(name = "custom_resource_schema", uniqueConstraints = @UniqueConstraint(columnNames = { "crd_id", "version" }))
 public class CustomResourceSchema {
+
     @Id
     private String id;
 

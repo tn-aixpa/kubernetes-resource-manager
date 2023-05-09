@@ -6,11 +6,10 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "auth-config")
 public class AuthenticationProperties {
+    //TODO spostare qui anche configurazione per oauth2 e toglierla da spring, rinominare client-id in audience
+    //TODO rinominare auth-config in auth
     String basicUsername;
     String basicPassword;
-    String prefix;
-    String role;
-    String jwtRoleClaim;
 
     public String getBasicUsername() {
         return basicUsername;
@@ -23,23 +22,5 @@ public class AuthenticationProperties {
     }
     public void setBasicPassword(String basicPassword) {
         this.basicPassword = basicPassword;
-    }
-    public String getPrefix() {
-        return prefix;
-    }
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
-    }
-    public String getRole() {
-        return role;
-    }
-    public void setRole(String role) {
-        this.role = role;
-    }
-    public String getJwtRoleClaim() {
-        return jwtRoleClaim;
-    }
-    public void setJwtRoleClaim(String jwtRoleClaim) {
-        this.jwtRoleClaim = jwtRoleClaim;
     }
 }

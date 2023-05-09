@@ -1,17 +1,17 @@
 package it.smartcommunitylab.dhub.rm.model;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import org.springframework.util.Assert;
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
-
-import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
-
 public class IdAwareCustomResource {
+
     private String id;
+
     @JsonUnwrapped
     private GenericKubernetesResource cr;
 
-    protected IdAwareCustomResource(){}
+    protected IdAwareCustomResource() {}
 
     public IdAwareCustomResource(GenericKubernetesResource cr) {
         Assert.notNull(cr, "CR is required");
@@ -34,6 +34,4 @@ public class IdAwareCustomResource {
     public void setCr(GenericKubernetesResource cr) {
         this.cr = cr;
     }
-
-    
 }

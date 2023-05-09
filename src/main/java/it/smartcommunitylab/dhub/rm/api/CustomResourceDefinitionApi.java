@@ -1,12 +1,12 @@
 package it.smartcommunitylab.dhub.rm.api;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import it.smartcommunitylab.dhub.rm.SystemKeys;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResourceDefinition;
 import it.smartcommunitylab.dhub.rm.model.dto.CustomResourceSchemaDTO;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceDefinitionService;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
 import jakarta.validation.constraints.Pattern;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-
 @RestController
 @PreAuthorize("hasAuthority(@authenticationProperties.getPrefix() + @authenticationProperties.getRole())")
 @SecurityRequirement(name = "basicAuth")
@@ -26,6 +24,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 @RequestMapping(SystemKeys.API_PATH + "/crd")
 @Validated
 public class CustomResourceDefinitionApi {
+
     /*
         CustomResourceDefinition
         GET /crd/ => list / search + pagination (come query param)
@@ -37,6 +36,7 @@ public class CustomResourceDefinitionApi {
 
     @Autowired
     private CustomResourceDefinitionService service;
+
     @Autowired
     private CustomResourceSchemaService schemaService;
 
@@ -46,7 +46,9 @@ public class CustomResourceDefinitionApi {
     }
 
     @GetMapping("/{id}")
-    public IdAwareCustomResourceDefinition findById(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CRD_ID) String id) {
+    public IdAwareCustomResourceDefinition findById(
+        @PathVariable @Pattern(regexp = SystemKeys.REGEX_CRD_ID) String id
+    ) {
         return service.findById(id);
     }
 

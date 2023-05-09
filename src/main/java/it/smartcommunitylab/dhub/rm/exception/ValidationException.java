@@ -1,21 +1,21 @@
 package it.smartcommunitylab.dhub.rm.exception;
 
+import com.networknt.schema.ValidationMessage;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.networknt.schema.ValidationMessage;
-
 public class ValidationException extends RuntimeException {
-    private String message = "The following validation errors were found: ";
+
+    // private final String message = "The following validation errors were found: ";
 
     public ValidationException(Set<ValidationMessage> errors) {
-        super();
-
-        String errorMessages = errors.stream().map(ValidationMessage::getMessage).collect(Collectors.joining("; "));
-        this.message += errorMessages;
+        super("The following validation errors were found: " + errors.stream().map(ValidationMessage::getMessage).collect(Collectors.joining("; ")));
+        // String errorMessages = errors.stream().map(ValidationMessage::getMessage).collect(Collectors.joining("; "));
+        // this.message = "The following validation errors were found: " + errorMessages;
     }
 
-    public String getMessage() {
-        return this.message;
-    }
+    // @Override
+    // public String getMessage() {
+    //     return this.message;
+    // }
 }

@@ -1,11 +1,11 @@
 package it.smartcommunitylab.dhub.rm.api;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import it.smartcommunitylab.dhub.rm.SystemKeys;
 import it.smartcommunitylab.dhub.rm.model.dto.CustomResourceSchemaDTO;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,8 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-
 @RestController
 @PreAuthorize("hasAuthority(@authenticationProperties.getPrefix() + @authenticationProperties.getRole())")
 @SecurityRequirement(name = "basicAuth")
@@ -36,6 +34,7 @@ public class CustomResourceSchemaApi {
 
     @GetMapping
     public Page<CustomResourceSchemaDTO> findAll(Pageable pageable) {
+        //TODO aggiungere parametri di ricerca per crdId e per keyword
         return service.findAll(pageable);
     }
 
@@ -45,12 +44,18 @@ public class CustomResourceSchemaApi {
     }
 
     @PostMapping
-    public CustomResourceSchemaDTO add(@RequestParam(required = false) String id, @Valid @RequestBody CustomResourceSchemaDTO request) {
+    public CustomResourceSchemaDTO add(
+        @RequestParam(required = false) String id,
+        @Valid @RequestBody CustomResourceSchemaDTO request
+    ) {
         return service.add(id, request);
     }
 
     @PutMapping("/{id}")
-    public CustomResourceSchemaDTO update(@PathVariable @Pattern(regexp = SystemKeys.REGEX_SCHEMA_ID) String id, @Valid @RequestBody CustomResourceSchemaDTO request) {
+    public CustomResourceSchemaDTO update(
+        @PathVariable @Pattern(regexp = SystemKeys.REGEX_SCHEMA_ID) String id,
+        @Valid @RequestBody CustomResourceSchemaDTO request
+    ) {
         return service.update(id, request);
     }
 
