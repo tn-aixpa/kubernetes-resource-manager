@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer';
 import { stringify } from 'querystring';
 import { fetchUtils, DataProvider } from 'ra-core';
 import jsonServerProvider from 'ra-data-json-server';
@@ -8,13 +9,16 @@ const fetchJson = (url: string, options: Options = {}) => {
         options.headers = new Headers({ Accept: 'application/json' });
     }
 
-    //options.headers = new Headers({ Authorization: 'Bearer ' + process.env.REACT_APP_TOKEN });
+    const encodedCredentials = Buffer.from(process.env.REACT_APP_BASIC_USERNAME + ':' + process.env.REACT_APP_BASIC_PASSWORD, 'binary').toString('base64');
     options.user = {
         authenticated: true,
-        token: 'Bearer ' + process.env.REACT_APP_TOKEN
+        token: 'Basic ' + encodedCredentials
     };
 
-    //options.credentials = 'include';
+    /*options.user = {
+        authenticated: true,
+        token: 'Bearer ' + process.env.REACT_APP_TOKEN
+    };*/
 
     return fetchUtils.fetchJson(url, options);
 };
@@ -64,7 +68,14 @@ const dataProvider = (baseUrl: string, httpClient = fetchJson): DataProvider => 
         updateMany: (resource, params) => provider.updateMany(resource, params),
         create: (resource, params) => provider.create(resource, params),
         delete: (resource, params) => provider.delete(resource, params),
-        deleteMany: (resource, params) => provider.deleteMany(resource, params),
+        deleteMany: (resource, params) =>
+            Promise.all(
+                params.ids.map(id =>
+                    httpClient(`${apiUrl}/${resource}/${id}`, {
+                        method: 'DELETE',
+                    })
+                )
+            ).then(responses => ({ data: responses.map(({ json }) => json) })),
     };
 };
 

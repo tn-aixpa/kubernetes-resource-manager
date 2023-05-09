@@ -1,4 +1,4 @@
-import { Create, Datagrid, Edit, EditButton, List, SimpleForm, TextField, TextInput } from "react-admin";
+import { Create, Datagrid, Edit, EditButton, List, ShowButton, SimpleForm, TextField, TextInput, Show, SimpleShowLayout, ReferenceInput } from "react-admin";
 import { parse, format } from "../utils";
 
 export const SchemaList = () => (
@@ -9,6 +9,7 @@ export const SchemaList = () => (
             <TextField source="version" />
             <TextField source="schema" />
             <EditButton />
+            <ShowButton />
         </Datagrid>
     </List>
 );
@@ -27,9 +28,20 @@ export const SchemaEdit = () => (
 export const SchemaCreate = () => (
     <Create>
         <SimpleForm>
-            <TextInput source="crdId" />
+            <ReferenceInput source="crdId" reference="crd" />
             <TextInput source="version" />
             <TextInput source="schema" fullWidth multiline parse={parse} format={format} />
         </SimpleForm>
     </Create>
+);
+
+export const SchemaShow = () => (
+    <Show>
+        <SimpleShowLayout>
+            <TextField source="id" />
+            <TextField source="crdId" />
+            <TextField source="version" />
+            <TextField source="schema" />
+        </SimpleShowLayout>
+    </Show>
 );

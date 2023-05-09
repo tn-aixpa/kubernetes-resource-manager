@@ -4,6 +4,7 @@ import it.smartcommunitylab.dhub.rm.SystemKeys;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +22,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtClaimNames;
 import org.springframework.security.oauth2.jwt.JwtClaimValidator;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
@@ -76,10 +78,10 @@ public class SecurityConfig {
     private JwtDecoder jwtDecoder() {
         NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder) JwtDecoders.fromIssuerLocation(authProps.getOauth2IssuerUri());
 
-        OAuth2TokenValidator<Jwt> audienceValidator = new JwtClaimValidator<List<String>>(
-            SystemKeys.AUD,
-            aud -> aud.contains(authProps.getOauth2Audience())
-        );
+        Predicate<List<String>> testClaimValue = claimValue ->
+            (claimValue != null) && claimValue.contains(authProps.getOauth2Audience());
+        OAuth2TokenValidator<Jwt> audienceValidator = new JwtClaimValidator<>(JwtClaimNames.AUD, testClaimValue);
+
         OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(authProps.getOauth2IssuerUri());
         OAuth2TokenValidator<Jwt> withAudience = new DelegatingOAuth2TokenValidator<>(withIssuer, audienceValidator);
 
@@ -93,7 +95,7 @@ public class SecurityConfig {
         converter.setJwtGrantedAuthoritiesConverter((Jwt source) -> {
             if (source == null) return null;
 
-            List<GrantedAuthority> roles = new ArrayList<GrantedAuthority>();
+            List<GrantedAuthority> roles = new ArrayList<>();
             roles.add(new SimpleGrantedAuthority("ROLE_USER"));
 
             return roles;

@@ -131,7 +131,7 @@ public class CustomResourceService {
                 .map(IdAwareCustomResource::new)
                 .collect(Collectors.toList());
         } else {
-            crs = new ArrayList<IdAwareCustomResource>();
+            crs = new ArrayList<>();
             ids
                 .stream()
                 .forEach(id -> {

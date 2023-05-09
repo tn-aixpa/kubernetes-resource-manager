@@ -130,7 +130,7 @@ public class CustomResourceDefinitionService {
                     .map(IdAwareCustomResourceDefinition::new)
                     .collect(Collectors.toList());
         } else {
-            crds = new ArrayList<IdAwareCustomResourceDefinition>();
+            crds = new ArrayList<>();
             ids
                 .stream()
                 .filter(authService::isCrdAllowed)

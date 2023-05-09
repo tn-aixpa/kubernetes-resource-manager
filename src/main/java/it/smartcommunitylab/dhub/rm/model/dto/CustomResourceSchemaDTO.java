@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotBlank;
 public class CustomResourceSchemaDTO {
 
     private String id;
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @NotBlank
     private String crdId;
@@ -55,16 +56,15 @@ public class CustomResourceSchemaDTO {
     }
 
     @JsonGetter("schema")
-    public String getSchemaAsString() {
+    public String getSchemaAsString() throws JsonProcessingException {
         if (schema != null) {
-            return schema.asText();
+            return objectMapper.writeValueAsString(schema);
         }
         return null;
     }
 
     @JsonSetter("schema")
     public void setSchemaAsString(String schema) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
         if (schema != null) {
             this.schema = objectMapper.readValue(schema, JsonNode.class);
         } else {
