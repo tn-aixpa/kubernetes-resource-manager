@@ -12,10 +12,10 @@ spring:
 # server
 server.port: ${HTTP_PORT:8080}
 
-namespace: default
 
 #kubernetes
 kubernetes:
+  namespace: default
   config:
   crd:
     allowed: >

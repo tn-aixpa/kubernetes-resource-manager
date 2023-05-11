@@ -33,16 +33,16 @@ public class CustomResourceApi {
     @Autowired
     private CustomResourceService service;
 
-    @Value("${namespace}")
+    @Value("${kubernetes.namespace}")
     private String namespace;
 
     @GetMapping("/{crdId}")
     public Page<IdAwareCustomResource> findAll(
         @PathVariable @Pattern(regexp = SystemKeys.REGEX_CRD_ID) String crdId,
-        @RequestParam(required = false) Collection<String> ids,
+        @RequestParam(required = false) Collection<String> id,
         Pageable pageable
     ) {
-        return service.findAll(crdId, namespace, ids, pageable);
+        return service.findAll(crdId, namespace, id, pageable);
     }
 
     @GetMapping("/{crdId}/{id}")
