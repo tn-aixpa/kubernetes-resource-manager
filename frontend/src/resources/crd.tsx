@@ -16,7 +16,6 @@ export const CrdShow = () => (
             <ReferenceManyField label="Schemas" reference="crs" target="crdId" >
                 <Datagrid>
                     <TextField source="id" />
-                    <TextField source="crdId" />
                     <TextField source="version" />
                     <TextField source="schema" />
                     <ShowButton />

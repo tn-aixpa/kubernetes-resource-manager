@@ -28,6 +28,15 @@ const dataProvider = (baseUrl: string, httpClient = fetchJson): DataProvider => 
     const provider = jsonServerProvider(apiUrl, httpClient);
 
     return {
+        fetchResources: async (): Promise<string[]> => {
+            //return ['myplatforms.contoso.com'];
+            return httpClient(`${apiUrl}/crd?size=1000`).then(({ headers, json }) => {
+                if (!json.content) {
+                    throw new Error('the response must match page<> model');
+                }
+                return json.content.map((crd: any) => crd.id)
+            });
+        },
         getList: (resource, params) => {
             const { page, perPage } = params.pagination;
             const { field, order } = params.sort;
@@ -36,7 +45,11 @@ const dataProvider = (baseUrl: string, httpClient = fetchJson): DataProvider => 
                 page: page - 1,
                 size: perPage,
             };
-            const url = `${apiUrl}/${resource}?${stringify(query)}`;
+            let url = `${apiUrl}/${resource}?${stringify(query)}`;
+            const idFilter = params?.filter?.id;
+            if (idFilter) {
+                url += `&id=${idFilter}`;
+            }
 
             return httpClient(url).then(({ headers, json }) => {
                 if (!json.content) {
@@ -49,7 +62,24 @@ const dataProvider = (baseUrl: string, httpClient = fetchJson): DataProvider => 
             });
         },
         getOne: (resource, params) => provider.getOne(resource, params),
-        getMany: (resource, params) => provider.getMany(resource, params),
+        //getMany: (resource, params) => provider.getMany(resource, params),
+        getMany: (resource, params) => {
+            let url = `${apiUrl}/${resource}`;
+            const ids = params.ids;
+            if (ids && ids.length > 0) {
+                url += `?id=${ids.join(',')}`;
+            }
+
+            return httpClient(url).then(({ headers, json }) => {
+                if (!json.content) {
+                    throw new Error('the response must match page<> model');
+                }
+                return {
+                    data: json.content,
+                    total: parseInt(json.totalElements, 10),
+                };
+            });
+        },
         getManyReference: (resource, params) => {
             const { page, perPage } = params.pagination;
             const { field, order } = params.sort;
