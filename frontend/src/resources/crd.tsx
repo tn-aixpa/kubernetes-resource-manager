@@ -1,4 +1,13 @@
-import { Datagrid, FunctionField, List, ReferenceManyField, Show, ShowButton, SimpleShowLayout, TextField } from "react-admin";
+import {
+    Datagrid,
+    FunctionField,
+    List,
+    ReferenceManyField,
+    Show,
+    ShowButton,
+    SimpleShowLayout,
+    TextField,
+} from 'react-admin';
 
 export const CrdList = () => (
     <List>
@@ -13,7 +22,7 @@ export const CrdShow = () => (
     <Show>
         <SimpleShowLayout>
             <FunctionField render={(record: any) => JSON.stringify(record)} />
-            <ReferenceManyField label="Schemas" reference="crs" target="crdId" >
+            <ReferenceManyField label="Schemas" reference="crs" target="crdId">
                 <Datagrid>
                     <TextField source="id" />
                     <TextField source="version" />

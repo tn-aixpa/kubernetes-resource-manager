@@ -9,10 +9,15 @@ const fetchJson = (url: string, options: Options = {}) => {
         options.headers = new Headers({ Accept: 'application/json' });
     }
 
-    const encodedCredentials = Buffer.from(process.env.REACT_APP_BASIC_USERNAME + ':' + process.env.REACT_APP_BASIC_PASSWORD, 'binary').toString('base64');
+    const encodedCredentials = Buffer.from(
+        process.env.REACT_APP_BASIC_USERNAME +
+            ':' +
+            process.env.REACT_APP_BASIC_PASSWORD,
+        'binary'
+    ).toString('base64');
     options.user = {
         authenticated: true,
-        token: 'Basic ' + encodedCredentials
+        token: 'Basic ' + encodedCredentials,
     };
 
     /*options.user = {
@@ -23,19 +28,24 @@ const fetchJson = (url: string, options: Options = {}) => {
     return fetchUtils.fetchJson(url, options);
 };
 
-const dataProvider = (baseUrl: string, httpClient = fetchJson): DataProvider => {
+const dataProvider = (
+    baseUrl: string,
+    httpClient = fetchJson
+): DataProvider => {
     const apiUrl = baseUrl + '/api';
     const provider = jsonServerProvider(apiUrl, httpClient);
 
     return {
         fetchResources: async (): Promise<string[]> => {
             //return ['myplatforms.contoso.com'];
-            return httpClient(`${apiUrl}/crd?size=1000`).then(({ headers, json }) => {
-                if (!json.content) {
-                    throw new Error('the response must match page<> model');
+            return httpClient(`${apiUrl}/crd?size=1000`).then(
+                ({ headers, json }) => {
+                    if (!json.content) {
+                        throw new Error('the response must match page<> model');
+                    }
+                    return json.content.map((crd: any) => crd.id);
                 }
-                return json.content.map((crd: any) => crd.id)
-            });
+            );
         },
         getList: (resource, params) => {
             const { page, perPage } = params.pagination;
@@ -89,7 +99,7 @@ const dataProvider = (baseUrl: string, httpClient = fetchJson): DataProvider => 
                 size: perPage,
             };
 
-            let url = `${apiUrl}`
+            let url = `${apiUrl}`;
             if (resource === 'crs') {
                 url += `/crd/${params.id}/schemas`;
             } else {

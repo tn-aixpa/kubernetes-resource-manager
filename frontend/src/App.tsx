@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 import appDataProvider from './dataProvider';
 import {
-    Admin,
     AdminContext,
     AdminUI,
     Loading,
@@ -60,7 +59,7 @@ function DynamicAdminUI() {
     console.log('views ', views);
 
     return (
-        <AdminUI ready={Loading} >
+        <AdminUI ready={Loading}>
             <Resource
                 name="crs"
                 list={SchemaList}
