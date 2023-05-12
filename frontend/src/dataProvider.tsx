@@ -37,13 +37,13 @@ const dataProvider = (
 
     return {
         fetchResources: async (): Promise<string[]> => {
-            //return ['myplatforms.contoso.com'];
-            return httpClient(`${apiUrl}/crd?size=1000`).then(
+            return httpClient(`${apiUrl}/crs?size=1000`).then(
                 ({ headers, json }) => {
                     if (!json.content) {
                         throw new Error('the response must match page<> model');
                     }
-                    return json.content.map((crd: any) => crd.id);
+                    const crdIds: string[] = json.content.map((crs: any) => crs.crdId);
+                    return Array.from(new Set(crdIds)).sort((a: string, b: string) => a.localeCompare(b));
                 }
             );
         },

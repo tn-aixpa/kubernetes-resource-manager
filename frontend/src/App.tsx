@@ -10,6 +10,7 @@ import {
     defaultTheme,
     localStorageStore,
     useDataProvider,
+    useStore,
 } from 'react-admin';
 import {
     SchemaList,
@@ -19,6 +20,7 @@ import {
 } from './resources/crs';
 import { CrdList, CrdShow } from './resources/crd';
 import { View, fetchViews } from './resources';
+import { updateCrdIds } from './utils';
 
 const API_URL: string = process.env.REACT_APP_API_URL as string;
 
@@ -48,14 +50,21 @@ function App() {
 function DynamicAdminUI() {
     const [views, setViews] = useState<View[]>([]);
     const dataProvider = useDataProvider();
+    const [crdIds, setCrdIds] = useStore<string[]>('crdIds', []);
 
     useEffect(() => {
         //fetch and store
-        dataProvider.fetchResources().then((res: any) => {
-            setViews(fetchViews(res));
-        });
-    }, [dataProvider]);
+        // dataProvider.fetchResources().then((res: any) => {
+        //     console.log('in callback');
+        //     setCrdIds(res);
+        // });
+        updateCrdIds(dataProvider, setCrdIds);
+    }, [dataProvider, setCrdIds]);
 
+    if (views.length !== crdIds.length || !views.every((s: View) => crdIds.includes(s.key))) {
+        console.log('in if', views.length, views, crdIds.length, crdIds);
+        setViews(fetchViews(crdIds));
+    }
     console.log('views ', views);
 
     return (
