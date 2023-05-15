@@ -61,7 +61,10 @@ function DynamicAdminUI() {
         updateCrdIds(dataProvider, setCrdIds);
     }, [dataProvider, setCrdIds]);
 
-    if (views.length !== crdIds.length || !views.every((s: View) => crdIds.includes(s.key))) {
+    if (
+        views.length !== crdIds.length ||
+        !views.every((s: View) => crdIds.includes(s.key))
+    ) {
         console.log('in if', views.length, views, crdIds.length, crdIds);
         setViews(fetchViews(crdIds));
     }

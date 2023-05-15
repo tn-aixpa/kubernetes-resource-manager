@@ -94,7 +94,10 @@ export const SchemaCreate = () => {
                 <FormDataConsumer>
                     {({ formData, ...rest }) =>
                         formData.crdId ? (
-                            <SchemaVersionInput crdId={formData.crdId} {...rest} />
+                            <SchemaVersionInput
+                                crdId={formData.crdId}
+                                {...rest}
+                            />
                         ) : (
                             <TextInput
                                 source="version"

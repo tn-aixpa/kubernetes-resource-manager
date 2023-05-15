@@ -1,7 +1,4 @@
-import {
-    TextInput,
-    useChoicesContext,
-} from 'react-admin';
+import { TextInput, useChoicesContext } from 'react-admin';
 
 export const PrecompiledInput = ({ props }: any) => {
     const { availableChoices } = useChoicesContext();

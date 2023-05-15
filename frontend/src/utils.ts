@@ -1,16 +1,16 @@
-import { DataProvider } from "react-admin"
+import { DataProvider } from 'react-admin';
 
 export const parse = (v: string) => {
     try {
-        return JSON.parse(v)
+        return JSON.parse(v);
     } catch (error) {
-        return v
+        return v;
     }
-}
+};
 
 export const format = (v: any) => {
-    return typeof v == "string" ? v : JSON.stringify(v)
-}
+    return typeof v == 'string' ? v : JSON.stringify(v);
+};
 
 export function updateCrdIds(dataProvider: DataProvider, setCrdIds: Function) {
     dataProvider.fetchResources().then((res: any) => {

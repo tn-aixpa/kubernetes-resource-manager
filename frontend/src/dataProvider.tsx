@@ -42,8 +42,12 @@ const dataProvider = (
                     if (!json.content) {
                         throw new Error('the response must match page<> model');
                     }
-                    const crdIds: string[] = json.content.map((crs: any) => crs.crdId);
-                    return Array.from(new Set(crdIds)).sort((a: string, b: string) => a.localeCompare(b));
+                    const crdIds: string[] = json.content.map(
+                        (crs: any) => crs.crdId
+                    );
+                    return Array.from(new Set(crdIds)).sort(
+                        (a: string, b: string) => a.localeCompare(b)
+                    );
                 }
             );
         },
@@ -72,7 +76,6 @@ const dataProvider = (
             });
         },
         getOne: (resource, params) => provider.getOne(resource, params),
-        //getMany: (resource, params) => provider.getMany(resource, params),
         getMany: (resource, params) => {
             let url = `${apiUrl}/${resource}`;
             const ids = params.ids;

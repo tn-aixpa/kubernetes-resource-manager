@@ -1,5 +1,15 @@
-import { SaveButton, Toolbar, DeleteWithConfirmButton, ToolbarClasses, useResourceContext, useDataProvider, useNotify, useStore, useRedirect } from "react-admin";
-import { updateCrdIds } from "../utils";
+import {
+    SaveButton,
+    Toolbar,
+    DeleteWithConfirmButton,
+    ToolbarClasses,
+    useResourceContext,
+    useDataProvider,
+    useNotify,
+    useStore,
+    useRedirect,
+} from 'react-admin';
+import { updateCrdIds } from '../utils';
 
 export const DeleteConfirmToolbar = () => {
     const resource = useResourceContext();

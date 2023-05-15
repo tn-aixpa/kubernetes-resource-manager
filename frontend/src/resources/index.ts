@@ -40,7 +40,7 @@ export const fetchViews = (types: string[]): View[] => {
                 list: CrList,
                 create: CrCreate,
                 edit: CrEdit,
-                show: CrShow
+                show: CrShow,
             };
         }
         return v;
