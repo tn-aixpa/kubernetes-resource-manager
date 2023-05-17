@@ -13,8 +13,13 @@ export const format = (v: any) => {
 };
 
 export function updateCrdIds(dataProvider: DataProvider, setCrdIds: Function) {
-    dataProvider.fetchResources().then((res: any) => {
-        console.log('updating CRD ids in store');
-        setCrdIds(res);
-    });
+    dataProvider
+        .fetchResources()
+        .then((res: any) => {
+            console.log('updating CRD ids in store');
+            setCrdIds(res);
+        })
+        .catch((error: any) => {
+            console.log('updateCrdIds', error);
+        });
 }

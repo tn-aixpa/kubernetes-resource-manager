@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import appDataProvider from './dataProvider';
+import { BrowserRouter } from 'react-router-dom';
 import {
     AdminContext,
     AdminUI,
@@ -21,6 +22,8 @@ import {
 import { CrdList, CrdShow } from './resources/crd';
 import { View, fetchViews } from './resources';
 import { updateCrdIds } from './utils';
+import authProvider from './authProvider';
+import { SSOLogin } from './components/SSOLogin';
 
 const API_URL: string = process.env.REACT_APP_API_URL as string;
 
@@ -36,14 +39,17 @@ const theme = {
 
 function App() {
     return (
-        <AdminContext
-            dataProvider={dataProvider}
-            i18nProvider={defaultI18nProvider}
-            store={store}
-            theme={theme}
-        >
-            <DynamicAdminUI />
-        </AdminContext>
+        <BrowserRouter>
+            <AdminContext
+                dataProvider={dataProvider}
+                authProvider={authProvider}
+                i18nProvider={defaultI18nProvider}
+                store={store}
+                theme={theme}
+            >
+                <DynamicAdminUI />
+            </AdminContext>
+        </BrowserRouter>
     );
 }
 
@@ -65,13 +71,11 @@ function DynamicAdminUI() {
         views.length !== crdIds.length ||
         !views.every((s: View) => crdIds.includes(s.key))
     ) {
-        console.log('in if', views.length, views, crdIds.length, crdIds);
         setViews(fetchViews(crdIds));
     }
-    console.log('views ', views);
 
     return (
-        <AdminUI ready={Loading}>
+        <AdminUI ready={Loading} loginPage={SSOLogin} requireAuth>
             <Resource
                 name="crs"
                 list={SchemaList}

@@ -1,31 +1,29 @@
-import { Buffer } from 'buffer';
+//import { Buffer } from 'buffer';
+import { User } from 'oidc-client-ts';
 import { stringify } from 'querystring';
 import { fetchUtils, DataProvider } from 'ra-core';
 import jsonServerProvider from 'ra-data-json-server';
 import { Options } from 'react-admin';
+
+const USER_STORAGE_KEY = `oidc.user:${process.env.REACT_APP_AUTHORITY}:${process.env.REACT_APP_CLIENT_ID}`;
 
 const fetchJson = (url: string, options: Options = {}) => {
     if (!options.headers) {
         options.headers = new Headers({ Accept: 'application/json' });
     }
 
-    const encodedCredentials = Buffer.from(
-        process.env.REACT_APP_BASIC_USERNAME +
-            ':' +
-            process.env.REACT_APP_BASIC_PASSWORD,
-        'binary'
-    ).toString('base64');
-    options.user = {
-        authenticated: true,
-        token: 'Basic ' + encodedCredentials,
-    };
+    const userString = localStorage.getItem(USER_STORAGE_KEY);
 
-    /*options.user = {
-        authenticated: true,
-        token: 'Bearer ' + process.env.REACT_APP_TOKEN
-    };*/
+    if (userString) {
+        const user = User.fromStorageString(userString);
+        options.user = {
+            authenticated: true,
+            token: 'Bearer ' + user.access_token,
+        };
 
-    return fetchUtils.fetchJson(url, options);
+        return fetchUtils.fetchJson(url, options);
+    }
+    return Promise.reject('No user found in store');
 };
 
 const dataProvider = (
@@ -37,6 +35,9 @@ const dataProvider = (
 
     return {
         fetchResources: async (): Promise<string[]> => {
+            if (!localStorage.getItem(USER_STORAGE_KEY)) {
+                return [];
+            }
             return httpClient(`${apiUrl}/crs?size=1000`).then(
                 ({ headers, json }) => {
                     if (!json.content) {
