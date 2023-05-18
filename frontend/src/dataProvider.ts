@@ -1,41 +1,40 @@
 //import { Buffer } from 'buffer';
-import { User } from 'oidc-client-ts';
+import { UserManager } from 'oidc-client-ts';
 import { stringify } from 'querystring';
 import { fetchUtils, DataProvider } from 'ra-core';
 import jsonServerProvider from 'ra-data-json-server';
 import { Options } from 'react-admin';
 
-const USER_STORAGE_KEY = `oidc.user:${process.env.REACT_APP_AUTHORITY}:${process.env.REACT_APP_CLIENT_ID}`;
-
-const fetchJson = (url: string, options: Options = {}) => {
-    if (!options.headers) {
-        options.headers = new Headers({ Accept: 'application/json' });
-    }
-
-    const userString = localStorage.getItem(USER_STORAGE_KEY);
-
-    if (userString) {
-        const user = User.fromStorageString(userString);
-        options.user = {
-            authenticated: true,
-            token: 'Bearer ' + user.access_token,
-        };
-
-        return fetchUtils.fetchJson(url, options);
-    }
-    return Promise.reject('No user found in store');
-};
-
 const dataProvider = (
     baseUrl: string,
-    httpClient = fetchJson
+    userManager: UserManager
 ): DataProvider => {
+    const httpClient = async (url: string, options: Options = {}) => {
+        if (!options.headers) {
+            options.headers = new Headers({ Accept: 'application/json' });
+        }
+    
+        const user = await userManager.getUser();
+    
+        if (user) {
+            options.user = {
+                authenticated: true,
+                token: 'Bearer ' + user.access_token,
+            };
+    
+            return fetchUtils.fetchJson(url, options);
+        }
+        return Promise.reject('No user found in store');
+    };
+
+
     const apiUrl = baseUrl + '/api';
     const provider = jsonServerProvider(apiUrl, httpClient);
 
     return {
         fetchResources: async (): Promise<string[]> => {
-            if (!localStorage.getItem(USER_STORAGE_KEY)) {
+            const user = await userManager.getUser();
+            if (!user) {
                 return [];
             }
             return httpClient(`${apiUrl}/crs?size=1000`).then(

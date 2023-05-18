@@ -25,7 +25,6 @@ import {
 } from 'react-admin';
 import { CrdProps } from '../components/CrdProps';
 import { DeleteConfirmToolbar } from '../components/DeleteConfirmToolbar';
-import { updateCrdIds } from '../utils';
 
 export const SchemaList = () => {
     const notify = useNotify();
@@ -33,7 +32,15 @@ export const SchemaList = () => {
     const [crdIds, setCrdIds] = useStore<string[]>('crdIds', []);
 
     const onSuccess = (data: any) => {
-        updateCrdIds(dataProvider, setCrdIds);
+        dataProvider
+            .fetchResources()
+            .then((res: any) => {
+                console.log('updating CRD ids in store');
+                setCrdIds(res);
+            })
+            .catch((error: any) => {
+                console.log('updateCrdIds', error);
+            });
         notify('ra.notification.created', { messageArgs: { smart_count: 1 } });
     };
     return (
@@ -76,10 +83,21 @@ export const SchemaCreate = () => {
     const resource = useResourceContext();
 
     const onSuccess = (data: any) => {
-        updateCrdIds(dataProvider, setCrdIds);
+        dataProvider
+            .fetchResources()
+            .then((res: any) => {
+                console.log('updating CRD ids in store');
+                setCrdIds(res);
+            })
+            .catch((error: any) => {
+                console.log('updateCrdIds', error);
+            });
         notify('ra.notification.created', { messageArgs: { smart_count: 1 } });
         redirect('edit', resource, data.id, data);
     };
+
+    const params = new URLSearchParams(window.location.search);
+    const crdIdFromQuery = params.get('crdId');
 
     return (
         <Create mutationOptions={{ onSuccess }}>
@@ -89,6 +107,7 @@ export const SchemaCreate = () => {
                         label="CRD"
                         validate={required()}
                         sx={{ width: '22em' }}
+                        defaultValue={crdIdFromQuery ? crdIdFromQuery : undefined}
                     />
                 </ReferenceInput>
                 <FormDataConsumer>

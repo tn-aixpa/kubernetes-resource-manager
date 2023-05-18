@@ -9,7 +9,6 @@ import {
     useStore,
     useRedirect,
 } from 'react-admin';
-import { updateCrdIds } from '../utils';
 
 export const DeleteConfirmToolbar = () => {
     const resource = useResourceContext();
@@ -20,7 +19,15 @@ export const DeleteConfirmToolbar = () => {
 
     const onSuccess = (data: any) => {
         if (resource === 'crs') {
-            updateCrdIds(dataProvider, setCrdIds);
+            dataProvider
+                .fetchResources()
+                .then((res: any) => {
+                    console.log('updating CRD ids in store');
+                    setCrdIds(res);
+                })
+                .catch((error: any) => {
+                    console.log('updateCrdIds', error);
+                });
         }
         notify('ra.notification.created', { messageArgs: { smart_count: 1 } });
         redirect('list', resource);
