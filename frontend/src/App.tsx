@@ -21,13 +21,25 @@ import {
 } from './resources/crs';
 import { CrdList, CrdShow } from './resources/crd';
 import { View, fetchViews } from './resources';
-import { updateCrdIds } from './utils';
-import authProvider from './authProvider';
+import authenticationProvider from './authProvider';
 import { SSOLogin } from './components/SSOLogin';
+import { UserManager, WebStorageStateStore } from 'oidc-client-ts';
 
 const API_URL: string = process.env.REACT_APP_API_URL as string;
 
-const dataProvider = appDataProvider(API_URL);
+const manager = new UserManager({
+    authority: process.env.REACT_APP_AUTHORITY || '',
+    client_id: process.env.REACT_APP_CLIENT_ID || '',
+    redirect_uri:
+        process.env.REACT_APP_REDIRECT_URI ||
+        `${window.location.origin}/auth-callback`,
+    scope: process.env.REACT_APP_SCOPE,
+    userStore: new WebStorageStateStore({ store: localStorage }),
+    loadUserInfo: true,
+});
+
+const dataProvider = appDataProvider(API_URL, manager);
+const authProvider = authenticationProvider(manager);
 const store = localStorageStore();
 
 const theme = {
@@ -59,12 +71,15 @@ function DynamicAdminUI() {
     const [crdIds, setCrdIds] = useStore<string[]>('crdIds', []);
 
     useEffect(() => {
-        //fetch and store
-        // dataProvider.fetchResources().then((res: any) => {
-        //     console.log('in callback');
-        //     setCrdIds(res);
-        // });
-        updateCrdIds(dataProvider, setCrdIds);
+        dataProvider
+            .fetchResources()
+            .then((res: any) => {
+                console.log('updating CRD ids in store');
+                setCrdIds(res);
+            })
+            .catch((error: any) => {
+                console.log('updateCrdIds', error);
+            });
     }, [dataProvider, setCrdIds]);
 
     if (
