@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import './App.css';
 import appDataProvider from './dataProvider';
 import { BrowserRouter } from 'react-router-dom';
@@ -20,7 +20,7 @@ import {
     SchemaShow,
 } from './resources/crs';
 import { CrdList, CrdShow } from './resources/crd';
-import { View, fetchViews } from './resources';
+import { View, ViewsContext, fetchViews } from './resources';
 import authenticationProvider from './authProvider';
 import { SSOLogin } from './components/SSOLogin';
 import { UserManager, WebStorageStateStore } from 'oidc-client-ts';
@@ -82,12 +82,29 @@ function DynamicAdminUI() {
             });
     }, [dataProvider, setCrdIds]);
 
-    if (
-        views.length !== crdIds.length ||
-        !views.every((s: View) => crdIds.includes(s.key))
-    ) {
-        setViews(fetchViews(crdIds));
-    }
+    const viewsContext = useContext(ViewsContext);
+    (async () => {
+        for (const crdId of crdIds) {
+                try {
+                    const crModule = await import("./resources/cr." + crdId);
+                    const crView = crModule.default;
+                    
+                    if (!viewsContext.list().some(v => v.key === crdId)) {
+                        viewsContext.put(crView);
+                    }
+                } catch (error) {
+                    console.log("No custom view for", crdId);
+                }
+                
+                if (
+                    views.length !== crdIds.length ||
+                    !views.every((s: View) => crdIds.includes(s.key))
+                ) {
+                    setViews(fetchViews(crdIds));
+                }
+        }
+    })();
+    
 
     return (
         <AdminUI ready={Loading} loginPage={SSOLogin} requireAuth>
@@ -108,7 +125,7 @@ function DynamicAdminUI() {
             />
             {views.map((v: any) => (
                 <Resource
-                    name={v.name}
+                    name={v.key}
                     options={{ label: v.name }}
                     key={v.key}
                     list={v.list}

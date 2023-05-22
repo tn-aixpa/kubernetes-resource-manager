@@ -33,3 +33,6 @@ build/
 ### VS Code ###
 .vscode/
 src/main/resources/application-local.yaml
+
+### Mac folder options ###
+.DS_Store

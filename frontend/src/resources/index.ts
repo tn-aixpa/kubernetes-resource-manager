@@ -1,7 +1,5 @@
-import { ComponentType, ReactElement } from 'react';
+import { ComponentType, ReactElement, createContext } from 'react';
 import { CrCreate, CrEdit, CrList, CrShow } from './cr';
-// import { PostsView } from './posts';
-// import { UsersView } from './users';
 
 //build views
 export interface View {
@@ -14,7 +12,7 @@ export interface View {
     icon?: ComponentType<any>;
 }
 
-class Views {
+export class Views {
     views: Array<View> = [];
 
     put(v: View) {
@@ -42,12 +40,23 @@ export const fetchViews = (types: string[]): View[] => {
                 edit: CrEdit,
                 show: CrShow,
             };
+        } else {
+            if (!v.list) {
+                v.list = CrList;
+            }
+            if (!v.create) {
+                v.create = CrCreate;
+            }
+            if (!v.edit) {
+                v.edit = CrEdit;
+            }
+            if (!v.show) {
+                v.show = CrShow;
+            }
         }
         return v;
     });
 };
 
-//register
 const views = new Views();
-// views.put(PostsView);
-// views.put(UsersView);
+export const ViewsContext = createContext(views);
