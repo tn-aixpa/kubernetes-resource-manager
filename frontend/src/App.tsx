@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import './App.css';
 import appDataProvider from './dataProvider';
 import { BrowserRouter } from 'react-router-dom';
@@ -10,8 +10,6 @@ import {
     defaultI18nProvider,
     defaultTheme,
     localStorageStore,
-    useDataProvider,
-    useStore,
 } from 'react-admin';
 import {
     SchemaList,
@@ -24,6 +22,7 @@ import { View, ViewsContext, fetchViews } from './resources';
 import authenticationProvider from './authProvider';
 import { SSOLogin } from './components/SSOLogin';
 import { UserManager, WebStorageStateStore } from 'oidc-client-ts';
+import { useUpdateCrdIds } from './hooks/useUpdateCrdIds';
 
 const API_URL: string = process.env.REACT_APP_API_URL as string;
 
@@ -67,44 +66,30 @@ function App() {
 
 function DynamicAdminUI() {
     const [views, setViews] = useState<View[]>([]);
-    const dataProvider = useDataProvider();
-    const [crdIds, setCrdIds] = useStore<string[]>('crdIds', []);
-
-    useEffect(() => {
-        dataProvider
-            .fetchResources()
-            .then((res: any) => {
-                console.log('updating CRD ids in store');
-                setCrdIds(res);
-            })
-            .catch((error: any) => {
-                console.log('updateCrdIds', error);
-            });
-    }, [dataProvider, setCrdIds]);
+    const { crdIds } = useUpdateCrdIds();
 
     const viewsContext = useContext(ViewsContext);
     (async () => {
         for (const crdId of crdIds) {
-                try {
-                    const crModule = await import("./resources/cr." + crdId);
-                    const crView = crModule.default;
-                    
-                    if (!viewsContext.list().some(v => v.key === crdId)) {
-                        viewsContext.put(crView);
-                    }
-                } catch (error) {
-                    console.log("No custom view for", crdId);
+            try {
+                const crModule = await import('./resources/cr.' + crdId);
+                const crView = crModule.default;
+
+                if (!viewsContext.list().some(v => v.key === crdId)) {
+                    viewsContext.put(crView);
                 }
-                
-                if (
-                    views.length !== crdIds.length ||
-                    !views.every((s: View) => crdIds.includes(s.key))
-                ) {
-                    setViews(fetchViews(crdIds));
-                }
+            } catch (error) {
+                console.log('No custom view for', crdId);
+            }
+
+            if (
+                views.length !== crdIds.length ||
+                !views.every((s: View) => crdIds.includes(s.key))
+            ) {
+                setViews(fetchViews(crdIds));
+            }
         }
     })();
-    
 
     return (
         <AdminUI ready={Loading} loginPage={SSOLogin} requireAuth>

@@ -4,32 +4,22 @@ import {
     DeleteWithConfirmButton,
     ToolbarClasses,
     useResourceContext,
-    useDataProvider,
     useNotify,
-    useStore,
     useRedirect,
 } from 'react-admin';
+import { useUpdateCrdIds } from '../hooks/useUpdateCrdIds';
 
 export const DeleteConfirmToolbar = () => {
     const resource = useResourceContext();
     const notify = useNotify();
     const redirect = useRedirect();
-    const dataProvider = useDataProvider();
-    const [crdIds, setCrdIds] = useStore<string[]>('crdIds', []);
+    const { updateCrdIds } = useUpdateCrdIds();
 
     const onSuccess = (data: any) => {
         if (resource === 'crs') {
-            dataProvider
-                .fetchResources()
-                .then((res: any) => {
-                    console.log('updating CRD ids in store');
-                    setCrdIds(res);
-                })
-                .catch((error: any) => {
-                    console.log('updateCrdIds', error);
-                });
+            updateCrdIds();
         }
-        notify('ra.notification.created', { messageArgs: { smart_count: 1 } });
+        notify('ra.notification.deleted', { messageArgs: { smart_count: 1 } });
         redirect('list', resource);
     };
 

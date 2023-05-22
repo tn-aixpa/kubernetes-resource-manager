@@ -19,29 +19,20 @@ import {
     Loading,
     useNotify,
     useRedirect,
-    useDataProvider,
-    useStore,
     useResourceContext,
 } from 'react-admin';
 import { CrdProps } from '../components/CrdProps';
 import { DeleteConfirmToolbar } from '../components/DeleteConfirmToolbar';
+import { useUpdateCrdIds } from '../hooks/useUpdateCrdIds';
 
 export const SchemaList = () => {
     const notify = useNotify();
-    const dataProvider = useDataProvider();
-    const [crdIds, setCrdIds] = useStore<string[]>('crdIds', []);
+
+    const { updateCrdIds } = useUpdateCrdIds();
 
     const onSuccess = (data: any) => {
-        dataProvider
-            .fetchResources()
-            .then((res: any) => {
-                console.log('updating CRD ids in store');
-                setCrdIds(res);
-            })
-            .catch((error: any) => {
-                console.log('updateCrdIds', error);
-            });
-        notify('ra.notification.created', { messageArgs: { smart_count: 1 } });
+        updateCrdIds();
+        notify('ra.notification.deleted', { messageArgs: { smart_count: 1 } });
     };
     return (
         <List>
@@ -52,7 +43,6 @@ export const SchemaList = () => {
                 <TextField source="schema" />
                 <EditButton />
                 <ShowButton />
-                {/* TODO usare onSuccess per aggiornare sidebar, disabilitare delete di gruppo, usare delete con conferma sempre */}
                 <DeleteWithConfirmButton mutationOptions={{ onSuccess }} />
             </Datagrid>
         </List>
@@ -78,20 +68,11 @@ export const SchemaEdit = () => (
 export const SchemaCreate = () => {
     const notify = useNotify();
     const redirect = useRedirect();
-    const dataProvider = useDataProvider();
-    const [crdIds, setCrdIds] = useStore<string[]>('crdIds', []);
     const resource = useResourceContext();
+    const { updateCrdIds } = useUpdateCrdIds();
 
     const onSuccess = (data: any) => {
-        dataProvider
-            .fetchResources()
-            .then((res: any) => {
-                console.log('updating CRD ids in store');
-                setCrdIds(res);
-            })
-            .catch((error: any) => {
-                console.log('updateCrdIds', error);
-            });
+        updateCrdIds();
         notify('ra.notification.created', { messageArgs: { smart_count: 1 } });
         redirect('edit', resource, data.id, data);
     };
@@ -107,7 +88,9 @@ export const SchemaCreate = () => {
                         label="CRD"
                         validate={required()}
                         sx={{ width: '22em' }}
-                        defaultValue={crdIdFromQuery ? crdIdFromQuery : undefined}
+                        defaultValue={
+                            crdIdFromQuery ? crdIdFromQuery : undefined
+                        }
                     />
                 </ReferenceInput>
                 <FormDataConsumer>
