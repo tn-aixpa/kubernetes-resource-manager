@@ -13,11 +13,11 @@ import {
     useShowController,
 } from 'react-admin';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-
+// TODO remove export from other lists
 export const CrdList = () => (
-    <List>
+    <List actions={false}>
         <Datagrid bulkActionButtons={false}>
-            <TextField source="id" />
+            <TextField source="spec.names.kind" label="Name"/>
             <ShowButton />
         </Datagrid>
     </List>

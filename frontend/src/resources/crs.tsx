@@ -16,7 +16,6 @@ import {
     FormDataConsumer,
     DeleteWithConfirmButton,
     useGetOne,
-    Loading,
     useNotify,
     useRedirect,
     useResourceContext,
@@ -24,6 +23,9 @@ import {
 import { CrdProps } from '../components/CrdProps';
 import { DeleteConfirmToolbar } from '../components/DeleteConfirmToolbar';
 import { useUpdateCrdIds } from '../hooks/useUpdateCrdIds';
+import { Typography } from '@mui/material';
+import { useFormContext } from 'react-hook-form';
+import { useEffect } from 'react';
 
 export const SchemaList = () => {
     const notify = useNotify();
@@ -34,18 +36,27 @@ export const SchemaList = () => {
         updateCrdIds();
         notify('ra.notification.deleted', { messageArgs: { smart_count: 1 } });
     };
+    // TODO schema -> copy button with import TextSnippetIcon from '@mui/icons-material/TextSnippet';
+    // TODO All cards should have a title (Create schema, etc.)
     return (
-        <List>
-            <Datagrid bulkActionButtons={false}>
-                <TextField source="id" />
-                <TextField source="crdId" label="CRD" />
-                <TextField source="version" />
-                <TextField source="schema" />
-                <EditButton />
-                <ShowButton />
-                <DeleteWithConfirmButton mutationOptions={{ onSuccess }} />
-            </Datagrid>
-        </List>
+        <>
+            <Typography variant="h4" className="login-page-title">
+                Settings
+            </Typography>
+            <Typography variant="subtitle1" className="login-page-title">
+                Please add a schema to enable CR management.
+            </Typography>
+            <List>
+                <Datagrid bulkActionButtons={false}>
+                    <TextField source="crdId" label="CRD" />
+                    <TextField source="version" />
+                    <TextField source="schema" />
+                    <EditButton />
+                    <ShowButton />
+                    <DeleteWithConfirmButton mutationOptions={{ onSuccess }} />
+                </Datagrid>
+            </List>
+        </>
     );
 };
 
@@ -79,7 +90,7 @@ export const SchemaCreate = () => {
 
     const params = new URLSearchParams(window.location.search);
     const crdIdFromQuery = params.get('crdId');
-
+    // TODO param in backend to filter out CRDs that already have a schema for the stored version
     return (
         <Create mutationOptions={{ onSuccess }}>
             <SimpleForm>
@@ -127,18 +138,16 @@ export const SchemaShow = () => (
     </Show>
 );
 
+// TODO custom field with useFormContext
 const SchemaVersionInput = ({ crdId }: CrdProps) => {
-    const { data, isLoading } = useGetOne('crd', { id: crdId });
-    if (isLoading) return <Loading />;
-    if (!data) return null;
-    const storedVersion = data.spec.versions.filter(
-        (version: any) => version.storage
-    )[0];
-    return (
-        <TextInput
-            source="version"
-            defaultValue={storedVersion.name}
-            disabled
-        />
-    );
+    const { setValue } = useFormContext(); // retrieve all hook methods
+    const { data } = useGetOne('crd', { id: crdId });
+    useEffect(() => {
+        const storedVersion = data.spec.versions.filter(
+            (version: any) => version.storage
+        )[0];
+        setValue('version', storedVersion.name);
+    }, [data, data.spec.versions, setValue]);
+
+    return <TextInput source="version" disabled />;
 };

@@ -1,4 +1,3 @@
-import React, { useContext, useState } from 'react';
 import './App.css';
 import appDataProvider from './dataProvider';
 import { BrowserRouter } from 'react-router-dom';
@@ -7,7 +6,6 @@ import {
     AdminUI,
     Loading,
     Resource,
-    defaultI18nProvider,
     defaultTheme,
     localStorageStore,
 } from 'react-admin';
@@ -17,12 +15,12 @@ import {
     SchemaCreate,
     SchemaShow,
 } from './resources/crs';
-import { CrdList, CrdShow } from './resources/crd';
-import { View, ViewsContext, fetchViews } from './resources';
+import { CrdShow } from './resources/crd';
 import authenticationProvider from './authProvider';
 import { SSOLogin } from './components/SSOLogin';
 import { UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import { useUpdateCrdIds } from './hooks/useUpdateCrdIds';
+import { i18nProvider } from './i18nProvider';
 
 const API_URL: string = process.env.REACT_APP_API_URL as string;
 
@@ -41,8 +39,13 @@ const dataProvider = appDataProvider(API_URL, manager);
 const authProvider = authenticationProvider(manager);
 const store = localStorageStore();
 
-const theme = {
+export const themeOptions = {
     ...defaultTheme,
+    palette: {
+        secondary: {
+            main: '#204372',
+        },
+    },
     sidebar: {
         width: 320, // The default value is 240
     },
@@ -54,9 +57,9 @@ function App() {
             <AdminContext
                 dataProvider={dataProvider}
                 authProvider={authProvider}
-                i18nProvider={defaultI18nProvider}
+                i18nProvider={i18nProvider}
                 store={store}
-                theme={theme}
+                theme={themeOptions}
             >
                 <DynamicAdminUI />
             </AdminContext>
@@ -65,50 +68,12 @@ function App() {
 }
 
 function DynamicAdminUI() {
-    const [views, setViews] = useState<View[]>([]);
-    const { crdIds } = useUpdateCrdIds();
-
-    const viewsContext = useContext(ViewsContext);
-    (async () => {
-        for (const crdId of crdIds) {
-            try {
-                const crModule = await import('./resources/cr.' + crdId);
-                const crView = crModule.default;
-
-                if (!viewsContext.list().some(v => v.key === crdId)) {
-                    viewsContext.put(crView);
-                }
-            } catch (error) {
-                console.log('No custom view for', crdId);
-            }
-
-            if (
-                views.length !== crdIds.length ||
-                !views.every((s: View) => crdIds.includes(s.key))
-            ) {
-                setViews(fetchViews(crdIds));
-            }
-        }
-    })();
-
+    const { getViewsList } = useUpdateCrdIds();
+    // Views will not load on refresh if CrdIds is set
+    // TODO custom menu: Dashboard, cr1, cr2,... Settings (schema, at the bottom)
     return (
         <AdminUI ready={Loading} loginPage={SSOLogin} requireAuth>
-            <Resource
-                name="crs"
-                list={SchemaList}
-                edit={SchemaEdit}
-                create={SchemaCreate}
-                show={SchemaShow}
-                options={{ label: 'Schemas' }}
-            />
-            <Resource
-                name="crd"
-                list={CrdList}
-                show={CrdShow}
-                options={{ label: 'CRDs' }}
-                recordRepresentation="id"
-            />
-            {views.map((v: any) => (
+            {getViewsList().map((v: any) => (
                 <Resource
                     name={v.key}
                     options={{ label: v.name }}
@@ -120,6 +85,20 @@ function DynamicAdminUI() {
                     icon={v.icon}
                 />
             ))}
+            <Resource
+                name="crs"
+                list={SchemaList}
+                edit={SchemaEdit}
+                create={SchemaCreate}
+                show={SchemaShow}
+                options={{ label: 'Settings' }}
+            />
+            <Resource
+                name="crd"
+                show={CrdShow}
+                options={{ label: 'CRDs' }}
+                recordRepresentation="id"
+            />
         </AdminUI>
     );
 }
