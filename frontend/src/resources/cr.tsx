@@ -15,75 +15,114 @@ import {
     useGetOne,
     Loading,
     DeleteWithConfirmButton,
+    useTranslate,
 } from 'react-admin';
 import { parse, format } from '../utils';
 import { CrdProps } from '../components/CrdProps';
 import { DeleteConfirmToolbar } from '../components/DeleteConfirmToolbar';
+import { Typography } from '@mui/material';
 
-export const CrList = () => (
-    <List>
-        <Datagrid>
-            <TextField source="id" />
-            <TextField source="apiVersion" />
-            <TextField source="kind" />
-            <EditButton />
-            <ShowButton />
-            <DeleteWithConfirmButton />
-        </Datagrid>
-    </List>
-);
+export const CrList = () => {
+    const crdId = useResourceContext();
+    const translate = useTranslate();
+    
+    return (
+        <>
+            <Typography variant="h4" className="login-page-title" sx={{"padding": "20px 0px 12px 0px"}}>
+                {crdId}
+            </Typography>
+            <List>
+                <Datagrid>
+                    <TextField source="id" />
+                    <TextField source="apiVersion" />
+                    <TextField source="kind" />
+                    <EditButton />
+                    <ShowButton />
+                    <DeleteWithConfirmButton />
+                </Datagrid>
+            </List>
+        </>
+    );
+}
 
-export const CrEdit = () => (
-    <Edit>
-        <SimpleForm toolbar={<DeleteConfirmToolbar />}>
-            <TextInput source="apiVersion" disabled />
-            <TextInput source="kind" disabled />
-            <TextInput source="metadata.name" disabled />
-            <TextInput
-                source="spec"
-                fullWidth
-                multiline
-                parse={parse}
-                format={format}
-            />
-        </SimpleForm>
-    </Edit>
-);
+export const CrEdit = () => {
+    const crdId = useResourceContext();
+    const translate = useTranslate();
+    
+    return (
+        <>
+            <Typography variant="h4" className="login-page-title" sx={{"padding": "20px 0px 12px 0px"}}>
+                {translate("pages.cr.edit.title") + crdId}
+            </Typography>
+            <Edit>
+                <SimpleForm toolbar={<DeleteConfirmToolbar />}>
+                    <TextInput source="apiVersion" disabled />
+                    <TextInput source="kind" disabled />
+                    <TextInput source="metadata.name" disabled />
+                    <TextInput
+                        source="spec"
+                        fullWidth
+                        multiline
+                        parse={parse}
+                        format={format}
+                    />
+                </SimpleForm>
+            </Edit>
+        </>
+    );
+}
 
 export const CrCreate = () => {
     const crdId = useResourceContext();
+    const translate = useTranslate();
+
     return (
-        <Create>
-            <SimpleForm>
-                {crdId && <ApiVersionInput crdId={crdId} />}
-                {crdId && <KindInput crdId={crdId} />}
-                {/* <ReferenceInput source="kind" reference="crd" filter={{ id: useResourceContext() }} >
-                    <PrecompiledInput />
-                </ReferenceInput> */}
-                <TextInput source="metadata.name" validate={required()} />
-                <TextInput
-                    source="spec"
-                    fullWidth
-                    multiline
-                    parse={parse}
-                    format={format}
-                />
-            </SimpleForm>
-        </Create>
+        <>
+            <Typography variant="h4" className="login-page-title" sx={{"padding": "20px 0px 12px 0px"}}>
+                {translate("pages.cr.create.title") + crdId}
+            </Typography>
+            <Create>
+                <SimpleForm>
+                    {crdId && <ApiVersionInput crdId={crdId} />}
+                    {crdId && <KindInput crdId={crdId} />}
+                    {/* <ReferenceInput source="kind" reference="crd" filter={{ id: useResourceContext() }} >
+                        <PrecompiledInput />
+                    </ReferenceInput> */}
+                    <TextInput source="metadata.name" validate={required()} />
+                    <TextInput
+                        source="spec"
+                        fullWidth
+                        multiline
+                        parse={parse}
+                        format={format}
+                    />
+                </SimpleForm>
+            </Create>
+        </>
     );
 };
 
-export const CrShow = () => (
-    <Show>
-        <SimpleShowLayout>
-            <TextField source="id" />
-            <TextField source="apiVersion" />
-            <TextField source="kind" />
-            <TextField source="metadata" />
-            <TextField source="spec" />
-        </SimpleShowLayout>
-    </Show>
-);
+export const CrShow = () => {
+    const crdId = useResourceContext();
+    const translate = useTranslate();
+    
+    return (
+        <>
+            <Typography variant="h4" className="login-page-title" sx={{"padding": "20px 0px 12px 0px"}}>
+                {translate("pages.cr.show.title") + crdId}
+            </Typography>
+            <Show>
+                <SimpleShowLayout>
+                    <TextField source="id" />
+                    <TextField source="apiVersion" />
+                    <TextField source="kind" />
+                    <TextField source="metadata" />
+                    <TextField source="spec" />
+                </SimpleShowLayout>
+            </Show>
+        </>
+    );
+}
 
 const ApiVersionInput = ({ crdId }: CrdProps) => {
     const { data, isLoading } = useGetOne('crd', { id: crdId });

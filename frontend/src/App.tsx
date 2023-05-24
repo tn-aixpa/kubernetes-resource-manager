@@ -21,6 +21,9 @@ import { SSOLogin } from './components/SSOLogin';
 import { UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import { useUpdateCrdIds } from './hooks/useUpdateCrdIds';
 import { i18nProvider } from './i18nProvider';
+import SettingsIcon from '@mui/icons-material/Settings';
+import MyLayout from './components/Layout';
+import MyDashboard from './components/Dashboard';
 
 const API_URL: string = process.env.REACT_APP_API_URL as string;
 
@@ -69,10 +72,9 @@ function App() {
 
 function DynamicAdminUI() {
     const { getViewsList } = useUpdateCrdIds();
-    // Views will not load on refresh if CrdIds is set
-    // TODO custom menu: Dashboard, cr1, cr2,... Settings (schema, at the bottom)
+    // TODO fix: Views will not load on refresh if CrdIds is set
     return (
-        <AdminUI ready={Loading} loginPage={SSOLogin} requireAuth>
+        <AdminUI ready={Loading} dashboard={MyDashboard} loginPage={SSOLogin} layout={MyLayout} requireAuth>
             {getViewsList().map((v: any) => (
                 <Resource
                     name={v.key}
@@ -91,6 +93,7 @@ function DynamicAdminUI() {
                 edit={SchemaEdit}
                 create={SchemaCreate}
                 show={SchemaShow}
+                icon={SettingsIcon}
                 options={{ label: 'Settings' }}
             />
             <Resource

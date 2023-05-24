@@ -6,12 +6,26 @@ const messages = {
     ...englishMessages,
     resources: {
         crs: {
-            name: 'Schema |||| Schemi',
+            name: 'Impostazioni',
             fields: {
                 version: 'Versione',
             },
         },
     },
+    pages: {
+        schema: {
+            list: {
+                title: "Impostazioni",
+                subtitle: "Aggiungere uno schema per abilitare la gestione delle CR corrispondenti."
+            },
+            create: {
+                title: "Crea schema"
+            },
+        },
+        cr: {
+
+        }
+    }
 };
 
 export default messages;
