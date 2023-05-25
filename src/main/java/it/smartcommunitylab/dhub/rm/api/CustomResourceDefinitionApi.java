@@ -45,9 +45,10 @@ public class CustomResourceDefinitionApi {
     @GetMapping
     public Page<IdAwareCustomResourceDefinition> findAll(
         @RequestParam(required = false) Collection<String> id,
+        @RequestParam(required = false) boolean onlyWithoutSchema,
         Pageable pageable
     ) {
-        return service.findAll(id, pageable);
+        return service.findAll(id, onlyWithoutSchema, pageable);
     }
 
     @GetMapping("/{id}")

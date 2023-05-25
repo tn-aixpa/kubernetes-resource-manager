@@ -132,7 +132,7 @@ export const SchemaCreate = () => {
             </Typography>
             <Create mutationOptions={{ onSuccess }}>
                 <SimpleForm>
-                    <ReferenceInput source="crdId" reference="crd">
+                    <ReferenceInput source="crdId" reference="crd" filter={{"onlyWithoutSchema": true}}>
                         <AutocompleteInput
                             label="CRD"
                             validate={required()}

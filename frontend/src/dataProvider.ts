@@ -1,4 +1,3 @@
-//import { Buffer } from 'buffer';
 import { UserManager } from 'oidc-client-ts';
 import { stringify } from 'querystring';
 import { fetchUtils, DataProvider } from 'ra-core';
@@ -60,9 +59,15 @@ const dataProvider = (
                 size: perPage,
             };
             let url = `${apiUrl}/${resource}?${stringify(query)}`;
+
             const idFilter = params?.filter?.id;
             if (idFilter) {
                 url += `&id=${idFilter}`;
+            }
+
+            const onlyWithoutSchema = params?.filter?.onlyWithoutSchema
+            if (onlyWithoutSchema) {
+                url += `&onlyWithoutSchema=${onlyWithoutSchema}`;
             }
 
             return httpClient(url).then(({ headers, json }) => {

@@ -9,7 +9,9 @@ import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinition
 import io.fabric8.kubernetes.client.KubernetesClient;
 import it.smartcommunitylab.dhub.rm.SystemKeys;
 import it.smartcommunitylab.dhub.rm.exception.ParsingException;
+import it.smartcommunitylab.dhub.rm.model.CustomResourceSchema;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResourceDefinition;
+import it.smartcommunitylab.dhub.rm.repository.CustomResourceSchemaRepository;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -30,10 +32,16 @@ public class CustomResourceDefinitionService {
 
     private final KubernetesClient client;
     private final AuthorizationService authService;
+    private final CustomResourceSchemaRepository customResourceSchemaRepository;
 
-    public CustomResourceDefinitionService(KubernetesClient client, AuthorizationService authService) {
+    public CustomResourceDefinitionService(
+        KubernetesClient client,
+        AuthorizationService authService,
+        CustomResourceSchemaRepository customResourceSchemaRepository
+    ) {
         this.client = client;
         this.authService = authService;
+        this.customResourceSchemaRepository = customResourceSchemaRepository;
     }
 
     private CustomResourceDefinitionVersion fetchVersion(String crdId, String versionName) {
@@ -118,15 +126,40 @@ public class CustomResourceDefinitionService {
         return kubeVersion.isPresent();
     }
 
-    public Page<IdAwareCustomResourceDefinition> findAll(Collection<String> ids, Pageable pageable) {
+    public Page<IdAwareCustomResourceDefinition> findAll(
+        Collection<String> ids,
+        boolean onlyWithoutSchema,
+        Pageable pageable
+    ) {
         List<IdAwareCustomResourceDefinition> crds;
         if (ids == null) {
+            CustomResourceDefinitionVersion a;
             CustomResourceDefinitionList crdList = client.apiextensions().v1().customResourceDefinitions().list();
             crds =
                 crdList
                     .getItems()
                     .stream()
-                    .filter(crd -> authService.isCrdAllowed(crd.getMetadata().getName()))
+                    .filter(crd -> {
+                        if (!authService.isCrdAllowed(crd.getMetadata().getName())) {
+                            return false;
+                        }
+                        Optional<CustomResourceDefinitionVersion> storedVersion = crd
+                            .getSpec()
+                            .getVersions()
+                            .stream()
+                            .filter(version -> version.getStorage())
+                            .findAny();
+                        if (storedVersion.isPresent()) {
+                            String storedVersionName = storedVersion.get().getName();
+                            Optional<CustomResourceSchema> schema =
+                                customResourceSchemaRepository.findByCrdIdAndVersion(
+                                    crd.getMetadata().getName(),
+                                    storedVersionName
+                                );
+                            return (!schema.isPresent());
+                        }
+                        return true;
+                    })
                     .map(IdAwareCustomResourceDefinition::new)
                     .collect(Collectors.toList());
         } else {
