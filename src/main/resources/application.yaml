@@ -23,7 +23,7 @@ kubernetes:
 
 # authentication and authorization config
 auth:
-  basic-username: user
-  basic-password: password
+  basic-username:
+  basic-password:
   oauth2-issuer-uri:
   oauth2-audience:

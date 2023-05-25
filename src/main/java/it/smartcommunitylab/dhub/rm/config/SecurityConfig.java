@@ -1,10 +1,14 @@
 package it.smartcommunitylab.dhub.rm.config;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 import it.smartcommunitylab.dhub.rm.SystemKeys;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,19 +44,16 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+
     @Autowired
     AuthenticationProperties authProps;
 
     @Bean("apiSecurityFilterChain")
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        //base config
         http
             .securityMatcher(new AntPathRequestMatcher(SystemKeys.API_PATH + "/**"))
-            .oauth2ResourceServer(oauth2 ->
-                oauth2.jwt().decoder(jwtDecoder()).jwtAuthenticationConverter(jwtAuthenticationConverter())
-            )
-            .httpBasic()
-            .and()
-            .authorizeHttpRequests(requests -> requests.anyRequest().authenticated())
             // allow cors
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             // disable csrf
@@ -61,18 +62,43 @@ public class SecurityConfig {
             // we don't want a session for these endpoints
             .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
+        //authentication (when configured)
+        if (authProps.isRequired()) {
+            logger.debug("Authentication required, enabled.");
+            http.authorizeHttpRequests(requests -> requests.anyRequest().authenticated());
+
+            if (authProps.isBasicAuthEnabled()) {
+                logger.info("Enable basic authentication");
+                http.httpBasic(withDefaults());
+            }
+
+            if (authProps.isOAuthEnabled()) {
+                logger.info("Enable JWT authentication");
+                http.oauth2ResourceServer(oauth2 ->
+                    oauth2.jwt().decoder(jwtDecoder()).jwtAuthenticationConverter(jwtAuthenticationConverter())
+                );
+            }
+        } else {
+            logger.warn("Enable anonymous authentication");
+            http.anonymous(anon -> anon.authorities("ROLE_USER"));
+        }
+
         return http.build();
     }
 
     @Bean
     public UserDetailsService userDetailsService() {
-        UserDetails user = User
-            .withDefaultPasswordEncoder()
-            .username(authProps.getBasicUsername())
-            .password(authProps.getBasicPassword())
-            .roles("USER")
-            .build();
-        return new InMemoryUserDetailsManager(user);
+        if (authProps.isBasicAuthEnabled()) {
+            UserDetails user = User
+                .withDefaultPasswordEncoder()
+                .username(authProps.getBasicUsername())
+                .password(authProps.getBasicPassword())
+                .roles("USER", "ADMIN")
+                .build();
+            return new InMemoryUserDetailsManager(user);
+        }
+
+        return new InMemoryUserDetailsManager();
     }
 
     private JwtDecoder jwtDecoder() {

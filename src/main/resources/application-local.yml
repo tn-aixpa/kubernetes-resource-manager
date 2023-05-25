@@ -1,0 +1,5 @@
+kubernetes.config: file:///home/mat/.kube/config
+namespace: mlrun
+
+# auth.basic-username: username
+# auth.basic-password: password
