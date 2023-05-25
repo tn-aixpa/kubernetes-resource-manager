@@ -13,17 +13,15 @@ const MyMenu = (props: MenuProps) => {
         <Menu {...props}>
             <Menu.DashboardItem />
             {Object.keys(resources).map(name =>
-                name === 'crs' ? (
-                    <div key="settings">
-                        <Divider />
-                        <Menu.ResourceItem name={name} />
-                    </div>
-                ) : (
-                    name !== 'crd' && (
+                name !== 'crd' && name !== 'crs' && (
                         <Menu.ResourceItem key={name} name={name} />
                     )
                 )
-            )}
+            }
+            <div key="settings">
+                <Divider />
+                <Menu.ResourceItem name={"crs"} />
+            </div>
         </Menu>
     );
 };

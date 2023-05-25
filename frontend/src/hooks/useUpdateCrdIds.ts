@@ -43,7 +43,6 @@ const updateViews = (res: string[]) => {
     return viewsList;
 }
 
-// TODO hook to obtain list of views
 export const useUpdateCrdIds = () => {
     const dataProvider = useDataProvider();
     const [crdIds, setCrdIds] = useStore<string[]>('crdIds', []);

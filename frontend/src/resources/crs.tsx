@@ -20,13 +20,19 @@ import {
     useRedirect,
     useResourceContext,
     useTranslate,
+    useRecordContext,
+    useShowController,
+    Loading,
+    Button,
 } from 'react-admin';
 import { CrdProps } from '../components/CrdProps';
 import { DeleteConfirmToolbar } from '../components/DeleteConfirmToolbar';
 import { useUpdateCrdIds } from '../hooks/useUpdateCrdIds';
 import { Typography } from '@mui/material';
+import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import { useFormContext } from 'react-hook-form';
 import { useEffect } from 'react';
+import ListActionsCreate from '../components/ListActionsCreate';
 
 export const SchemaList = () => {
     const notify = useNotify();
@@ -39,20 +45,27 @@ export const SchemaList = () => {
         notify('ra.notification.deleted', { messageArgs: { smart_count: 1 } });
     };
     // TODO schema -> copy button with import TextSnippetIcon from '@mui/icons-material/TextSnippet';
-    // TODO All cards should have a title (Create schema, etc.)
     return (
         <>
-            <Typography variant="h4" className="login-page-title" sx={{"padding": "20px 0px 12px 0px"}}>
-                {translate("pages.schema.list.title")}
+            <Typography
+                variant="h4"
+                className="login-page-title"
+                sx={{ padding: '20px 0px 12px 0px' }}
+            >
+                {translate('pages.schema.list.title')}
             </Typography>
-            <Typography variant="subtitle1" className="login-page-title" sx={{"padding": "0px"}}>
-                {translate("pages.schema.list.subtitle")}
+            <Typography
+                variant="subtitle1"
+                className="login-page-title"
+                sx={{ padding: '0px' }}
+            >
+                {translate('pages.schema.list.subtitle')}
             </Typography>
-            <List>
+            <List actions={<ListActionsCreate />}>
                 <Datagrid bulkActionButtons={false}>
                     <TextField source="crdId" label="CRD" />
                     <TextField source="version" />
-                    <TextField source="schema" />
+                    <CopyButton />
                     <EditButton />
                     <ShowButton />
                     <DeleteWithConfirmButton mutationOptions={{ onSuccess }} />
@@ -66,8 +79,12 @@ export const SchemaEdit = () => {
     const translate = useTranslate();
     return (
         <>
-            <Typography variant="h4" className="login-page-title" sx={{"padding": "20px 0px 12px 0px"}}>
-                {translate("pages.schema.edit.title")}
+            <Typography
+                variant="h4"
+                className="login-page-title"
+                sx={{ padding: '20px 0px 12px 0px' }}
+            >
+                {translate('pages.schema.edit.title')}
             </Typography>
             <Edit>
                 <SimpleForm toolbar={<DeleteConfirmToolbar />}>
@@ -104,8 +121,12 @@ export const SchemaCreate = () => {
     // TODO param in backend to filter out CRDs that already have a schema for the stored version
     return (
         <>
-            <Typography variant="h4" className="login-page-title" sx={{"padding": "20px 0px 12px 0px"}}>
-                {translate("pages.schema.create.title")}
+            <Typography
+                variant="h4"
+                className="login-page-title"
+                sx={{ padding: '20px 0px 12px 0px' }}
+            >
+                {translate('pages.schema.create.title')}
             </Typography>
             <Create mutationOptions={{ onSuccess }}>
                 <SimpleForm>
@@ -144,11 +165,17 @@ export const SchemaCreate = () => {
 
 export const SchemaShow = () => {
     const translate = useTranslate();
-    //TODO aggiungere collegamento per cliccare sul crd id e aprire la crd o includerla
+    const { record } = useShowController();
+    const crdId = record.crdId;
+
     return (
         <>
-            <Typography variant="h4" className="login-page-title" sx={{"padding": "20px 0px 12px 0px"}}>
-                {translate("pages.schema.show.title")}
+            <Typography
+                variant="h4"
+                className="login-page-title"
+                sx={{ padding: '20px 0px 12px 0px' }}
+            >
+                {translate('pages.schema.show.title')}
             </Typography>
             <Show>
                 <SimpleShowLayout>
@@ -156,6 +183,18 @@ export const SchemaShow = () => {
                     <TextField source="crdId" label="CRD" />
                     <TextField source="version" />
                     <TextField source="schema" />
+                </SimpleShowLayout>
+            </Show>
+            <Typography
+                variant="h6"
+                className="login-page-title"
+                sx={{ padding: '20px 0px 0px 0px' }}
+            >
+                CRD
+            </Typography>
+            <Show actions={false}>
+                <SimpleShowLayout>
+                    <CrdField crdId={crdId} />
                 </SimpleShowLayout>
             </Show>
         </>
@@ -173,4 +212,22 @@ const SchemaVersionInput = ({ crdId }: CrdProps) => {
     }, [data, data.spec.versions, setValue]);
 
     return <TextInput source="version" disabled />;
+};
+
+const CrdField = ({ crdId }: CrdProps) => {
+    const { data, isLoading } = useGetOne('crd', { id: crdId });
+    if (isLoading) return <Loading />;
+    if (!data) return null;
+    return <>{JSON.stringify(data)}</>;
+};
+
+const CopyButton = () => {
+    const { schema } = useRecordContext();
+    return (
+        <Button
+            label={'Copy'}
+            startIcon={<TextSnippetIcon />}
+            onClick={() => navigator.clipboard.writeText(schema)}
+        />
+    );
 };

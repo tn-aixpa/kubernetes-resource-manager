@@ -21,17 +21,24 @@ import { parse, format } from '../utils';
 import { CrdProps } from '../components/CrdProps';
 import { DeleteConfirmToolbar } from '../components/DeleteConfirmToolbar';
 import { Typography } from '@mui/material';
+import ListActionsCreate from '../components/ListActionsCreate';
+// TODO contact backend to use kind instead of crdid in titles
 
+// TODO (also for crs): remove delete from edit, put delete in show, put back to list in show (useRedirect) (cancel in edit), change create redirect to list
 export const CrList = () => {
     const crdId = useResourceContext();
     const translate = useTranslate();
-    
+
     return (
         <>
-            <Typography variant="h4" className="login-page-title" sx={{"padding": "20px 0px 12px 0px"}}>
-                {crdId}
+            <Typography
+                variant="h4"
+                className="login-page-title"
+                sx={{ padding: '20px 0px 12px 0px' }}
+            >
+                {crdId + translate('pages.cr.list.title')}
             </Typography>
-            <List>
+            <List actions={<ListActionsCreate />}>
                 <Datagrid>
                     <TextField source="id" />
                     <TextField source="apiVersion" />
@@ -43,16 +50,20 @@ export const CrList = () => {
             </List>
         </>
     );
-}
+};
 
 export const CrEdit = () => {
     const crdId = useResourceContext();
     const translate = useTranslate();
-    
+
     return (
         <>
-            <Typography variant="h4" className="login-page-title" sx={{"padding": "20px 0px 12px 0px"}}>
-                {translate("pages.cr.edit.title") + crdId}
+            <Typography
+                variant="h4"
+                className="login-page-title"
+                sx={{ padding: '20px 0px 12px 0px' }}
+            >
+                {translate('pages.cr.edit.title') + crdId}
             </Typography>
             <Edit>
                 <SimpleForm toolbar={<DeleteConfirmToolbar />}>
@@ -70,7 +81,7 @@ export const CrEdit = () => {
             </Edit>
         </>
     );
-}
+};
 
 export const CrCreate = () => {
     const crdId = useResourceContext();
@@ -78,8 +89,12 @@ export const CrCreate = () => {
 
     return (
         <>
-            <Typography variant="h4" className="login-page-title" sx={{"padding": "20px 0px 12px 0px"}}>
-                {translate("pages.cr.create.title") + crdId}
+            <Typography
+                variant="h4"
+                className="login-page-title"
+                sx={{ padding: '20px 0px 12px 0px' }}
+            >
+                {translate('pages.cr.create.title') + crdId}
             </Typography>
             <Create>
                 <SimpleForm>
@@ -105,11 +120,15 @@ export const CrCreate = () => {
 export const CrShow = () => {
     const crdId = useResourceContext();
     const translate = useTranslate();
-    
+
     return (
         <>
-            <Typography variant="h4" className="login-page-title" sx={{"padding": "20px 0px 12px 0px"}}>
-                {translate("pages.cr.show.title") + crdId}
+            <Typography
+                variant="h4"
+                className="login-page-title"
+                sx={{ padding: '20px 0px 12px 0px' }}
+            >
+                {translate('pages.cr.show.title') + crdId}
             </Typography>
             <Show>
                 <SimpleShowLayout>
@@ -122,7 +141,7 @@ export const CrShow = () => {
             </Show>
         </>
     );
-}
+};
 
 const ApiVersionInput = ({ crdId }: CrdProps) => {
     const { data, isLoading } = useGetOne('crd', { id: crdId });

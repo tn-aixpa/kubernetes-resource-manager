@@ -24,4 +24,4 @@ yarn-error.log*
 
 .env.development
 
-src/resources/cr.*.tsx
+# src/resources/cr.*.tsx

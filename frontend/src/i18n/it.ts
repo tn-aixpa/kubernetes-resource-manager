@@ -21,9 +21,26 @@ const messages = {
             create: {
                 title: "Crea schema"
             },
+            edit: {
+                title: "Modifica schema"
+            },
+            show: {
+                title: "Visualizza schema"
+            },
         },
         cr: {
-
+            list: {
+                title: " custom resources"
+            },
+            create: {
+                title: "Crea "
+            },
+            edit: {
+                title: "Modifica "
+            },
+            show: {
+                title: "Visualizza "
+            },
         }
     }
 };

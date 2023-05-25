@@ -27,6 +27,9 @@ const messages = {
             },
         },
         cr: {
+            list: {
+                title: " custom resources"
+            },
             create: {
                 title: "Create "
             },

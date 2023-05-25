@@ -13,11 +13,11 @@ import {
     useShowController,
 } from 'react-admin';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-// TODO remove export from other lists
+
 export const CrdList = () => (
     <List actions={false}>
         <Datagrid bulkActionButtons={false}>
-            <TextField source="spec.names.kind" label="Name"/>
+            <TextField source="spec.names.kind" label="Name" />
             <ShowButton />
         </Datagrid>
     </List>
@@ -49,7 +49,7 @@ const RelatedResources = () => {
     if (isLoading) return <Loading />;
     if (!data) return null;
     return total ? (
-        <React.Fragment>
+        <>
             <Datagrid
                 data={data}
                 total={total}
@@ -62,9 +62,16 @@ const RelatedResources = () => {
                 <TextField source="schema" />
                 <ShowButton />
             </Datagrid>
-            <Button label='List CRs' startIcon={<VisibilityIcon />} href={`${window.location.origin}/${record.id}`}></Button>
-        </React.Fragment>
+            <Button
+                label="List CRs"
+                startIcon={<VisibilityIcon />}
+                href={`${window.location.origin}/${record.id}`}
+            ></Button>
+        </>
     ) : (
-        <Button label='Create schema' href={`${window.location.origin}/crs/create?crdId=${record.id}`}></Button>
+        <Button
+            label="Create schema"
+            href={`${window.location.origin}/crs/create?crdId=${record.id}`}
+        ></Button>
     );
 };
