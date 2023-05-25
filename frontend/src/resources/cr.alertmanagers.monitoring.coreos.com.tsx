@@ -10,7 +10,7 @@ import {
 } from 'react-admin';
 import { View } from './index';
 import { Typography } from '@mui/material';
-import ListActionsCreate from '../components/ListActionsCreate';
+import ListTopToolbar from '../components/top-toolbars/ListTopToolbar';
 
 const CrList = () => {
     return (
@@ -22,7 +22,7 @@ const CrList = () => {
             >
                 {'Custom title'}
             </Typography>
-            <List actions={<ListActionsCreate />}>
+            <List actions={<ListTopToolbar />}>
                 <Datagrid>
                     <TextField source="id" />
                     <TextField label="API Version" source="apiVersion" />

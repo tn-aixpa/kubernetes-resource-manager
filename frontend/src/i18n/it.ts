@@ -15,34 +15,35 @@ const messages = {
     pages: {
         schema: {
             list: {
-                title: "Impostazioni",
-                subtitle: "Aggiungere uno schema per abilitare la gestione delle CR corrispondenti."
+                title: 'Impostazioni',
+                subtitle:
+                    'Aggiungere uno schema per abilitare la gestione delle CR corrispondenti.',
             },
             create: {
-                title: "Crea schema"
+                title: 'Crea schema',
             },
             edit: {
-                title: "Modifica schema"
+                title: 'Modifica schema',
             },
             show: {
-                title: "Visualizza schema"
+                title: 'Visualizza schema',
             },
         },
         cr: {
             list: {
-                title: " custom resources"
+                title: '',
             },
             create: {
-                title: "Crea "
+                title: 'Crea ',
             },
             edit: {
-                title: "Modifica "
+                title: 'Modifica ',
             },
             show: {
-                title: "Visualizza "
+                title: 'Visualizza ',
             },
-        }
-    }
+        },
+    },
 };
 
 export default messages;

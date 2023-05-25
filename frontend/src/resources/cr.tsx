@@ -19,26 +19,16 @@ import {
 } from 'react-admin';
 import { parse, format } from '../utils';
 import { CrdProps } from '../components/CrdProps';
-import { DeleteConfirmToolbar } from '../components/DeleteConfirmToolbar';
 import { Typography } from '@mui/material';
-import ListActionsCreate from '../components/ListActionsCreate';
-// TODO contact backend to use kind instead of crdid in titles
-
-// TODO (also for crs): remove delete from edit, put delete in show, put back to list in show (useRedirect) (cancel in edit), change create redirect to list
+import ListTopToolbar from '../components/top-toolbars/ListTopToolbar';
+import { SaveToolbar } from '../components/SaveToolbar';
+import ShowTopToolbar from '../components/top-toolbars/ShowTopToolbar';
+import EditTopToolbar from '../components/top-toolbars/EditTopToolbar';
 export const CrList = () => {
-    const crdId = useResourceContext();
-    const translate = useTranslate();
-
     return (
         <>
-            <Typography
-                variant="h4"
-                className="login-page-title"
-                sx={{ padding: '20px 0px 12px 0px' }}
-            >
-                {crdId + translate('pages.cr.list.title')}
-            </Typography>
-            <List actions={<ListActionsCreate />}>
+            <PageTitle pageType="list" />
+            <List actions={<ListTopToolbar />}>
                 <Datagrid>
                     <TextField source="id" />
                     <TextField source="apiVersion" />
@@ -53,20 +43,11 @@ export const CrList = () => {
 };
 
 export const CrEdit = () => {
-    const crdId = useResourceContext();
-    const translate = useTranslate();
-
     return (
         <>
-            <Typography
-                variant="h4"
-                className="login-page-title"
-                sx={{ padding: '20px 0px 12px 0px' }}
-            >
-                {translate('pages.cr.edit.title') + crdId}
-            </Typography>
-            <Edit>
-                <SimpleForm toolbar={<DeleteConfirmToolbar />}>
+            <PageTitle pageType="edit" />
+            <Edit actions={<EditTopToolbar />}>
+                <SimpleForm toolbar={<SaveToolbar />}>
                     <TextInput source="apiVersion" disabled />
                     <TextInput source="kind" disabled />
                     <TextInput source="metadata.name" disabled />
@@ -85,18 +66,11 @@ export const CrEdit = () => {
 
 export const CrCreate = () => {
     const crdId = useResourceContext();
-    const translate = useTranslate();
 
     return (
         <>
-            <Typography
-                variant="h4"
-                className="login-page-title"
-                sx={{ padding: '20px 0px 12px 0px' }}
-            >
-                {translate('pages.cr.create.title') + crdId}
-            </Typography>
-            <Create>
+            <PageTitle pageType="create" />
+            <Create redirect="list">
                 <SimpleForm>
                     {crdId && <ApiVersionInput crdId={crdId} />}
                     {crdId && <KindInput crdId={crdId} />}
@@ -118,19 +92,10 @@ export const CrCreate = () => {
 };
 
 export const CrShow = () => {
-    const crdId = useResourceContext();
-    const translate = useTranslate();
-
     return (
         <>
-            <Typography
-                variant="h4"
-                className="login-page-title"
-                sx={{ padding: '20px 0px 12px 0px' }}
-            >
-                {translate('pages.cr.show.title') + crdId}
-            </Typography>
-            <Show>
+            <PageTitle pageType="show" />
+            <Show actions={<ShowTopToolbar />}>
                 <SimpleShowLayout>
                     <TextField source="id" />
                     <TextField source="apiVersion" />
@@ -168,5 +133,25 @@ const KindInput = ({ crdId }: CrdProps) => {
     if (!data) return null;
     return (
         <TextInput source="kind" defaultValue={data.spec.names.kind} disabled />
+    );
+};
+
+const PageTitle = ({ pageType }: { pageType: string }) => {
+    const crdId = useResourceContext();
+    const translate = useTranslate();
+
+    const { data, isLoading } = useGetOne('crd', { id: crdId });
+    if (isLoading) return <Loading />;
+    if (!data) return null;
+
+    return (
+        <Typography
+            variant="h4"
+            className="login-page-title"
+            sx={{ padding: '20px 0px 12px 0px' }}
+        >
+            {translate('pages.cr.' + pageType + '.title') +
+                data.spec.names.kind}
+        </Typography>
     );
 };

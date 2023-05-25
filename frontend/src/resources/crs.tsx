@@ -26,13 +26,15 @@ import {
     Button,
 } from 'react-admin';
 import { CrdProps } from '../components/CrdProps';
-import { DeleteConfirmToolbar } from '../components/DeleteConfirmToolbar';
 import { useUpdateCrdIds } from '../hooks/useUpdateCrdIds';
 import { Typography } from '@mui/material';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import { useFormContext } from 'react-hook-form';
 import { useEffect } from 'react';
-import ListActionsCreate from '../components/ListActionsCreate';
+import { SaveToolbar } from '../components/SaveToolbar';
+import ListTopToolbar from '../components/top-toolbars/ListTopToolbar';
+import ShowTopToolbar from '../components/top-toolbars/ShowTopToolbar';
+import EditTopToolbar from '../components/top-toolbars/EditTopToolbar';
 
 export const SchemaList = () => {
     const notify = useNotify();
@@ -44,7 +46,7 @@ export const SchemaList = () => {
         updateCrdIds();
         notify('ra.notification.deleted', { messageArgs: { smart_count: 1 } });
     };
-    // TODO schema -> copy button with import TextSnippetIcon from '@mui/icons-material/TextSnippet';
+
     return (
         <>
             <Typography
@@ -61,7 +63,7 @@ export const SchemaList = () => {
             >
                 {translate('pages.schema.list.subtitle')}
             </Typography>
-            <List actions={<ListActionsCreate />}>
+            <List actions={<ListTopToolbar />}>
                 <Datagrid bulkActionButtons={false}>
                     <TextField source="crdId" label="CRD" />
                     <TextField source="version" />
@@ -86,8 +88,8 @@ export const SchemaEdit = () => {
             >
                 {translate('pages.schema.edit.title')}
             </Typography>
-            <Edit>
-                <SimpleForm toolbar={<DeleteConfirmToolbar />}>
+            <Edit actions={<EditTopToolbar />}>
+                <SimpleForm toolbar={<SaveToolbar />}>
                     <TextInput source="id" disabled sx={{ width: '22em' }} />
                     <TextInput
                         source="crdId"
@@ -113,7 +115,7 @@ export const SchemaCreate = () => {
     const onSuccess = (data: any) => {
         updateCrdIds();
         notify('ra.notification.created', { messageArgs: { smart_count: 1 } });
-        redirect('edit', resource, data.id, data);
+        redirect('list', resource);
     };
 
     const params = new URLSearchParams(window.location.search);
@@ -177,7 +179,7 @@ export const SchemaShow = () => {
             >
                 {translate('pages.schema.show.title')}
             </Typography>
-            <Show>
+            <Show actions={<ShowTopToolbar />}>
                 <SimpleShowLayout>
                     <TextField source="id" />
                     <TextField source="crdId" label="CRD" />

@@ -13,34 +13,34 @@ const messages = {
     pages: {
         schema: {
             list: {
-                title: "Settings",
-                subtitle: "Please add a schema to enable CR management."
+                title: 'Settings',
+                subtitle: 'Please add a schema to enable CR management.',
             },
             create: {
-                title: "Create schema"
+                title: 'Create schema',
             },
             edit: {
-                title: "Edit schema"
+                title: 'Edit schema',
             },
             show: {
-                title: "View schema"
+                title: 'View schema',
             },
         },
         cr: {
             list: {
-                title: " custom resources"
+                title: '',
             },
             create: {
-                title: "Create "
+                title: 'Create ',
             },
             edit: {
-                title: "Edit "
+                title: 'Edit ',
             },
             show: {
-                title: "View "
+                title: 'View ',
             },
-        }
-    }
+        },
+    },
 };
 
 export default messages;

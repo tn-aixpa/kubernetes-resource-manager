@@ -1,6 +1,6 @@
 import { CreateButton, TopToolbar } from 'react-admin';
 
-const ListActionsCreate = () => {
+const ListTopToolbar = () => {
     return (
         <TopToolbar>
             <CreateButton key="create-button" />
@@ -8,4 +8,4 @@ const ListActionsCreate = () => {
     );
 };
 
-export default ListActionsCreate;
+export default ListTopToolbar;
