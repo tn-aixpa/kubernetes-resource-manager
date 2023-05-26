@@ -15,7 +15,7 @@ import {
     SchemaCreate,
     SchemaShow,
 } from './resources/crs';
-import { CrdShow } from './resources/crd';
+import { CrdList, CrdShow } from './resources/crd';
 import authenticationProvider from './authProvider';
 import { SSOLogin } from './components/SSOLogin';
 import { UserManager, WebStorageStateStore } from 'oidc-client-ts';
@@ -74,7 +74,13 @@ function DynamicAdminUI() {
     const { getViewsList } = useUpdateCrdIds();
     // TODO fix: Views will not load on refresh if CrdIds is set
     return (
-        <AdminUI ready={Loading} dashboard={MyDashboard} loginPage={SSOLogin} layout={MyLayout} requireAuth>
+        <AdminUI
+            ready={Loading}
+            dashboard={MyDashboard}
+            loginPage={SSOLogin}
+            layout={MyLayout}
+            requireAuth
+        >
             {getViewsList().map((v: any) => (
                 <Resource
                     name={v.key}
@@ -98,7 +104,6 @@ function DynamicAdminUI() {
             />
             <Resource
                 name="crd"
-                show={CrdShow}
                 options={{ label: 'CRDs' }}
                 recordRepresentation="id"
             />

@@ -2,12 +2,12 @@ import { createContext, useCallback, useContext, useEffect } from 'react';
 import { useDataProvider, useStore } from 'react-admin';
 import { View, Views } from '../resources';
 import { CrCreate, CrEdit, CrList, CrShow } from '../resources/cr';
-import crCronTabsView from '../resources/cr.crontabs.stable.example.com';
-import crAlertManagersView from '../resources/cr.alertmanagers.monitoring.coreos.com';
+import crPostgres from '../resources/cr.postgres.db.movetokube.com';
+import crPostgresUsers from '../resources/cr.postgresusers.db.movetokube.com';
 
 const customViews: { [index: string]: View } = {
-    'crontabs.stable.example.com': crCronTabsView,
-    'alertmanagers.monitoring.coreos.com': crAlertManagersView,
+    'postgres.db.movetokube.com': crPostgres,
+    'postgresusers.db.movetokube.com': crPostgresUsers,
 };
 
 export const ViewsContext = createContext(new Views());
@@ -41,13 +41,13 @@ const updateViews = (res: string[]) => {
         return defaultView;
     });
     return viewsList;
-}
+};
 
 export const useUpdateCrdIds = () => {
     const dataProvider = useDataProvider();
     const [crdIds, setCrdIds] = useStore<string[]>('crdIds', []);
     const views = useContext(ViewsContext);
-    
+
     const getViewsList = () => {
         return views.list();
     };
@@ -67,7 +67,7 @@ export const useUpdateCrdIds = () => {
     useEffect(() => {
         if (crdIds && crdIds.length === 0) {
             updateCrdIds();
-        } else if (crdIds.length > 0 && views && views.list().length === 0 ) {
+        } else if (crdIds.length > 0 && views && views.list().length === 0) {
             views.set(updateViews(crdIds));
         }
     }, [crdIds, dataProvider, setCrdIds, updateCrdIds, views]);

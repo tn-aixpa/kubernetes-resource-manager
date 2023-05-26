@@ -14,3 +14,10 @@ export const PrecompiledInput = ({ props }: any) => {
 
     return <TextInput source="kind" defaultValue={defaultVal} />;
 };
+
+// To use:
+/*
+<ReferenceInput source="kind" reference="crd" filter={{ id: useResourceContext() }} >
+    <PrecompiledInput />
+</ReferenceInput>
+*/

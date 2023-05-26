@@ -35,6 +35,11 @@ import { SaveToolbar } from '../components/SaveToolbar';
 import ListTopToolbar from '../components/top-toolbars/ListTopToolbar';
 import ShowTopToolbar from '../components/top-toolbars/ShowTopToolbar';
 import EditTopToolbar from '../components/top-toolbars/EditTopToolbar';
+import {
+    AceEditorField,
+    AceEditorInput,
+} from '@smartcommunitylab/ra-ace-editor';
+import CreateTopToolbar from '../components/top-toolbars/CreateTopToolbar';
 
 export const SchemaList = () => {
     const notify = useNotify();
@@ -98,7 +103,11 @@ export const SchemaEdit = () => {
                         sx={{ width: '22em' }}
                     />
                     <TextInput source="version" disabled />
-                    <TextInput source="schema" fullWidth />
+                    <AceEditorInput
+                        mode="json"
+                        source="schema"
+                        theme="monokai"
+                    />
                 </SimpleForm>
             </Edit>
         </>
@@ -120,7 +129,7 @@ export const SchemaCreate = () => {
 
     const params = new URLSearchParams(window.location.search);
     const crdIdFromQuery = params.get('crdId');
-    // TODO param in backend to filter out CRDs that already have a schema for the stored version
+
     return (
         <>
             <Typography
@@ -130,9 +139,16 @@ export const SchemaCreate = () => {
             >
                 {translate('pages.schema.create.title')}
             </Typography>
-            <Create mutationOptions={{ onSuccess }}>
+            <Create
+                mutationOptions={{ onSuccess }}
+                actions={<CreateTopToolbar />}
+            >
                 <SimpleForm>
-                    <ReferenceInput source="crdId" reference="crd" filter={{"onlyWithoutSchema": true}}>
+                    <ReferenceInput
+                        source="crdId"
+                        reference="crd"
+                        filter={{ onlyWithoutSchema: true }}
+                    >
                         <AutocompleteInput
                             label="CRD"
                             validate={required()}
@@ -158,7 +174,11 @@ export const SchemaCreate = () => {
                             )
                         }
                     </FormDataConsumer>
-                    <TextInput source="schema" fullWidth />
+                    <AceEditorInput
+                        mode="json"
+                        source="schema"
+                        theme="monokai"
+                    />
                 </SimpleForm>
             </Create>
         </>
@@ -184,7 +204,7 @@ export const SchemaShow = () => {
                     <TextField source="id" />
                     <TextField source="crdId" label="CRD" />
                     <TextField source="version" />
-                    <TextField source="schema" />
+                    <AceEditorField mode="json" source="schema" />
                 </SimpleShowLayout>
             </Show>
             <Typography
@@ -220,7 +240,16 @@ const CrdField = ({ crdId }: CrdProps) => {
     const { data, isLoading } = useGetOne('crd', { id: crdId });
     if (isLoading) return <Loading />;
     if (!data) return null;
-    return <>{JSON.stringify(data)}</>;
+
+    return (
+        <AceEditorField
+            mode="json"
+            record={{
+                crd: JSON.stringify(data),
+            }}
+            source="crd"
+        />
+    );
 };
 
 const CopyButton = () => {
