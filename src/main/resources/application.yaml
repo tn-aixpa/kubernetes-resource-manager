@@ -12,11 +12,10 @@ spring:
 # server
 server.port: ${HTTP_PORT:8080}
 
-
 #kubernetes
 kubernetes:
   namespace: default
-  config:
+  config: ${K8S_CONFIG:}
   crd:
     allowed: >
     denied: >
@@ -27,3 +26,5 @@ auth:
   basic-password:
   oauth2-issuer-uri:
   oauth2-audience:
+
+security.cors.origins:
