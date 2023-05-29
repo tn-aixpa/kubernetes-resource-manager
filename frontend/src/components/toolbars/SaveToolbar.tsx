@@ -1,8 +1,4 @@
-import {
-    SaveButton,
-    Toolbar,
-    ToolbarClasses,
-} from 'react-admin';
+import { SaveButton, Toolbar, ToolbarClasses } from 'react-admin';
 
 export const SaveToolbar = () => {
     return (

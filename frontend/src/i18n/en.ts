@@ -2,13 +2,29 @@ import englishMessages from 'ra-language-english';
 
 const messages = {
     ...englishMessages,
+    login: {
+        title: 'Resource Manager',
+        message: 'Log in with AAC',
+    },
     resources: {
         crs: {
             name: 'Settings',
             fields: {
-                version: 'VVVersion',
+                id: 'ID',
+                crd: 'CRD',
+                version: 'Version',
+                schema: 'Schema',
             },
         },
+    },
+    dashboard: {
+        name: 'Dashboard',
+        title: 'Resource Manager',
+        message: 'Welcome to the Resource Manager.',
+    },
+    button: {
+        list: 'List',
+        copy: 'Copy',
     },
     pages: {
         schema: {
@@ -18,6 +34,7 @@ const messages = {
             },
             create: {
                 title: 'Create schema',
+                versionHelp: 'Please select a CRD',
             },
             edit: {
                 title: 'Edit schema',
@@ -38,6 +55,24 @@ const messages = {
             },
             show: {
                 title: 'View ',
+            },
+            'postgres.db.movetokube.com': {
+                names: {
+                    singular: 'Postgres DB',
+                    plural: 'Postgres DBs',
+                },
+            },
+            'postgresusers.db.movetokube.com': {
+                names: {
+                    singular: 'Postgres user',
+                    plural: 'Postgres users',
+                },
+            },
+        },
+        crd: {
+            show: {
+                listCrs: 'List CRs',
+                createSchema: 'Create schema',
             },
         },
     },

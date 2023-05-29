@@ -10,4 +10,4 @@ const KindInput = ({ crdId }: CrdProps) => {
     );
 };
 
-export default KindInput
+export default KindInput;

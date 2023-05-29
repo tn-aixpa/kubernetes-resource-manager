@@ -19,28 +19,26 @@ import {
 } from 'react-admin';
 import { View } from './index';
 import { Typography, Card } from '@mui/material';
-import ListTopToolbar from '../components/top-toolbars/ListTopToolbar';
+import ListTopToolbar from '../components/toolbars/ListTopToolbar';
 import { AceEditorField } from '@smartcommunitylab/ra-ace-editor';
-import ApiVersionInput from "../components/inputs/ApiVersionInput";
-import KindInput from "../components/inputs/KindInput";
+import ApiVersionInput from '../components/inputs/ApiVersionInput';
+import KindInput from '../components/inputs/KindInput';
 import { formatArray, parseArray } from '../utils';
-import EditTopToolbar from '../components/top-toolbars/EditTopToolbar';
-import { SaveToolbar } from '../components/SaveToolbar';
-import ShowTopToolbar from '../components/top-toolbars/ShowTopToolbar';
-import CreateTopToolbar from '../components/top-toolbars/CreateTopToolbar';
+import EditTopToolbar from '../components/toolbars/EditTopToolbar';
+import { SaveToolbar } from '../components/toolbars/SaveToolbar';
+import ShowTopToolbar from '../components/toolbars/ShowTopToolbar';
+import CreateTopToolbar from '../components/toolbars/CreateTopToolbar';
+import { SimplePageTitle } from '../components/SimplePageTitle';
 
-export const CrCreate = () => {
+const CrCreate = () => {
     const crdId = useResourceContext();
 
     return (
         <>
-            <Typography
-                variant="h4"
-                className="login-page-title"
-                sx={{ padding: '20px 0px 12px 0px' }}
-            >
-                {'Create Postgres DB'}
-            </Typography>
+            <SimplePageTitle
+                pageType="create"
+                crName="postgres.db.movetokube.com.names.singular"
+            />
             <Create redirect="list" actions={<CreateTopToolbar />}>
                 <SimpleForm>
                     {crdId && <ApiVersionInput crdId={crdId} />}
@@ -82,16 +80,13 @@ export const CrCreate = () => {
     );
 };
 
-export const CrEdit = () => {
+const CrEdit = () => {
     return (
         <>
-            <Typography
-                variant="h4"
-                className="login-page-title"
-                sx={{ padding: '20px 0px 12px 0px' }}
-            >
-                {'Edit Postgres DB'}
-            </Typography>
+            <SimplePageTitle
+                pageType="edit"
+                crName="postgres.db.movetokube.com.names.singular"
+            />
             <Edit actions={<EditTopToolbar />}>
                 <SimpleForm toolbar={<SaveToolbar />}>
                     <TextInput source="apiVersion" disabled />
@@ -136,13 +131,10 @@ export const CrEdit = () => {
 const CrList = () => {
     return (
         <>
-            <Typography
-                variant="h4"
-                className="login-page-title"
-                sx={{ padding: '20px 0px 12px 0px' }}
-            >
-                {'Postgres databases'}
-            </Typography>
+            <SimplePageTitle
+                pageType="list"
+                crName="postgres.db.movetokube.com.names.plural"
+            />
             <List actions={<ListTopToolbar />}>
                 <Datagrid>
                     <TextField source="id" />
@@ -162,13 +154,10 @@ const CrShow = () => {
 
     return (
         <>
-            <Typography
-                variant="h4"
-                className="login-page-title"
-                sx={{ padding: '20px 0px 12px 0px' }}
-            >
-                {'View Postgres DB'}
-            </Typography>
+            <SimplePageTitle
+                pageType="show"
+                crName="postgres.db.movetokube.com.names.singular"
+            />
             <Show actions={<ShowTopToolbar />}>
                 <SimpleShowLayout>
                     <TextField source="id" />

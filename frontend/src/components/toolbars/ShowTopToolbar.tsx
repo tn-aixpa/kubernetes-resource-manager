@@ -6,6 +6,7 @@ import {
     TopToolbar,
     EditButton,
     Button,
+    useTranslate,
 } from 'react-admin';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import { useUpdateCrdIds } from '../../hooks/useUpdateCrdIds';
@@ -14,6 +15,7 @@ const ShowTopToolbar = () => {
     const resource = useResourceContext();
     const notify = useNotify();
     const redirect = useRedirect();
+    const translate = useTranslate();
     const { updateCrdIds } = useUpdateCrdIds();
 
     const handleListClick = () => {
@@ -32,7 +34,7 @@ const ShowTopToolbar = () => {
         <TopToolbar>
             <EditButton key="edit-button" />
             <Button
-                label="List"
+                label={translate('button.list')}
                 onClick={handleListClick}
                 startIcon={<FormatListBulletedIcon />}
             />

@@ -15,7 +15,6 @@ import {
     SchemaCreate,
     SchemaShow,
 } from './resources/crs';
-import { CrdList, CrdShow } from './resources/crd';
 import authenticationProvider from './authProvider';
 import { SSOLogin } from './components/SSOLogin';
 import { UserManager, WebStorageStateStore } from 'oidc-client-ts';

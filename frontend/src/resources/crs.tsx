@@ -31,88 +31,15 @@ import { Typography } from '@mui/material';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import { useFormContext } from 'react-hook-form';
 import { useEffect } from 'react';
-import { SaveToolbar } from '../components/SaveToolbar';
-import ListTopToolbar from '../components/top-toolbars/ListTopToolbar';
-import ShowTopToolbar from '../components/top-toolbars/ShowTopToolbar';
-import EditTopToolbar from '../components/top-toolbars/EditTopToolbar';
+import { SaveToolbar } from '../components/toolbars/SaveToolbar';
+import ListTopToolbar from '../components/toolbars/ListTopToolbar';
+import ShowTopToolbar from '../components/toolbars/ShowTopToolbar';
+import EditTopToolbar from '../components/toolbars/EditTopToolbar';
 import {
     AceEditorField,
     AceEditorInput,
 } from '@smartcommunitylab/ra-ace-editor';
-import CreateTopToolbar from '../components/top-toolbars/CreateTopToolbar';
-
-export const SchemaList = () => {
-    const notify = useNotify();
-    const translate = useTranslate();
-
-    const { updateCrdIds } = useUpdateCrdIds();
-
-    const onSuccess = (data: any) => {
-        updateCrdIds();
-        notify('ra.notification.deleted', { messageArgs: { smart_count: 1 } });
-    };
-
-    return (
-        <>
-            <Typography
-                variant="h4"
-                className="login-page-title"
-                sx={{ padding: '20px 0px 12px 0px' }}
-            >
-                {translate('pages.schema.list.title')}
-            </Typography>
-            <Typography
-                variant="subtitle1"
-                className="login-page-title"
-                sx={{ padding: '0px' }}
-            >
-                {translate('pages.schema.list.subtitle')}
-            </Typography>
-            <List actions={<ListTopToolbar />}>
-                <Datagrid bulkActionButtons={false}>
-                    <TextField source="crdId" label="CRD" />
-                    <TextField source="version" />
-                    <CopyButton />
-                    <EditButton />
-                    <ShowButton />
-                    <DeleteWithConfirmButton mutationOptions={{ onSuccess }} />
-                </Datagrid>
-            </List>
-        </>
-    );
-};
-
-export const SchemaEdit = () => {
-    const translate = useTranslate();
-    return (
-        <>
-            <Typography
-                variant="h4"
-                className="login-page-title"
-                sx={{ padding: '20px 0px 12px 0px' }}
-            >
-                {translate('pages.schema.edit.title')}
-            </Typography>
-            <Edit actions={<EditTopToolbar />}>
-                <SimpleForm toolbar={<SaveToolbar />}>
-                    <TextInput source="id" disabled sx={{ width: '22em' }} />
-                    <TextInput
-                        source="crdId"
-                        label="CRD"
-                        disabled
-                        sx={{ width: '22em' }}
-                    />
-                    <TextInput source="version" disabled />
-                    <AceEditorInput
-                        mode="json"
-                        source="schema"
-                        theme="monokai"
-                    />
-                </SimpleForm>
-            </Edit>
-        </>
-    );
-};
+import CreateTopToolbar from '../components/toolbars/CreateTopToolbar';
 
 export const SchemaCreate = () => {
     const notify = useNotify();
@@ -168,7 +95,9 @@ export const SchemaCreate = () => {
                             ) : (
                                 <TextInput
                                     source="version"
-                                    helperText="Please select a CRD"
+                                    helperText={translate(
+                                        'pages.schema.create.versionHelp'
+                                    )}
                                     disabled
                                 />
                             )
@@ -181,6 +110,79 @@ export const SchemaCreate = () => {
                     />
                 </SimpleForm>
             </Create>
+        </>
+    );
+};
+
+export const SchemaEdit = () => {
+    const translate = useTranslate();
+    return (
+        <>
+            <Typography
+                variant="h4"
+                className="login-page-title"
+                sx={{ padding: '20px 0px 12px 0px' }}
+            >
+                {translate('pages.schema.edit.title')}
+            </Typography>
+            <Edit actions={<EditTopToolbar />}>
+                <SimpleForm toolbar={<SaveToolbar />}>
+                    <TextInput source="id" disabled sx={{ width: '22em' }} />
+                    <TextInput
+                        source="crdId"
+                        label="CRD"
+                        disabled
+                        sx={{ width: '22em' }}
+                    />
+                    <TextInput source="version" disabled />
+                    <AceEditorInput
+                        mode="json"
+                        source="schema"
+                        theme="monokai"
+                    />
+                </SimpleForm>
+            </Edit>
+        </>
+    );
+};
+
+export const SchemaList = () => {
+    const notify = useNotify();
+    const translate = useTranslate();
+
+    const { updateCrdIds } = useUpdateCrdIds();
+
+    const onSuccess = (data: any) => {
+        updateCrdIds();
+        notify('ra.notification.deleted', { messageArgs: { smart_count: 1 } });
+    };
+
+    return (
+        <>
+            <Typography
+                variant="h4"
+                className="login-page-title"
+                sx={{ padding: '20px 0px 12px 0px' }}
+            >
+                {translate('pages.schema.list.title')}
+            </Typography>
+            <Typography
+                variant="subtitle1"
+                className="login-page-title"
+                sx={{ padding: '0px' }}
+            >
+                {translate('pages.schema.list.subtitle')}
+            </Typography>
+            <List actions={<ListTopToolbar />}>
+                <Datagrid bulkActionButtons={false}>
+                    <TextField source="crdId" label="CRD" />
+                    <TextField source="version" />
+                    <CopyButton />
+                    <EditButton />
+                    <ShowButton />
+                    <DeleteWithConfirmButton mutationOptions={{ onSuccess }} />
+                </Datagrid>
+            </List>
         </>
     );
 };
@@ -254,9 +256,11 @@ const CrdField = ({ crdId }: CrdProps) => {
 
 const CopyButton = () => {
     const { schema } = useRecordContext();
+    const translate = useTranslate();
+
     return (
         <Button
-            label={'Copy'}
+            label={translate('button.copy')}
             startIcon={<TextSnippetIcon />}
             onClick={() => navigator.clipboard.writeText(schema)}
         />

@@ -11,6 +11,7 @@ import {
     TextField,
     useGetManyReference,
     useShowController,
+    useTranslate,
 } from 'react-admin';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
@@ -23,11 +24,6 @@ export const CrdList = () => (
     </List>
 );
 
-/*
-- se abbiamo schema -> mostrare elenco schemi + bottone per elenco CR
-- se non abbiamo schema -> mostrare bottone per andare a creare schema
-*/
-
 export const CrdShow = () => (
     <Show>
         <SimpleShowLayout>
@@ -39,6 +35,8 @@ export const CrdShow = () => (
 
 const RelatedResources = () => {
     const { record } = useShowController();
+    const translate = useTranslate();
+
     const sort = { field: 'id', order: 'ASC' };
     const { data, total, isLoading } = useGetManyReference('crs', {
         target: 'crdId',
@@ -63,14 +61,14 @@ const RelatedResources = () => {
                 <ShowButton />
             </Datagrid>
             <Button
-                label="List CRs"
+                label={translate('pages.crd.show.listCrs')}
                 startIcon={<VisibilityIcon />}
                 href={`${window.location.origin}/${record.id}`}
             ></Button>
         </>
     ) : (
         <Button
-            label="Create schema"
+            label={translate('pages.crd.show.createSchema')}
             href={`${window.location.origin}/crs/create?crdId=${record.id}`}
         ></Button>
     );

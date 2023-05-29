@@ -133,7 +133,6 @@ public class CustomResourceDefinitionService {
     ) {
         List<IdAwareCustomResourceDefinition> crds;
         if (ids == null) {
-            CustomResourceDefinitionVersion a;
             CustomResourceDefinitionList crdList = client.apiextensions().v1().customResourceDefinitions().list();
             crds =
                 crdList
@@ -143,20 +142,22 @@ public class CustomResourceDefinitionService {
                         if (!authService.isCrdAllowed(crd.getMetadata().getName())) {
                             return false;
                         }
-                        Optional<CustomResourceDefinitionVersion> storedVersion = crd
-                            .getSpec()
-                            .getVersions()
-                            .stream()
-                            .filter(version -> version.getStorage())
-                            .findAny();
-                        if (storedVersion.isPresent()) {
-                            String storedVersionName = storedVersion.get().getName();
-                            Optional<CustomResourceSchema> schema =
-                                customResourceSchemaRepository.findByCrdIdAndVersion(
-                                    crd.getMetadata().getName(),
-                                    storedVersionName
-                                );
-                            return (!schema.isPresent());
+                        if (onlyWithoutSchema) {
+                            Optional<CustomResourceDefinitionVersion> storedVersion = crd
+                                .getSpec()
+                                .getVersions()
+                                .stream()
+                                .filter(version -> version.getStorage())
+                                .findAny();
+                            if (storedVersion.isPresent()) {
+                                String storedVersionName = storedVersion.get().getName();
+                                Optional<CustomResourceSchema> schema =
+                                    customResourceSchemaRepository.findByCrdIdAndVersion(
+                                        crd.getMetadata().getName(),
+                                        storedVersionName
+                                    );
+                                return (!schema.isPresent());
+                            }
                         }
                         return true;
                     })

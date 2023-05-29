@@ -1,18 +1,19 @@
 import { Card, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { Button, useLogin } from 'react-admin';
+import { Button, useLogin, useTranslate } from 'react-admin';
 
 export const SSOLogin = () => {
     const login = useLogin();
+    const translate = useTranslate();
 
     return (
         <Root>
             <Card className={LoginClasses.card}>
-            <Typography variant="h3" className='login-page-title'>
-                Resource Manager
-            </Typography>
+                <Typography variant="h3" className="login-page-title">
+                    {translate('login.title')}
+                </Typography>
                 <Button
-                    label="Login with AAC"
+                    label={translate('login.message')}
                     onClick={() => login({})}
                     sx={{ margin: 'auto', display: 'block' }}
                 ></Button>

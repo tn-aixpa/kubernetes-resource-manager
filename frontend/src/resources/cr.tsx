@@ -20,32 +20,39 @@ import {
 } from 'react-admin';
 import { parseJson, formatJson } from '../utils';
 import { Typography } from '@mui/material';
-import ListTopToolbar from '../components/top-toolbars/ListTopToolbar';
-import { SaveToolbar } from '../components/SaveToolbar';
-import ShowTopToolbar from '../components/top-toolbars/ShowTopToolbar';
-import EditTopToolbar from '../components/top-toolbars/EditTopToolbar';
+import ListTopToolbar from '../components/toolbars/ListTopToolbar';
+import { SaveToolbar } from '../components/toolbars/SaveToolbar';
+import ShowTopToolbar from '../components/toolbars/ShowTopToolbar';
+import EditTopToolbar from '../components/toolbars/EditTopToolbar';
 import {
     AceEditorField,
     AceEditorInput,
 } from '@smartcommunitylab/ra-ace-editor';
-import CreateTopToolbar from '../components/top-toolbars/CreateTopToolbar';
+import CreateTopToolbar from '../components/toolbars/CreateTopToolbar';
 import KindInput from '../components/inputs/KindInput';
 import ApiVersionInput from '../components/inputs/ApiVersionInput';
 
-export const CrList = () => {
+export const CrCreate = () => {
+    const crdId = useResourceContext();
+
     return (
         <>
-            <PageTitle pageType="list" />
-            <List actions={<ListTopToolbar />}>
-                <Datagrid>
-                    <TextField source="id" />
-                    <TextField source="apiVersion" />
-                    <TextField source="kind" />
-                    <EditButton />
-                    <ShowButton />
-                    <DeleteWithConfirmButton />
-                </Datagrid>
-            </List>
+            <PageTitle pageType="create" />
+            <Create redirect="list" actions={<CreateTopToolbar />}>
+                <SimpleForm>
+                    {crdId && <ApiVersionInput crdId={crdId} />}
+                    {crdId && <KindInput crdId={crdId} />}
+                    <TextInput source="metadata.name" validate={required()} />
+
+                    <AceEditorInput
+                        mode="json"
+                        source="spec"
+                        theme="monokai"
+                        format={formatJson}
+                        parse={parseJson}
+                    />
+                </SimpleForm>
+            </Create>
         </>
     );
 };
@@ -72,30 +79,20 @@ export const CrEdit = () => {
     );
 };
 
-export const CrCreate = () => {
-    const crdId = useResourceContext();
-
+export const CrList = () => {
     return (
         <>
-            <PageTitle pageType="create" />
-            <Create redirect="list" actions={<CreateTopToolbar />}>
-                <SimpleForm>
-                    {crdId && <ApiVersionInput crdId={crdId} />}
-                    {crdId && <KindInput crdId={crdId} />}
-                    {/* <ReferenceInput source="kind" reference="crd" filter={{ id: useResourceContext() }} >
-                        <PrecompiledInput />
-                    </ReferenceInput> */}
-                    <TextInput source="metadata.name" validate={required()} />
-
-                    <AceEditorInput
-                        mode="json"
-                        source="spec"
-                        theme="monokai"
-                        format={formatJson}
-                        parse={parseJson}
-                    />
-                </SimpleForm>
-            </Create>
+            <PageTitle pageType="list" />
+            <List actions={<ListTopToolbar />}>
+                <Datagrid>
+                    <TextField source="id" />
+                    <TextField source="apiVersion" />
+                    <TextField source="kind" />
+                    <EditButton />
+                    <ShowButton />
+                    <DeleteWithConfirmButton />
+                </Datagrid>
+            </List>
         </>
     );
 };
