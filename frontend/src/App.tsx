@@ -24,6 +24,15 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import MyLayout from './Layout';
 import MyDashboard from './pages/Dashboard';
 import { CrdShow } from './resources/crd';
+import { useContext, useState } from 'react';
+import { View, ViewsContext, fetchViews } from './resources';
+import crPostgres from './resources/cr.postgres.db.movetokube.com';
+import crPostgresUsers from './resources/cr.postgresusers.db.movetokube.com';
+
+const customViews: { [index: string]: View } = {
+    'postgres.db.movetokube.com': crPostgres,
+    'postgresusers.db.movetokube.com': crPostgresUsers,
+};
 
 const API_URL: string = process.env.REACT_APP_API_URL as string;
 
@@ -71,8 +80,29 @@ function App() {
 }
 
 function DynamicAdminUI() {
-    const { getViewsList } = useUpdateCrdIds();
-    // TODO fix: Views will not load on refresh if CrdIds is set
+    const [views, setViews] = useState<View[]>([]);
+    const { crdIds } = useUpdateCrdIds();
+
+    const viewsContext = useContext(ViewsContext);
+    for (const crdId of crdIds) {
+        try {
+            console.log(viewsContext)
+            if (crdId in customViews && !viewsContext.list().some(v => v.key === crdId)) {
+                viewsContext.put(customViews[crdId]);
+            }
+        } catch (error) {
+            console.log("No custom view for", crdId);
+        }
+        
+        if (
+            views.length !== crdIds.length ||
+            !views.every((s: View) => crdIds.includes(s.key))
+        ) {
+            setViews(fetchViews(crdIds));
+        }
+    }
+    
+
     return (
         <AdminUI
             ready={Loading}
@@ -81,7 +111,7 @@ function DynamicAdminUI() {
             layout={MyLayout}
             requireAuth
         >
-            {getViewsList().map((v: any) => (
+            {views.map((v: any) => (
                 <Resource
                     name={v.key}
                     options={{ label: v.name }}
