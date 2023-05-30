@@ -20,17 +20,17 @@ import {
 } from 'react-admin';
 import { parseJson, formatJson } from '../utils';
 import { Typography } from '@mui/material';
-import ListTopToolbar from '../components/toolbars/ListTopToolbar';
-import { SaveToolbar } from '../components/toolbars/SaveToolbar';
-import ShowTopToolbar from '../components/toolbars/ShowTopToolbar';
-import EditTopToolbar from '../components/toolbars/EditTopToolbar';
+import { ViewToolbar } from '../components/ViewToolbar';
 import {
     AceEditorField,
     AceEditorInput,
 } from '@smartcommunitylab/ra-ace-editor';
-import CreateTopToolbar from '../components/toolbars/CreateTopToolbar';
-import KindInput from '../components/inputs/KindInput';
-import ApiVersionInput from '../components/inputs/ApiVersionInput';
+import {
+    CreateTopToolbar,
+    EditTopToolbar,
+    ListTopToolbar,
+    ShowTopToolbar,
+} from '../components/toolbars';
 
 export const CrCreate = () => {
     const crdId = useResourceContext();
@@ -62,7 +62,7 @@ export const CrEdit = () => {
         <>
             <PageTitle pageType="edit" />
             <Edit actions={<EditTopToolbar />}>
-                <SimpleForm toolbar={<SaveToolbar />}>
+                <SimpleForm toolbar={<ViewToolbar />}>
                     <TextInput source="apiVersion" disabled />
                     <TextInput source="kind" disabled />
                     <TextInput source="metadata.name" disabled />
@@ -147,3 +147,56 @@ const PageTitle = ({ pageType }: { pageType: string }) => {
         </Typography>
     );
 };
+
+export const SimplePageTitle = ({
+    pageType,
+    crName,
+}: {
+    pageType: string;
+    crName: string;
+}) => {
+    const translate = useTranslate();
+
+    return (
+        <Typography
+            variant="h4"
+            className="login-page-title"
+            sx={{ padding: '20px 0px 12px 0px' }}
+        >
+            {translate('pages.cr.' + pageType + '.title') +
+                translate('pages.cr.' + crName)}
+        </Typography>
+    );
+};
+
+export const ApiVersionInput = ({ crdId }: CrdProps) => {
+    const { data, isLoading } = useGetOne('crd', { id: crdId });
+    if (isLoading) return <Loading />;
+    if (!data) return null;
+    const group = data.spec.group;
+    const storedVersion = data.spec.versions.filter(
+        (version: any) => version.storage
+    )[0];
+    const apiVersion = `${group}/${storedVersion.name}`;
+    return (
+        <TextInput
+            source="apiVersion"
+            defaultValue={apiVersion}
+            sx={{ width: '22em' }}
+            disabled
+        />
+    );
+};
+
+export const KindInput = ({ crdId }: CrdProps) => {
+    const { data, isLoading } = useGetOne('crd', { id: crdId });
+    if (isLoading) return <Loading />;
+    if (!data) return null;
+    return (
+        <TextInput source="kind" defaultValue={data.spec.names.kind} disabled />
+    );
+};
+
+export interface CrdProps {
+    crdId: string;
+}

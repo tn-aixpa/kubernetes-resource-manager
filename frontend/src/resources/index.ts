@@ -1,6 +1,5 @@
 import { ComponentType, ReactElement } from 'react';
 
-//build views
 export interface View {
     key: string;
     name?: string;

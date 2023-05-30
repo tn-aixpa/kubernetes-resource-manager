@@ -16,13 +16,14 @@ import {
     SchemaShow,
 } from './resources/crs';
 import authenticationProvider from './authProvider';
-import { SSOLogin } from './components/SSOLogin';
+import { SSOLogin } from './pages/SSOLogin';
 import { UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import { useUpdateCrdIds } from './hooks/useUpdateCrdIds';
 import { i18nProvider } from './i18nProvider';
 import SettingsIcon from '@mui/icons-material/Settings';
-import MyLayout from './components/Layout';
-import MyDashboard from './components/Dashboard';
+import MyLayout from './Layout';
+import MyDashboard from './pages/Dashboard';
+import { CrdShow } from './resources/crd';
 
 const API_URL: string = process.env.REACT_APP_API_URL as string;
 
@@ -103,6 +104,7 @@ function DynamicAdminUI() {
             />
             <Resource
                 name="crd"
+                show={CrdShow}
                 options={{ label: 'CRDs' }}
                 recordRepresentation="id"
             />

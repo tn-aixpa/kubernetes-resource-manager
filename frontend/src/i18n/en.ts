@@ -8,7 +8,7 @@ const messages = {
     },
     resources: {
         crs: {
-            name: 'Settings',
+            name: 'Schema |||| Settings',
             fields: {
                 id: 'ID',
                 crd: 'CRD',

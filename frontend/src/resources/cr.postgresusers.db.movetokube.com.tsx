@@ -17,15 +17,16 @@ import {
 } from 'react-admin';
 import { View } from './index';
 import { Typography, Card } from '@mui/material';
-import ListTopToolbar from '../components/toolbars/ListTopToolbar';
 import { AceEditorField } from '@smartcommunitylab/ra-ace-editor';
-import ApiVersionInput from '../components/inputs/ApiVersionInput';
-import KindInput from '../components/inputs/KindInput';
-import EditTopToolbar from '../components/toolbars/EditTopToolbar';
-import { SaveToolbar } from '../components/toolbars/SaveToolbar';
-import ShowTopToolbar from '../components/toolbars/ShowTopToolbar';
-import CreateTopToolbar from '../components/toolbars/CreateTopToolbar';
+import { ViewToolbar } from '../components/ViewToolbar';
 import { SimplePageTitle } from '../components/SimplePageTitle';
+import {
+    CreateTopToolbar,
+    EditTopToolbar,
+    ListTopToolbar,
+    ShowTopToolbar,
+} from '../components/toolbars';
+import { ApiVersionInput, KindInput } from './cr';
 
 const CrCreate = () => {
     const crdId = useResourceContext();
@@ -82,7 +83,7 @@ const CrEdit = () => {
                 crName="postgresusers.db.movetokube.com.names.singular"
             />
             <Edit actions={<EditTopToolbar />}>
-                <SimpleForm toolbar={<SaveToolbar />}>
+                <SimpleForm toolbar={<ViewToolbar />}>
                     <TextInput source="apiVersion" disabled />
                     <TextInput source="kind" disabled />
                     <TextInput source="metadata.name" disabled />

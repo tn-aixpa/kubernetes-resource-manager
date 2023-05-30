@@ -21,25 +21,26 @@ import {
     useResourceContext,
     useTranslate,
     useRecordContext,
-    useShowController,
-    Loading,
     Button,
+    ReferenceField,
 } from 'react-admin';
-import { CrdProps } from '../components/CrdProps';
 import { useUpdateCrdIds } from '../hooks/useUpdateCrdIds';
 import { Typography } from '@mui/material';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import { useFormContext } from 'react-hook-form';
 import { useEffect } from 'react';
-import { SaveToolbar } from '../components/toolbars/SaveToolbar';
-import ListTopToolbar from '../components/toolbars/ListTopToolbar';
-import ShowTopToolbar from '../components/toolbars/ShowTopToolbar';
-import EditTopToolbar from '../components/toolbars/EditTopToolbar';
+import { ViewToolbar } from '../components/ViewToolbar';
 import {
     AceEditorField,
     AceEditorInput,
 } from '@smartcommunitylab/ra-ace-editor';
-import CreateTopToolbar from '../components/toolbars/CreateTopToolbar';
+import {
+    CreateTopToolbar,
+    EditTopToolbar,
+    ListTopToolbar,
+    ShowTopToolbar,
+} from '../components/toolbars';
+import { CrdProps } from './cr';
 
 export const SchemaCreate = () => {
     const notify = useNotify();
@@ -126,7 +127,7 @@ export const SchemaEdit = () => {
                 {translate('pages.schema.edit.title')}
             </Typography>
             <Edit actions={<EditTopToolbar />}>
-                <SimpleForm toolbar={<SaveToolbar />}>
+                <SimpleForm toolbar={<ViewToolbar />}>
                     <TextInput source="id" disabled sx={{ width: '22em' }} />
                     <TextInput
                         source="crdId"
@@ -189,8 +190,6 @@ export const SchemaList = () => {
 
 export const SchemaShow = () => {
     const translate = useTranslate();
-    const { record } = useShowController();
-    const crdId = record.crdId;
 
     return (
         <>
@@ -204,21 +203,14 @@ export const SchemaShow = () => {
             <Show actions={<ShowTopToolbar />}>
                 <SimpleShowLayout>
                     <TextField source="id" />
-                    <TextField source="crdId" label="CRD" />
+                    <ReferenceField
+                        source="crdId"
+                        label="CRD"
+                        reference="crd"
+                        link="show"
+                    />
                     <TextField source="version" />
                     <AceEditorField mode="json" source="schema" />
-                </SimpleShowLayout>
-            </Show>
-            <Typography
-                variant="h6"
-                className="login-page-title"
-                sx={{ padding: '20px 0px 0px 0px' }}
-            >
-                CRD
-            </Typography>
-            <Show actions={false}>
-                <SimpleShowLayout>
-                    <CrdField crdId={crdId} />
                 </SimpleShowLayout>
             </Show>
         </>
@@ -236,22 +228,6 @@ const SchemaVersionInput = ({ crdId }: CrdProps) => {
     }, [data, data.spec.versions, setValue]);
 
     return <TextInput source="version" disabled />;
-};
-
-const CrdField = ({ crdId }: CrdProps) => {
-    const { data, isLoading } = useGetOne('crd', { id: crdId });
-    if (isLoading) return <Loading />;
-    if (!data) return null;
-
-    return (
-        <AceEditorField
-            mode="json"
-            record={{
-                crd: JSON.stringify(data),
-            }}
-            source="crd"
-        />
-    );
 };
 
 const CopyButton = () => {
