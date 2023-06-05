@@ -88,7 +88,7 @@ const Login = () => {
                             color: theme => theme.palette.grey[500],
                         }}
                     >
-                        {translate('login.basic_message')}
+                        {translate('login.basicMessage')}
                     </Box>
                     {authType === 'basic' && (
                         <Box sx={{ padding: '0 1em 0em 1em' }}>

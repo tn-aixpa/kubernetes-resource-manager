@@ -15,13 +15,12 @@ import {
 } from 'react-admin';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Typography } from '@mui/material';
-import { ShowTopToolbar } from '../components/toolbars';
 import { AceEditorField } from '@smartcommunitylab/ra-ace-editor';
 
 export const CrdList = () => (
     <List actions={false}>
         <Datagrid bulkActionButtons={false}>
-            <TextField source="spec.names.kind" label="Name" />
+            <TextField source="spec.names.kind" />
             <ShowButton />
         </Datagrid>
     </List>
@@ -41,9 +40,7 @@ export const CrdShow = () => {
             >
                 {[translate('pages.crd.show.title'), record.id].join(' ')}
             </Typography>
-            <Show
-                actions={<ShowTopToolbar hasEdit={false} hasDelete={false} />}
-            >
+            <Show actions={false}>
                 <SimpleShowLayout>
                     <TextField source="metadata.creationTimestamp" />
                     <NumberField source="metadata.generation" />
@@ -88,8 +85,14 @@ const RelatedResources = () => {
                 bulkActionButtons={false}
                 sort={sort}
             >
-                <TextField source="id" />
-                <TextField source="version" />
+                <TextField
+                    source="id"
+                    label={translate('pages.crd.show.crs.id')}
+                />
+                <TextField
+                    source="version"
+                    label={translate('pages.crd.show.crs.version')}
+                />
                 <ShowButton resource="crs" />
             </Datagrid>
             <Button

@@ -47,26 +47,10 @@ const CrCreate = () => {
                         <KindInput crdId={crdId} sx={{ display: 'none' }} />
                     )}
                     <TextInput source="metadata.name" validate={required()} />
-                    <TextInput
-                        source="spec.database"
-                        validate={required()}
-                        label="Database"
-                    />
-                    <TextInput
-                        source="spec.privileges"
-                        validate={required()}
-                        label="Privileges"
-                    />
-                    <TextInput
-                        source="spec.role"
-                        validate={required()}
-                        label="Role"
-                    />
-                    <TextInput
-                        source="spec.secretName"
-                        validate={required()}
-                        label="Secret name"
-                    />
+                    <TextInput source="spec.database" validate={required()} />
+                    <TextInput source="spec.privileges" validate={required()} />
+                    <TextInput source="spec.role" validate={required()} />
+                    <TextInput source="spec.secretName" validate={required()} />
                 </SimpleForm>
             </Create>
         </>
@@ -86,26 +70,10 @@ const CrEdit = () => {
             />
             <Edit actions={<EditTopToolbar />}>
                 <SimpleForm toolbar={<ViewToolbar />}>
-                    <TextInput
-                        source="spec.database"
-                        validate={required()}
-                        label="Database"
-                    />
-                    <TextInput
-                        source="spec.privileges"
-                        validate={required()}
-                        label="Privileges"
-                    />
-                    <TextInput
-                        source="spec.role"
-                        validate={required()}
-                        label="Role"
-                    />
-                    <TextInput
-                        source="spec.secretName"
-                        validate={required()}
-                        label="Secret name"
-                    />
+                    <TextInput source="spec.database" validate={required()} />
+                    <TextInput source="spec.privileges" validate={required()} />
+                    <TextInput source="spec.role" validate={required()} />
+                    <TextInput source="spec.secretName" validate={required()} />
                 </SimpleForm>
             </Edit>
         </>
@@ -122,7 +90,7 @@ const CrList = () => {
             <List actions={<ListTopToolbar />}>
                 <Datagrid>
                     <TextField source="id" />
-                    <TextField label="API Version" source="apiVersion" />
+                    <TextField source="apiVersion" />
                     <TextField source="kind" />
                     <EditButton />
                     <ShowButton />
@@ -146,10 +114,10 @@ const CrShow = () => {
             />
             <Show actions={<ShowTopToolbar />}>
                 <SimpleShowLayout>
-                    <TextField source="spec.database" label="Database" />
-                    <TextField source="spec.privileges" label="Privileges" />
-                    <TextField source="spec.role" label="Role" />
-                    <TextField source="spec.secretName" label="Secret name" />
+                    <TextField source="spec.database" />
+                    <TextField source="spec.privileges" />
+                    <TextField source="spec.role" />
+                    <TextField source="spec.secretName" />
                 </SimpleShowLayout>
             </Show>
         </>

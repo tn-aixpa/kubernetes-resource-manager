@@ -50,27 +50,18 @@ const CrCreate = () => {
                         <KindInput crdId={crdId} sx={{ display: 'none' }} />
                     )}
                     <TextInput source="metadata.name" validate={required()} />
-                    <TextInput
-                        source="spec.database"
-                        validate={required()}
-                        label="Database"
-                    />
-                    <BooleanInput
-                        source="spec.dropOnDelete"
-                        label="Drop on delete"
-                    />
+                    <TextInput source="spec.database" validate={required()} />
+                    <BooleanInput source="spec.dropOnDelete" />
                     <TextInput
                         fullWidth
                         source="spec.extensions"
-                        label="Comma-separated list of extensions"
                         format={formatArray}
                         parse={parseArray}
                     />
-                    <TextInput source="spec.masterRole" label="Master role" />
+                    <TextInput source="spec.masterRole" />
                     <TextInput
                         fullWidth
                         source="spec.schemas"
-                        label="Comma-separated list of schemas"
                         format={formatArray}
                         parse={parseArray}
                     />
@@ -93,27 +84,18 @@ const CrEdit = () => {
             />
             <Edit actions={<EditTopToolbar />}>
                 <SimpleForm toolbar={<ViewToolbar />}>
-                    <TextInput
-                        source="spec.database"
-                        validate={required()}
-                        label="Database"
-                    />
-                    <BooleanInput
-                        source="spec.dropOnDelete"
-                        label="Drop on delete"
-                    />
+                    <TextInput source="spec.database" validate={required()} />
+                    <BooleanInput source="spec.dropOnDelete" />
                     <TextInput
                         fullWidth
                         source="spec.extensions"
-                        label="Comma-separated list of extensions"
                         format={formatArray}
                         parse={parseArray}
                     />
-                    <TextInput source="spec.masterRole" label="Master role" />
+                    <TextInput source="spec.masterRole" />
                     <TextInput
                         fullWidth
                         source="spec.schemas"
-                        label="Comma-separated list of schemas"
                         format={formatArray}
                         parse={parseArray}
                     />
@@ -156,14 +138,11 @@ const CrShow = () => {
             />
             <Show actions={<ShowTopToolbar />}>
                 <SimpleShowLayout>
-                    <TextField source="spec.database" label="Database" />
-                    <BooleanField
-                        source="spec.dropOnDelete"
-                        label="Drop on delete"
-                    />
-                    <TextField source="spec.extensions" label="Extensions" />
-                    <TextField source="spec.masterRole" label="Master role" />
-                    <TextField source="spec.schemas" label="Schema" />
+                    <TextField source="spec.database" />
+                    <BooleanField source="spec.dropOnDelete" />
+                    <TextField source="spec.extensions" />
+                    <TextField source="spec.masterRole" />
+                    <TextField source="spec.schemas" />
                 </SimpleShowLayout>
             </Show>
         </>

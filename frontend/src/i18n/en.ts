@@ -3,7 +3,7 @@ import englishMessages from 'ra-language-english';
 const messages = {
     ...englishMessages,
     login: {
-        basic_message: 'Please log in to continue',
+        basicMessage: 'Please log in to continue',
         title: 'Resource Manager',
         message: 'Log in with AAC',
     },
@@ -12,13 +12,48 @@ const messages = {
             name: 'Schema |||| Settings',
             fields: {
                 id: 'ID',
-                crd: 'CRDDDDD',
+                crdId: 'CRD',
                 version: 'Version',
                 schema: 'Schema',
             },
         },
         crd: {
             name: 'CRD |||| CRDs',
+            fields: {
+                metadata: {
+                    creationTimestamp: 'Created',
+                    generation: 'Generation',
+                    name: 'Name',
+                    resourceVersion: 'Resource version',
+                    uid: 'UID',
+                },
+                managedFields: 'Managed fields',
+            },
+        },
+        'postgres.db.movetokube.com': {
+            name: 'Postgres DB |||| Postgres DBs',
+            fields: {
+                id: 'ID',
+                spec: {
+                    database: 'Database',
+                    dropOnDelete: 'Drop on delete',
+                    extensions: 'Extensions',
+                    masterRole: 'Master role',
+                    schemas: 'Schemas',
+                },
+            },
+        },
+        'postgresusers.db.movetokube.com': {
+            name: 'Postgres user |||| Postgres users',
+            fields: {
+                id: 'ID',
+                spec: {
+                    database: 'Database',
+                    privileges: 'Privileges',
+                    role: 'Role',
+                    secretName: 'Secret name',
+                },
+            },
         },
     },
     dashboard: {
@@ -60,6 +95,14 @@ const messages = {
             show: {
                 title: 'View',
             },
+            defaultFields: {
+                id: 'ID',
+                apiVersion: 'API Version',
+                kind: 'Kind',
+                metadata: 'Metadata',
+                metadataName: 'Name',
+                spec: 'Specification',
+            },
             'postgres.db.movetokube.com': {
                 names: {
                     singular: 'Postgres DB',
@@ -78,6 +121,10 @@ const messages = {
                 title: 'View CRD',
                 listCrs: 'List custom resources',
                 createSchema: 'Create schema',
+                crs: {
+                    id: 'ID',
+                    version: 'Version',
+                },
             },
         },
     },

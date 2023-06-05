@@ -80,7 +80,6 @@ export const SchemaCreate = () => {
                         filter={{ onlyWithoutSchema: true }}
                     >
                         <AutocompleteInput
-                            label="CRD"
                             validate={required()}
                             sx={{ width: '22em' }}
                             defaultValue={
@@ -134,12 +133,7 @@ export const SchemaEdit = () => {
             <Edit actions={<EditTopToolbar />}>
                 <SimpleForm toolbar={<ViewToolbar />}>
                     <TextInput source="id" disabled sx={{ width: '22em' }} />
-                    <TextInput
-                        source="crdId"
-                        label="CRD"
-                        disabled
-                        sx={{ width: '22em' }}
-                    />
+                    <TextInput source="crdId" disabled sx={{ width: '22em' }} />
                     <TextInput source="version" disabled />
                     <AceEditorInput
                         mode="json"
