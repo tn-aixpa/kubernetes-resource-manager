@@ -3,6 +3,7 @@ import englishMessages from 'ra-language-english';
 const messages = {
     ...englishMessages,
     login: {
+        basic_message: 'Please log in to continue',
         title: 'Resource Manager',
         message: 'Log in with AAC',
     },
@@ -11,10 +12,13 @@ const messages = {
             name: 'Schema |||| Settings',
             fields: {
                 id: 'ID',
-                crd: 'CRD',
+                crd: 'CRDDDDD',
                 version: 'Version',
                 schema: 'Schema',
             },
+        },
+        crd: {
+            name: 'CRD |||| CRDs',
         },
     },
     dashboard: {
@@ -48,13 +52,13 @@ const messages = {
                 title: '',
             },
             create: {
-                title: 'Create ',
+                title: 'Create',
             },
             edit: {
-                title: 'Edit ',
+                title: 'Edit',
             },
             show: {
-                title: 'View ',
+                title: 'View',
             },
             'postgres.db.movetokube.com': {
                 names: {
@@ -71,7 +75,8 @@ const messages = {
         },
         crd: {
             show: {
-                listCrs: 'List CRs',
+                title: 'View CRD',
+                listCrs: 'List custom resources',
                 createSchema: 'Create schema',
             },
         },

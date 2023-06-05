@@ -1,7 +1,7 @@
 import { UserManager } from 'oidc-client-ts';
 import { AuthProvider } from 'react-admin';
 
-const authProvider = (userManager: UserManager): AuthProvider => {
+const authProviderOAuth = (userManager: UserManager): AuthProvider => {
     return {
         login: () => {
             return userManager.signinRedirect();
@@ -53,7 +53,7 @@ const authProvider = (userManager: UserManager): AuthProvider => {
                 throw error;
             }
         },
-    }
+    };
 };
 
-export default authProvider;
+export default authProviderOAuth;

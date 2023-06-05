@@ -2,9 +2,9 @@ import React from 'react';
 import {
     Button,
     Datagrid,
-    FunctionField,
     List,
     Loading,
+    NumberField,
     Show,
     ShowButton,
     SimpleShowLayout,
@@ -14,6 +14,9 @@ import {
     useTranslate,
 } from 'react-admin';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { Typography } from '@mui/material';
+import { ShowTopToolbar } from '../components/toolbars';
+import { AceEditorField } from '@smartcommunitylab/ra-ace-editor';
 
 export const CrdList = () => (
     <List actions={false}>
@@ -24,18 +27,48 @@ export const CrdList = () => (
     </List>
 );
 
-export const CrdShow = () => (
-    <Show>
-        <SimpleShowLayout>
-            <FunctionField render={(record: any) => JSON.stringify(record)} />
-            <RelatedResources />
-        </SimpleShowLayout>
-    </Show>
-);
+export const CrdShow = () => {
+    const translate = useTranslate();
+    const { record } = useShowController();
+    if (!record) return null;
+
+    return (
+        <>
+            <Typography
+                variant="h4"
+                className="login-page-title"
+                sx={{ padding: '20px 0px 12px 0px' }}
+            >
+                {[translate('pages.crd.show.title'), record.id].join(' ')}
+            </Typography>
+            <Show
+                actions={<ShowTopToolbar hasEdit={false} hasDelete={false} />}
+            >
+                <SimpleShowLayout>
+                    <TextField source="metadata.creationTimestamp" />
+                    <NumberField source="metadata.generation" />
+                    <TextField source="metadata.name" />
+                    <TextField source="metadata.resourceVersion" />
+                    <TextField source="metadata.uid" />
+                    <AceEditorField
+                        mode="json"
+                        record={{
+                            managedFields: JSON.stringify(
+                                record.metadata.managedFields
+                            ),
+                        }}
+                        source="managedFields"
+                    />
+                    <RelatedResources />
+                </SimpleShowLayout>
+            </Show>
+        </>
+    );
+};
 
 const RelatedResources = () => {
-    const { record } = useShowController();
     const translate = useTranslate();
+    const { record } = useShowController();
 
     const sort = { field: 'id', order: 'ASC' };
     const { data, total, isLoading } = useGetManyReference('crs', {
@@ -57,8 +90,7 @@ const RelatedResources = () => {
             >
                 <TextField source="id" />
                 <TextField source="version" />
-                <TextField source="schema" />
-                <ShowButton />
+                <ShowButton resource="crs" />
             </Datagrid>
             <Button
                 label={translate('pages.crd.show.listCrs')}

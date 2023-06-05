@@ -15,8 +15,9 @@ import {
     SchemaCreate,
     SchemaShow,
 } from './resources/crs';
-import authenticationProvider from './authProvider';
-import { SSOLogin } from './pages/SSOLogin';
+import authProviderOAuth from './authProviderOAuth';
+import authProviderBasic from './authProviderBasic';
+import Login from './pages/Login';
 import { UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import { useUpdateCrdIds } from './hooks/useUpdateCrdIds';
 import { i18nProvider } from './i18nProvider';
@@ -48,7 +49,18 @@ const manager = new UserManager({
 });
 
 const dataProvider = appDataProvider(API_URL, manager);
-const authProvider = authenticationProvider(manager);
+
+const authType = process.env.REACT_APP_AUTH;
+let authProvider: any = null;
+let requireAuth = false;
+if (authType === 'oauth') {
+    authProvider = authProviderOAuth(manager);
+    requireAuth = true;
+} else if (authType === 'basic') {
+    authProvider = authProviderBasic();
+    requireAuth = true;
+}
+
 const store = localStorageStore();
 
 export const themeOptions = {
@@ -86,14 +98,17 @@ function DynamicAdminUI() {
     const viewsContext = useContext(ViewsContext);
     for (const crdId of crdIds) {
         try {
-            console.log(viewsContext)
-            if (crdId in customViews && !viewsContext.list().some(v => v.key === crdId)) {
+            console.log(viewsContext);
+            if (
+                crdId in customViews &&
+                !viewsContext.list().some(v => v.key === crdId)
+            ) {
                 viewsContext.put(customViews[crdId]);
             }
         } catch (error) {
-            console.log("No custom view for", crdId);
+            console.log('No custom view for', crdId);
         }
-        
+
         if (
             views.length !== crdIds.length ||
             !views.every((s: View) => crdIds.includes(s.key))
@@ -101,15 +116,14 @@ function DynamicAdminUI() {
             setViews(fetchViews(crdIds));
         }
     }
-    
 
     return (
         <AdminUI
             ready={Loading}
             dashboard={MyDashboard}
-            loginPage={SSOLogin}
+            loginPage={Login}
             layout={MyLayout}
-            requireAuth
+            requireAuth={requireAuth}
         >
             {views.map((v: any) => (
                 <Resource
@@ -130,14 +144,8 @@ function DynamicAdminUI() {
                 create={SchemaCreate}
                 show={SchemaShow}
                 icon={SettingsIcon}
-                options={{ label: 'Settings' }}
             />
-            <Resource
-                name="crd"
-                show={CrdShow}
-                options={{ label: 'CRDs' }}
-                recordRepresentation="id"
-            />
+            <Resource name="crd" show={CrdShow} recordRepresentation="id" />
         </AdminUI>
     );
 }

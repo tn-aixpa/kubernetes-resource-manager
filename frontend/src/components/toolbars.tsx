@@ -14,28 +14,13 @@ import { useUpdateCrdIds } from '../hooks/useUpdateCrdIds';
 export const TopToolbar = (props: TopToolbarProps) => {
     const { hasCreate, hasEdit, hasShow, hasList, hasDelete } = props;
 
-    const resource = useResourceContext();
-    const redirect = useRedirect();
-    const notify = useNotify();
-    const { updateCrdIds } = useUpdateCrdIds();
-
-    const onSuccess = (data: any) => {
-        if (resource === 'crs') {
-            updateCrdIds();
-        }
-        notify('ra.notification.deleted', { messageArgs: { smart_count: 1 } });
-        redirect('list', resource);
-    };
-
     return (
         <ReactAdminTopToolbar>
             {hasCreate && <CreateButton key="create-button" />}
             {hasEdit && <EditButton key="edit-button" />}
             {hasShow && <ShowButton key="show-button" />}
             {hasList && <ListButton key="list-button" />}
-            {hasDelete && (
-                <DeleteWithConfirmButton mutationOptions={{ onSuccess }} />
-            )}
+            {hasDelete && ( <DeleteWithConfirmButton /> )}
         </ReactAdminTopToolbar>
     );
 };
@@ -74,3 +59,31 @@ export const ShowTopToolbar = (props: TopToolbarProps) => {
         />
     );
 };
+
+const SchemaDeleteButton = () => {
+    const resource = useResourceContext();
+    const redirect = useRedirect();
+    const notify = useNotify();
+    const { updateCrdIds } = useUpdateCrdIds();
+
+    const onSuccess = (data: any) => {
+        updateCrdIds();
+        notify('ra.notification.deleted', { messageArgs: { smart_count: 1 } });
+        redirect('list', resource);
+    };
+
+    return (<DeleteWithConfirmButton mutationOptions={{ onSuccess }} />);
+}
+
+export const SchemaShowTopToolbar = (props: TopToolbarProps) => {
+    const { hasCreate, hasEdit = true, hasShow, hasList = true, hasDelete = true } = props;
+    return (
+        <ReactAdminTopToolbar>
+            {hasCreate && <CreateButton key="create-button" />}
+            {hasEdit && <EditButton key="edit-button" />}
+            {hasShow && <ShowButton key="show-button" />}
+            {hasList && <ListButton key="list-button" />}
+            {hasDelete && ( <SchemaDeleteButton key='delete-button' /> )}
+        </ReactAdminTopToolbar>
+    );
+}

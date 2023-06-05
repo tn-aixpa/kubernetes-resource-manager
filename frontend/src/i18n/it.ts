@@ -4,6 +4,7 @@ import englishMessages from 'ra-language-english';
 const messages = {
     ...englishMessages,
     login: {
+        basic_message: 'Autenticarsi per continuare',
         title: 'Resource Manager',
         message: 'Accedi con AAC',
     },
@@ -16,6 +17,9 @@ const messages = {
                 version: 'Versione',
                 schema: 'Schema',
             },
+        },
+        crd: {
+            name: 'CRD',
         },
     },
     dashboard: {
@@ -50,13 +54,13 @@ const messages = {
                 title: '',
             },
             create: {
-                title: 'Crea ',
+                title: 'Crea',
             },
             edit: {
-                title: 'Modifica ',
+                title: 'Modifica',
             },
             show: {
-                title: 'Visualizza ',
+                title: 'Visualizza',
             },
             'postgres.db.movetokube.com': {
                 names: {
@@ -73,7 +77,8 @@ const messages = {
         },
         crd: {
             show: {
-                listCrs: 'Elenco CR',
+                title: 'Visualizza CRD',
+                listCrs: 'Elenco custom resources',
                 createSchema: 'Crea schema',
             },
         },

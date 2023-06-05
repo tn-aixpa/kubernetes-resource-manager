@@ -17,9 +17,10 @@ import {
     DeleteWithConfirmButton,
     useTranslate,
     useShowController,
+    useEditController,
 } from 'react-admin';
 import { parseJson, formatJson } from '../utils';
-import { Typography } from '@mui/material';
+import { SxProps, Typography } from '@mui/material';
 import { ViewToolbar } from '../components/ViewToolbar';
 import {
     AceEditorField,
@@ -58,9 +59,12 @@ export const CrCreate = () => {
 };
 
 export const CrEdit = () => {
+    const { record } = useEditController();
+    if (!record) return null;
+
     return (
         <>
-            <PageTitle pageType="edit" />
+            <PageTitle pageType="edit" crId={record.id} />
             <Edit actions={<EditTopToolbar />}>
                 <SimpleForm toolbar={<ViewToolbar />}>
                     <TextInput source="apiVersion" disabled />
@@ -99,10 +103,11 @@ export const CrList = () => {
 
 export const CrShow = () => {
     const { record } = useShowController();
+    if (!record) return null;
 
     return (
         <>
-            <PageTitle pageType="show" />
+            <PageTitle pageType="show" crId={record.id} />
             <Show actions={<ShowTopToolbar />}>
                 <SimpleShowLayout>
                     <TextField source="id" />
@@ -128,7 +133,7 @@ export const CrShow = () => {
     );
 };
 
-const PageTitle = ({ pageType }: { pageType: string }) => {
+const PageTitle = ({ pageType, crId }: { pageType: string; crId?: string }) => {
     const crdId = useResourceContext();
     const translate = useTranslate();
 
@@ -142,34 +147,18 @@ const PageTitle = ({ pageType }: { pageType: string }) => {
             className="login-page-title"
             sx={{ padding: '20px 0px 12px 0px' }}
         >
-            {translate('pages.cr.' + pageType + '.title') +
-                data.spec.names.kind}
+            {[
+                translate('pages.cr.' + pageType + '.title'),
+                data.spec.names.kind,
+                crId,
+            ]
+                .join(' ')
+                .trim()}
         </Typography>
     );
 };
 
-export const SimplePageTitle = ({
-    pageType,
-    crName,
-}: {
-    pageType: string;
-    crName: string;
-}) => {
-    const translate = useTranslate();
-
-    return (
-        <Typography
-            variant="h4"
-            className="login-page-title"
-            sx={{ padding: '20px 0px 12px 0px' }}
-        >
-            {translate('pages.cr.' + pageType + '.title') +
-                translate('pages.cr.' + crName)}
-        </Typography>
-    );
-};
-
-export const ApiVersionInput = ({ crdId }: CrdProps) => {
+export const ApiVersionInput = ({ crdId, sx }: CrdProps) => {
     const { data, isLoading } = useGetOne('crd', { id: crdId });
     if (isLoading) return <Loading />;
     if (!data) return null;
@@ -182,21 +171,55 @@ export const ApiVersionInput = ({ crdId }: CrdProps) => {
         <TextInput
             source="apiVersion"
             defaultValue={apiVersion}
-            sx={{ width: '22em' }}
+            sx={sx}
             disabled
         />
     );
 };
 
-export const KindInput = ({ crdId }: CrdProps) => {
+export const KindInput = ({ crdId, sx }: CrdProps) => {
     const { data, isLoading } = useGetOne('crd', { id: crdId });
     if (isLoading) return <Loading />;
     if (!data) return null;
     return (
-        <TextInput source="kind" defaultValue={data.spec.names.kind} disabled />
+        <TextInput
+            source="kind"
+            defaultValue={data.spec.names.kind}
+            sx={sx}
+            disabled
+        />
     );
 };
 
 export interface CrdProps {
     crdId: string;
+    sx?: SxProps;
 }
+
+export const SimplePageTitle = ({
+    pageType,
+    crName,
+    crId = '',
+}: {
+    pageType: string;
+    crName: string;
+    crId?: string;
+}) => {
+    const translate = useTranslate();
+
+    return (
+        <Typography
+            variant="h4"
+            className="login-page-title"
+            sx={{ padding: '20px 0px 12px 0px' }}
+        >
+            {[
+                translate('pages.cr.' + pageType + '.title'),
+                translate('pages.cr.' + crName),
+                crId,
+            ]
+                .join(' ')
+                .trim()}
+        </Typography>
+    );
+};

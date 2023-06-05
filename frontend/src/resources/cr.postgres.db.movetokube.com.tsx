@@ -16,20 +16,18 @@ import {
     required,
     BooleanInput,
     Edit,
+    useEditController,
 } from 'react-admin';
 import { View } from './index';
-import { Typography, Card } from '@mui/material';
-import { AceEditorField } from '@smartcommunitylab/ra-ace-editor';
 import { formatArray, parseArray } from '../utils';
 import { ViewToolbar } from '../components/ViewToolbar';
-import { SimplePageTitle } from '../components/SimplePageTitle';
 import {
     CreateTopToolbar,
     EditTopToolbar,
     ListTopToolbar,
     ShowTopToolbar,
 } from '../components/toolbars';
-import { ApiVersionInput, KindInput } from './cr';
+import { ApiVersionInput, KindInput, SimplePageTitle } from './cr';
 
 const CrCreate = () => {
     const crdId = useResourceContext();
@@ -42,39 +40,40 @@ const CrCreate = () => {
             />
             <Create redirect="list" actions={<CreateTopToolbar />}>
                 <SimpleForm>
-                    {crdId && <ApiVersionInput crdId={crdId} />}
-                    {crdId && <KindInput crdId={crdId} />}
+                    {crdId && (
+                        <ApiVersionInput
+                            crdId={crdId}
+                            sx={{ display: 'none' }}
+                        />
+                    )}
+                    {crdId && (
+                        <KindInput crdId={crdId} sx={{ display: 'none' }} />
+                    )}
                     <TextInput source="metadata.name" validate={required()} />
-                    <Card sx={{ padding: '20px' }}>
-                        <Typography variant="h6">Specification</Typography>
-                        <TextInput
-                            source="spec.database"
-                            validate={required()}
-                            label="Database"
-                        />
-                        <BooleanInput
-                            source="spec.dropOnDelete"
-                            label="Drop on delete"
-                        />
-                        <TextInput
-                            fullWidth
-                            source="spec.extensions"
-                            label="Comma-separated list of extensions"
-                            format={formatArray}
-                            parse={parseArray}
-                        />
-                        <TextInput
-                            source="spec.masterRole"
-                            label="Master role"
-                        />
-                        <TextInput
-                            fullWidth
-                            source="spec.schemas"
-                            label="Comma-separated list of schemas"
-                            format={formatArray}
-                            parse={parseArray}
-                        />
-                    </Card>
+                    <TextInput
+                        source="spec.database"
+                        validate={required()}
+                        label="Database"
+                    />
+                    <BooleanInput
+                        source="spec.dropOnDelete"
+                        label="Drop on delete"
+                    />
+                    <TextInput
+                        fullWidth
+                        source="spec.extensions"
+                        label="Comma-separated list of extensions"
+                        format={formatArray}
+                        parse={parseArray}
+                    />
+                    <TextInput source="spec.masterRole" label="Master role" />
+                    <TextInput
+                        fullWidth
+                        source="spec.schemas"
+                        label="Comma-separated list of schemas"
+                        format={formatArray}
+                        parse={parseArray}
+                    />
                 </SimpleForm>
             </Create>
         </>
@@ -82,47 +81,42 @@ const CrCreate = () => {
 };
 
 const CrEdit = () => {
+    const { record } = useEditController();
+    if (!record) return null;
+
     return (
         <>
             <SimplePageTitle
                 pageType="edit"
                 crName="postgres.db.movetokube.com.names.singular"
+                crId={record.spec.database}
             />
             <Edit actions={<EditTopToolbar />}>
                 <SimpleForm toolbar={<ViewToolbar />}>
-                    <TextInput source="apiVersion" disabled />
-                    <TextInput source="kind" disabled />
-                    <TextInput source="metadata.name" disabled />
-                    <Card sx={{ padding: '20px' }}>
-                        <Typography variant="h6">Specification</Typography>
-                        <TextInput
-                            source="spec.database"
-                            validate={required()}
-                            label="Database"
-                        />
-                        <BooleanInput
-                            source="spec.dropOnDelete"
-                            label="Drop on delete"
-                        />
-                        <TextInput
-                            fullWidth
-                            source="spec.extensions"
-                            label="Comma-separated list of extensions"
-                            format={formatArray}
-                            parse={parseArray}
-                        />
-                        <TextInput
-                            source="spec.masterRole"
-                            label="Master role"
-                        />
-                        <TextInput
-                            fullWidth
-                            source="spec.schemas"
-                            label="Comma-separated list of schemas"
-                            format={formatArray}
-                            parse={parseArray}
-                        />
-                    </Card>
+                    <TextInput
+                        source="spec.database"
+                        validate={required()}
+                        label="Database"
+                    />
+                    <BooleanInput
+                        source="spec.dropOnDelete"
+                        label="Drop on delete"
+                    />
+                    <TextInput
+                        fullWidth
+                        source="spec.extensions"
+                        label="Comma-separated list of extensions"
+                        format={formatArray}
+                        parse={parseArray}
+                    />
+                    <TextInput source="spec.masterRole" label="Master role" />
+                    <TextInput
+                        fullWidth
+                        source="spec.schemas"
+                        label="Comma-separated list of schemas"
+                        format={formatArray}
+                        parse={parseArray}
+                    />
                 </SimpleForm>
             </Edit>
         </>
@@ -139,8 +133,7 @@ const CrList = () => {
             <List actions={<ListTopToolbar />}>
                 <Datagrid>
                     <TextField source="id" />
-                    <TextField label="API Version" source="apiVersion" />
-                    <TextField source="kind" />
+                    <TextField source="spec.database" />
                     <EditButton />
                     <ShowButton />
                     <DeleteWithConfirmButton />
@@ -152,26 +145,17 @@ const CrList = () => {
 
 const CrShow = () => {
     const { record } = useShowController();
+    if (!record) return null;
 
     return (
         <>
             <SimplePageTitle
                 pageType="show"
                 crName="postgres.db.movetokube.com.names.singular"
+                crId={record.spec.database}
             />
             <Show actions={<ShowTopToolbar />}>
                 <SimpleShowLayout>
-                    <TextField source="id" />
-                    <TextField label="API Version" source="apiVersion" />
-                    <TextField source="kind" />
-                    <AceEditorField
-                        mode="json"
-                        record={{
-                            metadata: JSON.stringify(record.metadata),
-                        }}
-                        source="metadata"
-                    />
-                    <Typography variant="h6">Specification</Typography>
                     <TextField source="spec.database" label="Database" />
                     <BooleanField
                         source="spec.dropOnDelete"

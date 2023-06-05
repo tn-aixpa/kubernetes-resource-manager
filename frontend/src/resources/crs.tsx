@@ -23,6 +23,8 @@ import {
     useRecordContext,
     Button,
     ReferenceField,
+    useShowController,
+    useEditController,
 } from 'react-admin';
 import { useUpdateCrdIds } from '../hooks/useUpdateCrdIds';
 import { Typography } from '@mui/material';
@@ -117,6 +119,9 @@ export const SchemaCreate = () => {
 
 export const SchemaEdit = () => {
     const translate = useTranslate();
+    const { record } = useEditController();
+    if (!record) return null;
+
     return (
         <>
             <Typography
@@ -124,7 +129,7 @@ export const SchemaEdit = () => {
                 className="login-page-title"
                 sx={{ padding: '20px 0px 12px 0px' }}
             >
-                {translate('pages.schema.edit.title')}
+                {[translate('pages.schema.edit.title'), record.id].join(' ')}
             </Typography>
             <Edit actions={<EditTopToolbar />}>
                 <SimpleForm toolbar={<ViewToolbar />}>
@@ -176,7 +181,7 @@ export const SchemaList = () => {
             </Typography>
             <List actions={<ListTopToolbar />}>
                 <Datagrid bulkActionButtons={false}>
-                    <TextField source="crdId" label="CRD" />
+                    <TextField source="crdId" />
                     <TextField source="version" />
                     <CopyButton />
                     <EditButton />
@@ -190,6 +195,8 @@ export const SchemaList = () => {
 
 export const SchemaShow = () => {
     const translate = useTranslate();
+    const { record } = useShowController();
+    if (!record) return null;
 
     return (
         <>
@@ -198,14 +205,13 @@ export const SchemaShow = () => {
                 className="login-page-title"
                 sx={{ padding: '20px 0px 12px 0px' }}
             >
-                {translate('pages.schema.show.title')}
+                {[translate('pages.schema.show.title'), record.id].join(' ')}
             </Typography>
             <Show actions={<ShowTopToolbar />}>
                 <SimpleShowLayout>
                     <TextField source="id" />
                     <ReferenceField
                         source="crdId"
-                        label="CRD"
                         reference="crd"
                         link="show"
                     />

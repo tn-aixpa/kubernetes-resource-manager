@@ -8,34 +8,52 @@ const dataProvider = (
     baseUrl: string,
     userManager: UserManager
 ): DataProvider => {
+    const authType = process.env.REACT_APP_AUTH?.toLowerCase();
+
     const httpClient = async (url: string, options: Options = {}) => {
         if (!options.headers) {
             options.headers = new Headers({ Accept: 'application/json' });
         }
-    
-        const user = await userManager.getUser();
-    
-        if (user) {
+
+        if (authType === 'oauth') {
+            const user = await userManager.getUser();
+            if (!user) {
+                return Promise.reject('OAuth: No user found in store');
+            }
             options.user = {
                 authenticated: true,
                 token: 'Bearer ' + user.access_token,
             };
-    
-            return fetchUtils.fetchJson(url, options);
+        } else if (authType === 'basic') {
+            const basicAuth = localStorage.getItem('basic-auth');
+            if (!basicAuth) {
+                return Promise.reject('Basic: No user found in store');
+            }
+            options.headers = new Headers({
+                Accept: 'application/json',
+                Authorization: 'Basic ' + basicAuth,
+            });
         }
-        return Promise.reject('No user found in store');
-    };
 
+        return fetchUtils.fetchJson(url, options);
+    };
 
     const apiUrl = baseUrl + '/api';
     const provider = jsonServerProvider(apiUrl, httpClient);
 
     return {
         fetchResources: async (): Promise<string[]> => {
-            const user = await userManager.getUser();
-            if (!user) {
-                return [];
+            if (authType === 'oauth') {
+                const user = await userManager.getUser();
+                if (!user) {
+                    return [];
+                }
+            } else if (authType === 'basic') {
+                if (!localStorage.getItem('basic-auth')) {
+                    return [];
+                }
             }
+
             return httpClient(`${apiUrl}/crs?size=1000`).then(
                 ({ headers, json }) => {
                     if (!json.content) {
@@ -65,7 +83,7 @@ const dataProvider = (
                 url += `&id=${idFilter}`;
             }
 
-            const onlyWithoutSchema = params?.filter?.onlyWithoutSchema
+            const onlyWithoutSchema = params?.filter?.onlyWithoutSchema;
             if (onlyWithoutSchema) {
                 url += `&onlyWithoutSchema=${onlyWithoutSchema}`;
             }
