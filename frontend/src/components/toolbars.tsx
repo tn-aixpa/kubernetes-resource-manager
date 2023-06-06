@@ -20,7 +20,7 @@ export const TopToolbar = (props: TopToolbarProps) => {
             {hasEdit && <EditButton key="edit-button" />}
             {hasShow && <ShowButton key="show-button" />}
             {hasList && <ListButton key="list-button" />}
-            {hasDelete && ( <DeleteWithConfirmButton /> )}
+            {hasDelete && <DeleteWithConfirmButton key="delete-button" />}
         </ReactAdminTopToolbar>
     );
 };
@@ -72,18 +72,24 @@ const SchemaDeleteButton = () => {
         redirect('list', resource);
     };
 
-    return (<DeleteWithConfirmButton mutationOptions={{ onSuccess }} />);
-}
+    return <DeleteWithConfirmButton mutationOptions={{ onSuccess }} />;
+};
 
 export const SchemaShowTopToolbar = (props: TopToolbarProps) => {
-    const { hasCreate, hasEdit = true, hasShow, hasList = true, hasDelete = true } = props;
+    const {
+        hasCreate,
+        hasEdit = true,
+        hasShow,
+        hasList = true,
+        hasDelete = true,
+    } = props;
     return (
         <ReactAdminTopToolbar>
             {hasCreate && <CreateButton key="create-button" />}
             {hasEdit && <EditButton key="edit-button" />}
             {hasShow && <ShowButton key="show-button" />}
             {hasList && <ListButton key="list-button" />}
-            {hasDelete && ( <SchemaDeleteButton key='delete-button' /> )}
+            {hasDelete && <SchemaDeleteButton key="delete-button" />}
         </ReactAdminTopToolbar>
     );
-}
+};

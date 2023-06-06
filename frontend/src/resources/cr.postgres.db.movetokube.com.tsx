@@ -17,6 +17,10 @@ import {
     BooleanInput,
     Edit,
     useEditController,
+    useGetList,
+    Loading,
+    useTranslate,
+    Button,
 } from 'react-admin';
 import { View } from './index';
 import { formatArray, parseArray } from '../utils';
@@ -28,6 +32,10 @@ import {
     ShowTopToolbar,
 } from '../components/toolbars';
 import { ApiVersionInput, KindInput, SimplePageTitle } from './cr';
+import { Typography } from '@mui/material';
+import { CR_POSTGRES_USERS } from './cr.postgresusers.db.movetokube.com';
+
+export const CR_POSTGRES_DB = 'postgres.db.movetokube.com';
 
 const CrCreate = () => {
     const crdId = useResourceContext();
@@ -36,7 +44,7 @@ const CrCreate = () => {
         <>
             <SimplePageTitle
                 pageType="create"
-                crName="postgres.db.movetokube.com.names.singular"
+                crName={`${CR_POSTGRES_DB}.names.singular`}
             />
             <Create redirect="list" actions={<CreateTopToolbar />}>
                 <SimpleForm>
@@ -79,7 +87,7 @@ const CrEdit = () => {
         <>
             <SimplePageTitle
                 pageType="edit"
-                crName="postgres.db.movetokube.com.names.singular"
+                crName={`${CR_POSTGRES_DB}.names.singular`}
                 crId={record.spec.database}
             />
             <Edit actions={<EditTopToolbar />}>
@@ -110,7 +118,7 @@ const CrList = () => {
         <>
             <SimplePageTitle
                 pageType="list"
-                crName="postgres.db.movetokube.com.names.plural"
+                crName={`${CR_POSTGRES_DB}.names.plural`}
             />
             <List actions={<ListTopToolbar />}>
                 <Datagrid>
@@ -133,7 +141,7 @@ const CrShow = () => {
         <>
             <SimplePageTitle
                 pageType="show"
-                crName="postgres.db.movetokube.com.names.singular"
+                crName={`${CR_POSTGRES_DB}.names.singular`}
                 crId={record.spec.database}
             />
             <Show actions={<ShowTopToolbar />}>
@@ -143,14 +151,86 @@ const CrShow = () => {
                     <TextField source="spec.extensions" />
                     <TextField source="spec.masterRole" />
                     <TextField source="spec.schemas" />
+                    <PostgresUsers />
                 </SimpleShowLayout>
             </Show>
         </>
     );
 };
 
+const PostgresUsers = () => {
+    const translate = useTranslate();
+    const { record } = useShowController();
+
+    const sort = { field: 'id', order: 'ASC' };
+    const { data, total, isLoading } = useGetList(CR_POSTGRES_USERS, {
+        pagination: { page: 1, perPage: 1000 },
+        sort: sort,
+    });
+
+    if (isLoading) return <Loading />;
+    if (!data) return null;
+
+    const dbUsers = data.filter(
+        (user: any) => user.spec.database === record.metadata.name
+    );
+
+    return (
+        <>
+            <Typography variant="h6">
+                {translate(`pages.cr.${CR_POSTGRES_DB}.users.title`)}
+            </Typography>
+            {dbUsers.length > 0 && (
+                <Datagrid
+                    data={dbUsers}
+                    total={total}
+                    isLoading={isLoading}
+                    sort={sort}
+                >
+                    <TextField
+                        source="id"
+                        label={translate(
+                            `pages.cr.${CR_POSTGRES_DB}.users.fields.id`
+                        )}
+                    />
+                    <TextField
+                        source="spec.role"
+                        label={translate(
+                            `pages.cr.${CR_POSTGRES_DB}.users.fields.role`
+                        )}
+                    />
+                    <TextField
+                        source="spec.privileges"
+                        label={translate(
+                            `pages.cr.${CR_POSTGRES_DB}.users.fields.privileges`
+                        )}
+                    />
+                    <TextField
+                        source="spec.secretName"
+                        label={translate(
+                            `pages.cr.${CR_POSTGRES_DB}.users.fields.secretName`
+                        )}
+                    />
+                    <EditButton resource={CR_POSTGRES_USERS} />
+                    <ShowButton resource={CR_POSTGRES_USERS} />
+                    <DeleteWithConfirmButton
+                        redirect={false}
+                        resource={CR_POSTGRES_USERS}
+                    />
+                </Datagrid>
+            )}
+            <Button
+                label={translate(
+                    `pages.cr.${CR_POSTGRES_DB}.users.createButton`
+                )}
+                href={`${window.location.origin}/${CR_POSTGRES_USERS}/create?db=${record.metadata.name}`}
+            ></Button>
+        </>
+    );
+};
+
 const CustomView: View = {
-    key: 'postgres.db.movetokube.com',
+    key: CR_POSTGRES_DB,
     name: 'Postgres',
     list: CrList,
     show: CrShow,

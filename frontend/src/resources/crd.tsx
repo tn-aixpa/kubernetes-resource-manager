@@ -33,11 +33,7 @@ export const CrdShow = () => {
 
     return (
         <>
-            <Typography
-                variant="h4"
-                className="login-page-title"
-                sx={{ padding: '20px 0px 12px 0px' }}
-            >
+            <Typography variant="h4" className="page-title">
                 {[translate('pages.crd.show.title'), record.id].join(' ')}
             </Typography>
             <Show actions={false}>
@@ -78,6 +74,9 @@ const RelatedResources = () => {
     if (!data) return null;
     return total ? (
         <>
+            <Typography variant="h6">
+                {translate('pages.crd.show.crs.title')}
+            </Typography>
             <Datagrid
                 data={data}
                 total={total}
@@ -87,11 +86,11 @@ const RelatedResources = () => {
             >
                 <TextField
                     source="id"
-                    label={translate('pages.crd.show.crs.id')}
+                    label={translate('pages.crd.show.crs.fields.id')}
                 />
                 <TextField
                     source="version"
-                    label={translate('pages.crd.show.crs.version')}
+                    label={translate('pages.crd.show.crs.fields.version')}
                 />
                 <ShowButton resource="crs" />
             </Datagrid>

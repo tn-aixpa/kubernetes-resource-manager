@@ -176,11 +176,7 @@ const PageTitle = ({ pageType, crId }: { pageType: string; crId?: string }) => {
     if (!data) return null;
 
     return (
-        <Typography
-            variant="h4"
-            className="login-page-title"
-            sx={{ padding: '20px 0px 12px 0px' }}
-        >
+        <Typography variant="h4" className="page-title">
             {[
                 translate('pages.cr.' + pageType + '.title'),
                 data.spec.names.kind,
@@ -246,11 +242,7 @@ export const SimplePageTitle = ({
     const translate = useTranslate();
 
     return (
-        <Typography
-            variant="h4"
-            className="login-page-title"
-            sx={{ padding: '20px 0px 12px 0px' }}
-        >
+        <Typography variant="h4" className="page-title">
             {[
                 translate('pages.cr.' + pageType + '.title'),
                 translate('pages.cr.' + crName),

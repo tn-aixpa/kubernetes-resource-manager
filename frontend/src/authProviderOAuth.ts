@@ -29,11 +29,7 @@ const authProviderOAuth = (userManager: UserManager): AuthProvider => {
         // get the user's profile
         getIdentity: async () => {
             const user = await userManager.getUser();
-            console.log(
-                'getIdentity',
-                user?.profile.sub,
-                user?.profile.preferred_username
-            );
+
             return Promise.resolve({
                 id: user?.profile.sub || '',
                 fullName: user?.profile.preferred_username,

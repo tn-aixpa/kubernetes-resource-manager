@@ -1,8 +1,5 @@
 import {
-    Datagrid,
     EditButton,
-    List,
-    ShowButton,
     TextField,
     Show,
     SimpleShowLayout,
@@ -10,32 +7,54 @@ import {
     Create,
     SimpleForm,
     TextInput,
+    TopToolbar as ReactAdminTopToolbar,
     useResourceContext,
     required,
     Edit,
     useEditController,
     useShowController,
+    ShowButton,
+    ListButton,
+    useNotify,
+    useRedirect,
 } from 'react-admin';
 import { View } from './index';
 import { ViewToolbar } from '../components/ViewToolbar';
-import {
-    CreateTopToolbar,
-    EditTopToolbar,
-    ListTopToolbar,
-    ShowTopToolbar,
-} from '../components/toolbars';
+import { TopToolbarProps } from '../components/toolbars';
 import { ApiVersionInput, KindInput, SimplePageTitle } from './cr';
+import { CR_POSTGRES_DB } from './cr.postgres.db.movetokube.com';
+
+export const CR_POSTGRES_USERS = 'postgresusers.db.movetokube.com';
 
 const CrCreate = () => {
     const crdId = useResourceContext();
+    const notify = useNotify();
+    const redirect = useRedirect();
+    const params = new URLSearchParams(window.location.search);
+    const dbId = params.get('db') || '';
+
+    const onSuccess = (data: any) => {
+        notify('ra.notification.created', { messageArgs: { smart_count: 1 } });
+        redirect('show', CR_POSTGRES_DB, dbId);
+    };
 
     return (
         <>
             <SimplePageTitle
                 pageType="create"
-                crName="postgresusers.db.movetokube.com.names.singular"
+                crName={`${CR_POSTGRES_USERS}.names.singular`}
             />
-            <Create redirect="list" actions={<CreateTopToolbar />}>
+            <Create
+                mutationOptions={{ onSuccess }}
+                actions={
+                    <UserTopToolbar
+                        redirect={`${CR_POSTGRES_DB}/${dbId}/show`}
+                        buttons={{
+                            hasList: true,
+                        }}
+                    />
+                }
+            >
                 <SimpleForm>
                     {crdId && (
                         <ApiVersionInput
@@ -47,9 +66,15 @@ const CrCreate = () => {
                         <KindInput crdId={crdId} sx={{ display: 'none' }} />
                     )}
                     <TextInput source="metadata.name" validate={required()} />
-                    <TextInput source="spec.database" validate={required()} />
-                    <TextInput source="spec.privileges" validate={required()} />
+                    <TextInput
+                        source="spec.database"
+                        validate={required()}
+                        defaultValue={dbId}
+                        disabled
+                        sx={{ display: 'none' }}
+                    />
                     <TextInput source="spec.role" validate={required()} />
+                    <TextInput source="spec.privileges" validate={required()} />
                     <TextInput source="spec.secretName" validate={required()} />
                 </SimpleForm>
             </Create>
@@ -58,21 +83,42 @@ const CrCreate = () => {
 };
 
 const CrEdit = () => {
+    const notify = useNotify();
+    const redirect = useRedirect();
     const { record } = useEditController();
     if (!record) return null;
+
+    const onSuccess = (data: any) => {
+        notify('ra.notification.updated', {
+            messageArgs: { smart_count: 1 },
+            undoable: true,
+        });
+        redirect('show', CR_POSTGRES_DB, record.spec.database);
+    };
 
     return (
         <>
             <SimplePageTitle
                 pageType="edit"
-                crName="postgresusers.db.movetokube.com.names.singular"
+                crName={`${CR_POSTGRES_USERS}.names.singular`}
                 crId={record.spec.role}
             />
-            <Edit actions={<EditTopToolbar />}>
+            <Edit
+                mutationOptions={{ onSuccess }}
+                actions={
+                    <UserTopToolbar
+                        redirect={`${CR_POSTGRES_DB}/${record.spec.database}/show`}
+                        buttons={{
+                            hasShow: true,
+                            hasList: true,
+                        }}
+                    />
+                }
+            >
                 <SimpleForm toolbar={<ViewToolbar />}>
                     <TextInput source="spec.database" validate={required()} />
-                    <TextInput source="spec.privileges" validate={required()} />
                     <TextInput source="spec.role" validate={required()} />
+                    <TextInput source="spec.privileges" validate={required()} />
                     <TextInput source="spec.secretName" validate={required()} />
                 </SimpleForm>
             </Edit>
@@ -80,12 +126,13 @@ const CrEdit = () => {
     );
 };
 
+/*
 const CrList = () => {
     return (
         <>
             <SimplePageTitle
                 pageType="list"
-                crName="postgresusers.db.movetokube.com.names.plural"
+                crName={`${CR_POSTGRES_USERS}.names.plural`}
             />
             <List actions={<ListTopToolbar />}>
                 <Datagrid>
@@ -100,6 +147,7 @@ const CrList = () => {
         </>
     );
 };
+*/
 
 const CrShow = () => {
     const { record } = useShowController();
@@ -109,14 +157,25 @@ const CrShow = () => {
         <>
             <SimplePageTitle
                 pageType="show"
-                crName="postgresusers.db.movetokube.com.names.singular"
+                crName={`${CR_POSTGRES_USERS}.names.singular`}
                 crId={record.spec.role}
             />
-            <Show actions={<ShowTopToolbar />}>
+            <Show
+                actions={
+                    <UserTopToolbar
+                        redirect={`${CR_POSTGRES_DB}/${record.spec.database}/show`}
+                        buttons={{
+                            hasEdit: true,
+                            hasList: true,
+                            hasDelete: true,
+                        }}
+                    />
+                }
+            >
                 <SimpleShowLayout>
                     <TextField source="spec.database" />
-                    <TextField source="spec.privileges" />
                     <TextField source="spec.role" />
+                    <TextField source="spec.privileges" />
                     <TextField source="spec.secretName" />
                 </SimpleShowLayout>
             </Show>
@@ -124,10 +183,34 @@ const CrShow = () => {
     );
 };
 
+const UserTopToolbar = ({
+    redirect,
+    buttons,
+}: {
+    redirect: string;
+    buttons: TopToolbarProps;
+}) => {
+    const { hasEdit, hasList, hasShow, hasDelete } = buttons;
+
+    return (
+        <ReactAdminTopToolbar>
+            {hasEdit && <EditButton key="edit-button" />}
+            {hasShow && <ShowButton key="show-button" />}
+            {hasList && <ListButton key="list-button" resource={redirect} />}
+            {hasDelete && (
+                <DeleteWithConfirmButton
+                    key="delete-button"
+                    redirect={`${window.location.origin}/${redirect}`}
+                />
+            )}
+        </ReactAdminTopToolbar>
+    );
+};
+
 const CustomView: View = {
-    key: 'postgresusers.db.movetokube.com',
+    key: CR_POSTGRES_USERS,
     name: 'Postgres users',
-    list: CrList,
+    // list: CrList,
     show: CrShow,
     create: CrCreate,
     edit: CrEdit,

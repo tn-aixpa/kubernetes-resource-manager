@@ -62,11 +62,7 @@ export const SchemaCreate = () => {
 
     return (
         <>
-            <Typography
-                variant="h4"
-                className="login-page-title"
-                sx={{ padding: '20px 0px 12px 0px' }}
-            >
+            <Typography variant="h4" className="page-title">
                 {translate('pages.schema.create.title')}
             </Typography>
             <Create
@@ -123,11 +119,7 @@ export const SchemaEdit = () => {
 
     return (
         <>
-            <Typography
-                variant="h4"
-                className="login-page-title"
-                sx={{ padding: '20px 0px 12px 0px' }}
-            >
+            <Typography variant="h4" className="page-title">
                 {[translate('pages.schema.edit.title'), record.id].join(' ')}
             </Typography>
             <Edit actions={<EditTopToolbar />}>
@@ -159,18 +151,10 @@ export const SchemaList = () => {
 
     return (
         <>
-            <Typography
-                variant="h4"
-                className="login-page-title"
-                sx={{ padding: '20px 0px 12px 0px' }}
-            >
+            <Typography variant="h4" className="page-title">
                 {translate('pages.schema.list.title')}
             </Typography>
-            <Typography
-                variant="subtitle1"
-                className="login-page-title"
-                sx={{ padding: '0px' }}
-            >
+            <Typography variant="subtitle1" sx={{ padding: '0px' }}>
                 {translate('pages.schema.list.subtitle')}
             </Typography>
             <List actions={<ListTopToolbar />}>
@@ -194,11 +178,7 @@ export const SchemaShow = () => {
 
     return (
         <>
-            <Typography
-                variant="h4"
-                className="login-page-title"
-                sx={{ padding: '20px 0px 12px 0px' }}
-            >
+            <Typography variant="h4" className="page-title">
                 {[translate('pages.schema.show.title'), record.id].join(' ')}
             </Typography>
             <Show actions={<ShowTopToolbar />}>

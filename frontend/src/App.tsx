@@ -5,8 +5,10 @@ import {
     AdminContext,
     AdminUI,
     Loading,
+    Options,
     Resource,
     defaultTheme,
+    fetchUtils,
     localStorageStore,
 } from 'react-admin';
 import {
@@ -35,7 +37,12 @@ const customViews: { [index: string]: View } = {
     'postgresusers.db.movetokube.com': crPostgresUsers,
 };
 
+export const AUTH_TYPE_BASIC = 'basic';
+export const AUTH_TYPE_OAUTH = 'oauth';
+
 const API_URL: string = process.env.REACT_APP_API_URL as string;
+
+const authType = process.env.REACT_APP_AUTH;
 
 const manager = new UserManager({
     authority: process.env.REACT_APP_AUTHORITY || '',
@@ -48,18 +55,51 @@ const manager = new UserManager({
     loadUserInfo: true,
 });
 
-const dataProvider = appDataProvider(API_URL, manager);
+const httpClient = async (url: string, options: Options = {}) => {
+    if (!options.headers) {
+        options.headers = new Headers({ Accept: 'application/json' });
+    }
 
-const authType = process.env.REACT_APP_AUTH;
-let authProvider: any = null;
-let requireAuth = false;
-if (authType === 'oauth') {
-    authProvider = authProviderOAuth(manager);
-    requireAuth = true;
-} else if (authType === 'basic') {
-    authProvider = authProviderBasic();
-    requireAuth = true;
-}
+    if (authType === AUTH_TYPE_OAUTH) {
+        const user = await manager.getUser();
+        if (!user) {
+            return Promise.reject('OAuth: No user found in store');
+        }
+        options.user = {
+            authenticated: true,
+            token: 'Bearer ' + user.access_token,
+        };
+    } else if (authType === AUTH_TYPE_BASIC) {
+        const basicAuth = sessionStorage.getItem('basic-auth');
+        if (!basicAuth) {
+            return Promise.reject('Basic: No user found in store');
+        }
+        options.headers = new Headers({
+            Accept: 'application/json',
+            Authorization: 'Basic ' + basicAuth,
+        });
+    }
+
+    return fetchUtils.fetchJson(url, options);
+};
+
+const dataProvider = appDataProvider(API_URL, manager, httpClient);
+
+const getAuthProvider = () => {
+    if (authType === AUTH_TYPE_OAUTH) {
+        return authProviderOAuth(manager);
+    } else if (authType === AUTH_TYPE_BASIC) {
+        return authProviderBasic();
+    }
+};
+
+const isAuthEnabled = () => {
+    if (authType === AUTH_TYPE_OAUTH || authType === AUTH_TYPE_BASIC) {
+        return true;
+    }
+
+    return false;
+};
 
 const store = localStorageStore();
 
@@ -80,7 +120,7 @@ function App() {
         <BrowserRouter>
             <AdminContext
                 dataProvider={dataProvider}
-                authProvider={authProvider}
+                authProvider={getAuthProvider()}
                 i18nProvider={i18nProvider}
                 store={store}
                 theme={themeOptions}
@@ -98,7 +138,6 @@ function DynamicAdminUI() {
     const viewsContext = useContext(ViewsContext);
     for (const crdId of crdIds) {
         try {
-            console.log(viewsContext);
             if (
                 crdId in customViews &&
                 !viewsContext.list().some(v => v.key === crdId)
@@ -123,7 +162,7 @@ function DynamicAdminUI() {
             dashboard={MyDashboard}
             loginPage={Login}
             layout={MyLayout}
-            requireAuth={requireAuth}
+            requireAuth={isAuthEnabled()}
         >
             {views.map((v: any) => (
                 <Resource

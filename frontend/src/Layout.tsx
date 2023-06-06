@@ -3,6 +3,7 @@ import {
     LayoutProps,
     Menu,
     MenuProps,
+    ResourceDefinition,
     useResourceDefinitions,
     useTranslate,
 } from 'react-admin';
@@ -14,11 +15,15 @@ const MyMenu = (props: MenuProps) => {
     return (
         <Menu {...props}>
             <Menu.DashboardItem primaryText={translate('dashboard.name')} />
-            {Object.keys(resources).map(
-                name =>
-                    name !== 'crd' &&
-                    name !== 'crs' && (
-                        <Menu.ResourceItem key={name} name={name} />
+            {Object.values(resources).map(
+                (resource: ResourceDefinition) =>
+                    resource.name !== 'crd' &&
+                    resource.name !== 'crs' &&
+                    resource.hasList && (
+                        <Menu.ResourceItem
+                            key={resource.name}
+                            name={resource.name}
+                        />
                     )
             )}
             <div key="settings">

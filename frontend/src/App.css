@@ -37,8 +37,8 @@
   }
 }
 
-.login-page-title {
-  padding: 20px;
+.page-title {
+  padding: 20px 0px 12px 0px;
 }
 
 .ace_editor {

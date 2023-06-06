@@ -39,19 +39,6 @@ export const fetchViews = (types: string[]): View[] => {
                 edit: CrEdit,
                 show: CrShow,
             };
-        } else {
-            if (!v.list) {
-                v.list = CrList;
-            }
-            if (!v.create) {
-                v.create = CrCreate;
-            }
-            if (!v.edit) {
-                v.edit = CrEdit;
-            }
-            if (!v.show) {
-                v.show = CrShow;
-            }
         }
         return v;
     });

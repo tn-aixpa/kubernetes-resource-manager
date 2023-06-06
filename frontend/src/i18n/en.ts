@@ -48,7 +48,7 @@ const messages = {
             fields: {
                 id: 'ID',
                 spec: {
-                    database: 'Database',
+                    database: 'Database ID',
                     privileges: 'Privileges',
                     role: 'Role',
                     secretName: 'Secret name',
@@ -108,6 +108,16 @@ const messages = {
                     singular: 'Postgres DB',
                     plural: 'Postgres DBs',
                 },
+                users: {
+                    title: 'Users',
+                    createButton: 'Add user',
+                    fields: {
+                        id: 'ID',
+                        role: 'Role',
+                        privileges: 'Privileges',
+                        secretName: 'SecretName',
+                    },
+                },
             },
             'postgresusers.db.movetokube.com': {
                 names: {
@@ -122,8 +132,11 @@ const messages = {
                 listCrs: 'List custom resources',
                 createSchema: 'Create schema',
                 crs: {
-                    id: 'ID',
-                    version: 'Version',
+                    title: 'Schemas',
+                    fields: {
+                        id: 'ID',
+                        version: 'Version',
+                    },
                 },
             },
         },

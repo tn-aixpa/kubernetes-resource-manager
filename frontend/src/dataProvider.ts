@@ -3,53 +3,35 @@ import { stringify } from 'querystring';
 import { fetchUtils, DataProvider } from 'ra-core';
 import jsonServerProvider from 'ra-data-json-server';
 import { Options } from 'react-admin';
+import { AUTH_TYPE_BASIC, AUTH_TYPE_OAUTH } from './App';
 
 const dataProvider = (
     baseUrl: string,
-    userManager: UserManager
+    userManager: UserManager,
+    httpClient: (
+        url: any,
+        options?: fetchUtils.Options | undefined
+    ) => Promise<{
+        status: number;
+        headers: Headers;
+        body: string;
+        json: any;
+    }>
 ): DataProvider => {
-    const authType = process.env.REACT_APP_AUTH?.toLowerCase();
-
-    const httpClient = async (url: string, options: Options = {}) => {
-        if (!options.headers) {
-            options.headers = new Headers({ Accept: 'application/json' });
-        }
-
-        if (authType === 'oauth') {
-            const user = await userManager.getUser();
-            if (!user) {
-                return Promise.reject('OAuth: No user found in store');
-            }
-            options.user = {
-                authenticated: true,
-                token: 'Bearer ' + user.access_token,
-            };
-        } else if (authType === 'basic') {
-            const basicAuth = localStorage.getItem('basic-auth');
-            if (!basicAuth) {
-                return Promise.reject('Basic: No user found in store');
-            }
-            options.headers = new Headers({
-                Accept: 'application/json',
-                Authorization: 'Basic ' + basicAuth,
-            });
-        }
-
-        return fetchUtils.fetchJson(url, options);
-    };
+    const authType = process.env.REACT_APP_AUTH;
 
     const apiUrl = baseUrl + '/api';
     const provider = jsonServerProvider(apiUrl, httpClient);
 
     return {
         fetchResources: async (): Promise<string[]> => {
-            if (authType === 'oauth') {
+            if (authType === AUTH_TYPE_OAUTH) {
                 const user = await userManager.getUser();
                 if (!user) {
                     return [];
                 }
-            } else if (authType === 'basic') {
-                if (!localStorage.getItem('basic-auth')) {
+            } else if (authType === AUTH_TYPE_BASIC) {
+                if (!sessionStorage.getItem('basic-auth')) {
                     return [];
                 }
             }
