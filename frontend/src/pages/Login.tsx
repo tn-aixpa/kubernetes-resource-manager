@@ -97,7 +97,7 @@ const Login = () => {
                                 <TextInput
                                     autoFocus
                                     source="username"
-                                    label={translate('ra.auth.username')}
+                                    label={'ra.auth.username'}
                                     disabled={loading}
                                     validate={required()}
                                     fullWidth
@@ -106,7 +106,7 @@ const Login = () => {
                             <Box sx={{ marginTop: '1em' }}>
                                 <TextInput
                                     source="password"
-                                    label={translate('ra.auth.password')}
+                                    label={'ra.auth.password'}
                                     type="password"
                                     disabled={loading}
                                     validate={required()}

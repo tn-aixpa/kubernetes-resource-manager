@@ -34,7 +34,6 @@ import {
 } from '../components/toolbars';
 
 export const CrCreate = () => {
-    const translate = useTranslate();
     const crdId = useResourceContext();
 
     return (
@@ -54,7 +53,7 @@ export const CrCreate = () => {
                     <TextInput
                         source="metadata.name"
                         validate={required()}
-                        label={translate('pages.cr.defaultFields.metadataName')}
+                        label={'pages.cr.defaultFields.metadataName'}
                     />
 
                     <AceEditorInput
@@ -71,7 +70,6 @@ export const CrCreate = () => {
 };
 
 export const CrEdit = () => {
-    const translate = useTranslate();
     const { record } = useEditController();
     if (!record) return null;
 
@@ -86,7 +84,7 @@ export const CrEdit = () => {
                         theme="monokai"
                         format={formatJson}
                         parse={parseJson}
-                        label={translate('pages.cr.defaultFields.spec')}
+                        label={'pages.cr.defaultFields.spec'}
                     />
                 </SimpleForm>
             </Edit>
@@ -95,8 +93,6 @@ export const CrEdit = () => {
 };
 
 export const CrList = () => {
-    const translate = useTranslate();
-
     return (
         <>
             <PageTitle pageType="list" />
@@ -104,15 +100,15 @@ export const CrList = () => {
                 <Datagrid>
                     <TextField
                         source="id"
-                        label={translate('pages.cr.defaultFields.id')}
+                        label={'pages.cr.defaultFields.id'}
                     />
                     <TextField
                         source="apiVersion"
-                        label={translate('pages.cr.defaultFields.apiVersion')}
+                        label={'pages.cr.defaultFields.apiVersion'}
                     />
                     <TextField
                         source="kind"
-                        label={translate('pages.cr.defaultFields.kind')}
+                        label={'pages.cr.defaultFields.kind'}
                     />
                     <EditButton />
                     <ShowButton />
@@ -124,7 +120,6 @@ export const CrList = () => {
 };
 
 export const CrShow = () => {
-    const translate = useTranslate();
     const { record } = useShowController();
     if (!record) return null;
 
@@ -135,15 +130,15 @@ export const CrShow = () => {
                 <SimpleShowLayout>
                     <TextField
                         source="id"
-                        label={translate('pages.cr.defaultFields.id')}
+                        label={'pages.cr.defaultFields.id'}
                     />
                     <TextField
                         source="apiVersion"
-                        label={translate('pages.cr.defaultFields.apiVersion')}
+                        label={'pages.cr.defaultFields.apiVersion'}
                     />
                     <TextField
                         source="kind"
-                        label={translate('pages.cr.defaultFields.kind')}
+                        label={'pages.cr.defaultFields.kind'}
                     />
                     <AceEditorField
                         mode="json"
@@ -151,7 +146,7 @@ export const CrShow = () => {
                             metadata: JSON.stringify(record.metadata),
                         }}
                         source="metadata"
-                        label={translate('pages.cr.defaultFields.metadata')}
+                        label={'pages.cr.defaultFields.metadata'}
                     />
                     <AceEditorField
                         mode="json"
@@ -159,7 +154,7 @@ export const CrShow = () => {
                             spec: JSON.stringify(record.spec),
                         }}
                         source="spec"
-                        label={translate('pages.cr.defaultFields.spec')}
+                        label={'pages.cr.defaultFields.spec'}
                     />
                 </SimpleShowLayout>
             </Show>
@@ -189,7 +184,6 @@ const PageTitle = ({ pageType, crId }: { pageType: string; crId?: string }) => {
 };
 
 export const ApiVersionInput = ({ crdId, sx }: CrdProps) => {
-    const translate = useTranslate();
     const { data, isLoading } = useGetOne('crd', { id: crdId });
     if (isLoading) return <Loading />;
     if (!data) return null;
@@ -203,14 +197,13 @@ export const ApiVersionInput = ({ crdId, sx }: CrdProps) => {
             source="apiVersion"
             defaultValue={apiVersion}
             sx={sx}
-            label={translate('pages.cr.defaultFields.apiVersion')}
+            label={'pages.cr.defaultFields.apiVersion'}
             disabled
         />
     );
 };
 
 export const KindInput = ({ crdId, sx }: CrdProps) => {
-    const translate = useTranslate();
     const { data, isLoading } = useGetOne('crd', { id: crdId });
     if (isLoading) return <Loading />;
     if (!data) return null;
@@ -219,7 +212,7 @@ export const KindInput = ({ crdId, sx }: CrdProps) => {
             source="kind"
             defaultValue={data.spec.names.kind}
             sx={sx}
-            label={translate('pages.cr.defaultFields.kind')}
+            label={'pages.cr.defaultFields.kind'}
             disabled
         />
     );

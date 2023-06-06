@@ -86,23 +86,23 @@ const RelatedResources = () => {
             >
                 <TextField
                     source="id"
-                    label={translate('pages.crd.show.crs.fields.id')}
+                    label={'pages.crd.show.crs.fields.id'}
                 />
                 <TextField
                     source="version"
-                    label={translate('pages.crd.show.crs.fields.version')}
+                    label={'pages.crd.show.crs.fields.version'}
                 />
                 <ShowButton resource="crs" />
             </Datagrid>
             <Button
-                label={translate('pages.crd.show.listCrs')}
+                label={'pages.crd.show.listCrs'}
                 startIcon={<VisibilityIcon />}
                 href={`${window.location.origin}/${record.id}`}
             ></Button>
         </>
     ) : (
         <Button
-            label={translate('pages.crd.show.createSchema')}
+            label={'pages.crd.show.createSchema'}
             href={`${window.location.origin}/crs/create?crdId=${record.id}`}
         ></Button>
     );

@@ -55,6 +55,25 @@ const messages = {
                 },
             },
         },
+        'nuclioapigateways.nuclio.io': {
+            name: 'Nuclio API Gateway',
+            fields: {
+                id: 'ID',
+                spec: {
+                    'authentication.basicAuth': {
+                        username: 'Nome utente',
+                        password: 'Password',
+                    },
+                    authenticationMode: 'Metodo di autenticazione',
+                    host: 'Host',
+                    name: 'Nome',
+                    path: 'Percorso',
+                    upstreams: 'Upstreams',
+                    'upstreams.kind': 'Tipo',
+                    'upstreams.nucliofunction.name': 'Nome funzione Nuclio'
+                },
+            },
+        },
     },
     dashboard: {
         name: 'Cruscotto',
@@ -124,6 +143,12 @@ const messages = {
                 names: {
                     singular: 'Utente Postgres',
                     plural: 'Utenti Postgres',
+                },
+            },
+            'nuclioapigateways.nuclio.io': {
+                names: {
+                    singular: 'Nuclio API Gateway',
+                    plural: 'Nuclio API Gateway',
                 },
             },
         },

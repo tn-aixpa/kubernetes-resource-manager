@@ -55,6 +55,25 @@ const messages = {
                 },
             },
         },
+        'nuclioapigateways.nuclio.io': {
+            name: 'Nuclio API Gateway |||| Nuclio API Gateways',
+            fields: {
+                id: 'ID',
+                spec: {
+                    'authentication.basicAuth': {
+                        username: 'Username',
+                        password: 'Password',
+                    },
+                    authenticationMode: 'Authentication mode',
+                    host: 'Host',
+                    name: 'Name',
+                    path: 'Path',
+                    upstreams: 'Upstreams',
+                    'upstreams.kind': 'Kind',
+                    'upstreams.nucliofunction.name': 'Nuclio function name'
+                },
+            },
+        },
     },
     dashboard: {
         name: 'Dashboard',
@@ -123,6 +142,12 @@ const messages = {
                 names: {
                     singular: 'Postgres user',
                     plural: 'Postgres users',
+                },
+            },
+            'nuclioapigateways.nuclio.io': {
+                names: {
+                    singular: 'Nuclio API Gateway',
+                    plural: 'Nuclio API Gateways',
                 },
             },
         },

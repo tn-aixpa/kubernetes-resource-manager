@@ -31,10 +31,12 @@ import { useContext, useState } from 'react';
 import { View, ViewsContext, fetchViews } from './resources';
 import crPostgres from './resources/cr.postgres.db.movetokube.com';
 import crPostgresUsers from './resources/cr.postgresusers.db.movetokube.com';
+import crNuclioApiGateways from './resources/cr.nuclioapigateways.nuclio.io';
 
 const customViews: { [index: string]: View } = {
     'postgres.db.movetokube.com': crPostgres,
     'postgresusers.db.movetokube.com': crPostgresUsers,
+    'nuclioapigateways.nuclio.io': crNuclioApiGateways,
 };
 
 export const AUTH_TYPE_BASIC = 'basic';

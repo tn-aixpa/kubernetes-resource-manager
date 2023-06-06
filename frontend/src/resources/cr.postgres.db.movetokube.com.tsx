@@ -189,27 +189,19 @@ const PostgresUsers = () => {
                 >
                     <TextField
                         source="id"
-                        label={translate(
-                            `pages.cr.${CR_POSTGRES_DB}.users.fields.id`
-                        )}
+                        label={`pages.cr.${CR_POSTGRES_DB}.users.fields.id`}
                     />
                     <TextField
                         source="spec.role"
-                        label={translate(
-                            `pages.cr.${CR_POSTGRES_DB}.users.fields.role`
-                        )}
+                        label={`pages.cr.${CR_POSTGRES_DB}.users.fields.role`}
                     />
                     <TextField
                         source="spec.privileges"
-                        label={translate(
-                            `pages.cr.${CR_POSTGRES_DB}.users.fields.privileges`
-                        )}
+                        label={`pages.cr.${CR_POSTGRES_DB}.users.fields.privileges`}
                     />
                     <TextField
                         source="spec.secretName"
-                        label={translate(
-                            `pages.cr.${CR_POSTGRES_DB}.users.fields.secretName`
-                        )}
+                        label={`pages.cr.${CR_POSTGRES_DB}.users.fields.secretName`}
                     />
                     <EditButton resource={CR_POSTGRES_USERS} />
                     <ShowButton resource={CR_POSTGRES_USERS} />
@@ -220,9 +212,7 @@ const PostgresUsers = () => {
                 </Datagrid>
             )}
             <Button
-                label={translate(
-                    `pages.cr.${CR_POSTGRES_DB}.users.createButton`
-                )}
+                label={`pages.cr.${CR_POSTGRES_DB}.users.createButton`}
                 href={`${window.location.origin}/${CR_POSTGRES_USERS}/create?db=${record.metadata.name}`}
             ></Button>
         </>

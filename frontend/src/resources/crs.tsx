@@ -212,11 +212,10 @@ const SchemaVersionInput = ({ crdId }: CrdProps) => {
 
 const CopyButton = () => {
     const { schema } = useRecordContext();
-    const translate = useTranslate();
 
     return (
         <Button
-            label={translate('button.copy')}
+            label={'button.copy'}
             startIcon={<TextSnippetIcon />}
             onClick={() => navigator.clipboard.writeText(schema)}
         />
