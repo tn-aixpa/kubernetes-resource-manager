@@ -18,6 +18,8 @@ import {
     ArrayInput,
     SimpleFormIterator,
     ArrayField,
+    SelectInput,
+    FormDataConsumer,
 } from 'react-admin';
 import { ViewToolbar } from '../components/ViewToolbar';
 import {
@@ -52,20 +54,35 @@ const CrCreate = () => {
                         <KindInput crdId={crdId} sx={{ display: 'none' }} />
                     )}
                     <TextInput source="metadata.name" validate={required()} />
-                    <TextInput
+                    <SelectInput
                         source="spec.authenticationMode"
+                        choices={[
+                            { id: 'none', name: 'None' },
+                            { id: 'basicAuth', name: 'Basic' },
+                        ]}
                         validate={required()}
                     />
-                    <TextInput
-                        source="spec.authentication.basicAuth.username"
-                        validate={required()}
-                    />
-                    <TextInput
-                        source="spec.authentication.basicAuth.password"
-                        validate={required()}
-                    />
+                    <FormDataConsumer>
+                        {({ formData, ...rest }) =>
+                            formData.spec?.authenticationMode &&
+                            formData.spec?.authenticationMode ===
+                                'basicAuth' && (
+                                <>
+                                    <TextInput
+                                        source="spec.authentication.basicAuth.username"
+                                        validate={required()}
+                                    />
+                                    <TextInput
+                                        source="spec.authentication.basicAuth.password"
+                                        validate={required()}
+                                    />
+                                </>
+                            )
+                        }
+                    </FormDataConsumer>
                     <TextInput source="spec.host" validate={required()} />
                     <TextInput source="spec.name" validate={required()} />
+                    <TextInput source="spec.description" />
                     <TextInput source="spec.path" validate={required()} />
                     <ArrayInput source="spec.upstreams">
                         <SimpleFormIterator inline>
@@ -94,20 +111,35 @@ const CrEdit = () => {
             />
             <Edit actions={<EditTopToolbar />}>
                 <SimpleForm toolbar={<ViewToolbar />}>
-                    <TextInput
+                    <SelectInput
                         source="spec.authenticationMode"
+                        choices={[
+                            { id: 'none', name: 'None' },
+                            { id: 'basicAuth', name: 'Basic' },
+                        ]}
                         validate={required()}
                     />
-                    <TextInput
-                        source="spec.authentication.basicAuth.username"
-                        validate={required()}
-                    />
-                    <TextInput
-                        source="spec.authentication.basicAuth.password"
-                        validate={required()}
-                    />
+                    <FormDataConsumer>
+                        {({ formData, ...rest }) =>
+                            formData.spec?.authenticationMode &&
+                            formData.spec?.authenticationMode ===
+                                'basicAuth' && (
+                                <>
+                                    <TextInput
+                                        source="spec.authentication.basicAuth.username"
+                                        validate={required()}
+                                    />
+                                    <TextInput
+                                        source="spec.authentication.basicAuth.password"
+                                        validate={required()}
+                                    />
+                                </>
+                            )
+                        }
+                    </FormDataConsumer>
                     <TextInput source="spec.host" validate={required()} />
                     <TextInput source="spec.name" validate={required()} />
+                    <TextInput source="spec.description" />
                     <TextInput source="spec.path" validate={required()} />
                     <ArrayInput source="spec.upstreams">
                         <SimpleFormIterator inline>
@@ -149,6 +181,7 @@ const CrList = () => {
 const CrShow = () => {
     const { record } = useShowController();
     if (!record) return null;
+    console.log(record);
 
     return (
         <>
@@ -159,15 +192,26 @@ const CrShow = () => {
             <Show actions={<ShowTopToolbar />}>
                 <SimpleShowLayout>
                     <TextField source="spec.authenticationMode" />
-                    <TextField source="spec.authentication.basicAuth.username" />
-                    <TextField source="spec.authentication.basicAuth.password" />
+                    {record.spec.authenticationMode === 'basicAuth' && (
+                        <TextField source="spec.authentication.basicAuth.username" />
+                    )}
+                    {record.spec.authenticationMode === 'basicAuth' && (
+                        <TextField source="spec.authentication.basicAuth.password" />
+                    )}
                     <TextField source="spec.host" />
                     <TextField source="spec.name" />
+                    <TextField source="spec.description" />
                     <TextField source="spec.path" />
                     <ArrayField source="spec.upstreams">
                         <Datagrid bulkActionButtons={false}>
-                            <TextField source="kind" label={`resources.${CR_NUCLIO_APIGATEWAYS}.fields.spec.upstreams.kind`} />
-                            <TextField source="nucliofunction.name" label={`resources.${CR_NUCLIO_APIGATEWAYS}.fields.spec.upstreams.nucliofunction.name`} />
+                            <TextField
+                                source="kind"
+                                label={`resources.${CR_NUCLIO_APIGATEWAYS}.fields.spec.upstreams.kind`}
+                            />
+                            <TextField
+                                source="nucliofunction.name"
+                                label={`resources.${CR_NUCLIO_APIGATEWAYS}.fields.spec.upstreams.nucliofunction.name`}
+                            />
                         </Datagrid>
                     </ArrayField>
                 </SimpleShowLayout>

@@ -67,6 +67,7 @@ const messages = {
                     authenticationMode: 'Metodo di autenticazione',
                     host: 'Host',
                     name: 'Nome',
+                    description: 'Descrizione',
                     path: 'Percorso',
                     upstreams: 'Upstreams',
                     'upstreams.kind': 'Tipo',
