@@ -30,6 +30,7 @@ import {
 } from '../components/toolbars';
 import { ApiVersionInput, KindInput, SimplePageTitle } from './cr';
 import { View } from '.';
+import Breadcrumb from '../components/Breadcrumb';
 
 const CR_NUCLIO_APIGATEWAYS = 'nuclioapigateways.nuclio.io';
 
@@ -38,6 +39,7 @@ const CrCreate = () => {
 
     return (
         <>
+            <Breadcrumb />
             <SimplePageTitle
                 pageType="create"
                 crName={`${CR_NUCLIO_APIGATEWAYS}.names.singular`}
@@ -105,6 +107,7 @@ const CrEdit = () => {
 
     return (
         <>
+            <Breadcrumb />
             <SimplePageTitle
                 pageType="edit"
                 crName={`${CR_NUCLIO_APIGATEWAYS}.names.singular`}
@@ -159,6 +162,7 @@ const CrEdit = () => {
 const CrList = () => {
     return (
         <>
+            <Breadcrumb />
             <SimplePageTitle
                 pageType="list"
                 crName={`${CR_NUCLIO_APIGATEWAYS}.names.plural`}
@@ -185,6 +189,7 @@ const CrShow = () => {
 
     return (
         <>
+            <Breadcrumb />
             <SimplePageTitle
                 pageType="show"
                 crName={`${CR_NUCLIO_APIGATEWAYS}.names.singular`}

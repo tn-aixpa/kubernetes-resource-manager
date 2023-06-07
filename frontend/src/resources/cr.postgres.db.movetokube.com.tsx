@@ -34,6 +34,7 @@ import {
 import { ApiVersionInput, KindInput, SimplePageTitle } from './cr';
 import { Typography } from '@mui/material';
 import { CR_POSTGRES_USERS } from './cr.postgresusers.db.movetokube.com';
+import Breadcrumb from '../components/Breadcrumb';
 
 export const CR_POSTGRES_DB = 'postgres.db.movetokube.com';
 
@@ -42,6 +43,7 @@ const CrCreate = () => {
 
     return (
         <>
+            <Breadcrumb />
             <SimplePageTitle
                 pageType="create"
                 crName={`${CR_POSTGRES_DB}.names.singular`}
@@ -85,6 +87,7 @@ const CrEdit = () => {
 
     return (
         <>
+            <Breadcrumb />
             <SimplePageTitle
                 pageType="edit"
                 crName={`${CR_POSTGRES_DB}.names.singular`}
@@ -116,6 +119,7 @@ const CrEdit = () => {
 const CrList = () => {
     return (
         <>
+            <Breadcrumb />
             <SimplePageTitle
                 pageType="list"
                 crName={`${CR_POSTGRES_DB}.names.plural`}
@@ -139,6 +143,7 @@ const CrShow = () => {
 
     return (
         <>
+            <Breadcrumb />
             <SimplePageTitle
                 pageType="show"
                 crName={`${CR_POSTGRES_DB}.names.singular`}

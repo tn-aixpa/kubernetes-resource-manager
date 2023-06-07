@@ -32,12 +32,14 @@ import {
     ListTopToolbar,
     ShowTopToolbar,
 } from '../components/toolbars';
+import Breadcrumb from '../components/Breadcrumb';
 
 export const CrCreate = () => {
     const crdId = useResourceContext();
 
     return (
         <>
+            <Breadcrumb />
             <PageTitle pageType="create" />
             <Create redirect="list" actions={<CreateTopToolbar />}>
                 <SimpleForm>
@@ -75,6 +77,7 @@ export const CrEdit = () => {
 
     return (
         <>
+            <Breadcrumb />
             <PageTitle pageType="edit" crId={record.id} />
             <Edit actions={<EditTopToolbar />}>
                 <SimpleForm toolbar={<ViewToolbar />}>
@@ -95,6 +98,7 @@ export const CrEdit = () => {
 export const CrList = () => {
     return (
         <>
+            <Breadcrumb />
             <PageTitle pageType="list" />
             <List actions={<ListTopToolbar />}>
                 <Datagrid>
@@ -125,6 +129,7 @@ export const CrShow = () => {
 
     return (
         <>
+            <Breadcrumb />
             <PageTitle pageType="show" crId={record.id} />
             <Show actions={<ShowTopToolbar />}>
                 <SimpleShowLayout>

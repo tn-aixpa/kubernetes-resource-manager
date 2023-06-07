@@ -43,6 +43,7 @@ import {
     ShowTopToolbar,
 } from '../components/toolbars';
 import { CrdProps } from './cr';
+import Breadcrumb from '../components/Breadcrumb';
 
 export const SchemaCreate = () => {
     const notify = useNotify();
@@ -62,6 +63,7 @@ export const SchemaCreate = () => {
 
     return (
         <>
+            <Breadcrumb />
             <Typography variant="h4" className="page-title">
                 {translate('pages.schema.create.title')}
             </Typography>
@@ -119,6 +121,7 @@ export const SchemaEdit = () => {
 
     return (
         <>
+            <Breadcrumb />
             <Typography variant="h4" className="page-title">
                 {[translate('pages.schema.edit.title'), record.id].join(' ')}
             </Typography>
@@ -151,6 +154,7 @@ export const SchemaList = () => {
 
     return (
         <>
+            <Breadcrumb />
             <Typography variant="h4" className="page-title">
                 {translate('pages.schema.list.title')}
             </Typography>
@@ -178,6 +182,7 @@ export const SchemaShow = () => {
 
     return (
         <>
+            <Breadcrumb />
             <Typography variant="h4" className="page-title">
                 {[translate('pages.schema.show.title'), record.id].join(' ')}
             </Typography>

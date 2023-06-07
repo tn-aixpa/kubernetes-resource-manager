@@ -16,14 +16,18 @@ import {
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Typography } from '@mui/material';
 import { AceEditorField } from '@smartcommunitylab/ra-ace-editor';
+import Breadcrumb from '../components/Breadcrumb';
 
 export const CrdList = () => (
-    <List actions={false}>
-        <Datagrid bulkActionButtons={false}>
-            <TextField source="spec.names.kind" />
-            <ShowButton />
-        </Datagrid>
-    </List>
+    <>
+        <Breadcrumb />
+        <List actions={false}>
+            <Datagrid bulkActionButtons={false}>
+                <TextField source="spec.names.kind" />
+                <ShowButton />
+            </Datagrid>
+        </List>
+    </>
 );
 
 export const CrdShow = () => {
@@ -33,6 +37,7 @@ export const CrdShow = () => {
 
     return (
         <>
+            <Breadcrumb />
             <Typography variant="h4" className="page-title">
                 {[translate('pages.crd.show.title'), record.id].join(' ')}
             </Typography>
