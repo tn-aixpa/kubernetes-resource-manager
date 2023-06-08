@@ -1,74 +1,77 @@
-import { Breadcrumbs, Link, Typography } from '@mui/material';
-import { useLocation } from 'react-router-dom';
+import { Breadcrumbs, Typography } from '@mui/material';
+import { useResourceContext, useTranslate } from 'react-admin';
+import { useLocation, Link } from 'react-router-dom';
 
 const Breadcrumb = () => {
+    const translate = useTranslate();
     const location = useLocation();
-    console.log('location', location.pathname);
-    const path = location.pathname.slice(1).split('/');
-    console.log('path', path);
-    //const resource = path[0];
-    let links = [
-        {
-            name: path[0],
-            ref: `${window.location.origin}/${path[0]}`,
-        },
-    ];
+    const resource = useResourceContext();
 
-    if (path.length === 2) {
-        //create or edit
-        if (path[1] === 'create') {
+    const regexShow = '^/[^/]*/([^/]*)/show(/.*)?$';
+    const regexCreate = '^/[^/]*/create(/.*)?$';
+    const regexEdit = '^/[^/]*/([^/]*)(/[^/]*)?$';
+
+    let links = [];
+
+    if (resource) {
+        links.push({
+            name: translate(`resources.${resource}.name`, {
+                smart_count: 2,
+                _: resource,
+            }),
+            ref: `/${resource}`,
+        });
+
+        const matchShow = location.pathname.match(regexShow);
+        if (matchShow && matchShow[1]) {
+            // Show
             links.push({
-                name: 'create',
-                ref: `${window.location.origin}/${path[0]}/create`,
+                name: matchShow[1],
+                ref: `/${resource}/${matchShow[1]}/show`,
+            });
+        } else if (location.pathname.match(regexCreate)) {
+            // Create
+            links.push({
+                name: translate('ra.action.create'),
+                ref: `/${resource}/create`,
             });
         } else {
-            links.push({
-                name: path[1],
-                ref: `${window.location.origin}/${path[0]}/${path[1]}/show`,
-            });
-            links.push({
-                name: 'edit',
-                ref: `${window.location.origin}/${path[0]}/${path[1]}`,
-            });
+            const matchEdit = location.pathname.match(regexEdit);
+            if (matchEdit && matchEdit[1]) {
+                // Edit
+                links.push({
+                    name: matchEdit[1],
+                    ref: `/${resource}/${matchEdit[1]}/show`,
+                });
+                links.push({
+                    name: translate('ra.action.edit'),
+                    ref: `/${resource}/${matchEdit[1]}`,
+                });
+            }
         }
-    } else if (path.length === 3) {
-        //show
-        links.push({
-            name: path[1],
-            ref: `${window.location.origin}/${path[0]}/${path[1]}/show`,
-        });
+        // List does not need additional elements
     }
 
     return (
         <Breadcrumbs aria-label="breadcrumb" sx={{ paddingTop: '10px' }}>
-            <Link underline="hover" color="inherit" href="/">
-                Dashboard
+            <Link to="/" className="breadcrumb-link">
+                {translate('ra.page.dashboard')}
             </Link>
             {links.map((page, index) =>
                 index !== links.length - 1 ? (
                     <Link
                         key={page.name}
-                        underline="hover"
-                        color="inherit"
-                        href={page.ref}
+                        to={page.ref}
+                        className="breadcrumb-link"
                     >
                         {page.name}
                     </Link>
                 ) : (
-                    <Typography color="text.primary">{page.name}</Typography>
+                    <Typography key={page.name} color="text.primary">
+                        {page.name}
+                    </Typography>
                 )
             )}
-            {/* <Link underline="hover" color="inherit" href="/">
-                MUI
-            </Link>
-            <Link
-                underline="hover"
-                color="inherit"
-                href="/material-ui/getting-started/installation/"
-            >
-                Core
-            </Link>
-            <Typography color="text.primary">Breadcrumbs</Typography> */}
         </Breadcrumbs>
     );
 };

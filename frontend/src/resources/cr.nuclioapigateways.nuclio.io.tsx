@@ -11,7 +11,6 @@ import {
     Show,
     SimpleShowLayout,
     required,
-    useResourceContext,
     DeleteWithConfirmButton,
     useShowController,
     useEditController,
@@ -28,34 +27,45 @@ import {
     ListTopToolbar,
     ShowTopToolbar,
 } from '../components/toolbars';
-import { ApiVersionInput, KindInput, SimplePageTitle } from './cr';
+import { SimplePageTitle } from './cr';
 import { View } from '.';
 import Breadcrumb from '../components/Breadcrumb';
+import { useCrTransform } from '../hooks/useCrTransform';
 
 const CR_NUCLIO_APIGATEWAYS = 'nuclioapigateways.nuclio.io';
 
 const CrCreate = () => {
-    const crdId = useResourceContext();
+    const { apiVersion, kind } = useCrTransform();
+    const transform = (cr: any) => ({
+        ...cr,
+        apiVersion: apiVersion,
+        kind: kind,
+    });
 
     return (
         <>
             <Breadcrumb />
-            <SimplePageTitle
-                pageType="create"
-                crName={`${CR_NUCLIO_APIGATEWAYS}.names.singular`}
-            />
-            <Create redirect="list" actions={<CreateTopToolbar />}>
+            <SimplePageTitle pageType="create" crName={CR_NUCLIO_APIGATEWAYS} />
+            <Create
+                redirect="list"
+                actions={<CreateTopToolbar />}
+                transform={transform}
+            >
                 <SimpleForm>
-                    {crdId && (
-                        <ApiVersionInput
-                            crdId={crdId}
-                            sx={{ display: 'none' }}
-                        />
-                    )}
-                    {crdId && (
-                        <KindInput crdId={crdId} sx={{ display: 'none' }} />
-                    )}
                     <TextInput source="metadata.name" validate={required()} />
+                    <TextInput source="spec.host" validate={required()} />
+                    <TextInput source="spec.name" validate={required()} />
+                    <TextInput source="spec.description" />
+                    <TextInput source="spec.path" validate={required()} />
+                    <ArrayInput source="spec.upstreams">
+                        <SimpleFormIterator inline>
+                            <TextInput source="kind" validate={required()} />
+                            <TextInput
+                                source="nucliofunction.name"
+                                validate={required()}
+                            />
+                        </SimpleFormIterator>
+                    </ArrayInput>
                     <SelectInput
                         source="spec.authenticationMode"
                         choices={[
@@ -82,19 +92,6 @@ const CrCreate = () => {
                             )
                         }
                     </FormDataConsumer>
-                    <TextInput source="spec.host" validate={required()} />
-                    <TextInput source="spec.name" validate={required()} />
-                    <TextInput source="spec.description" />
-                    <TextInput source="spec.path" validate={required()} />
-                    <ArrayInput source="spec.upstreams">
-                        <SimpleFormIterator inline>
-                            <TextInput source="kind" validate={required()} />
-                            <TextInput
-                                source="nucliofunction.name"
-                                validate={required()}
-                            />
-                        </SimpleFormIterator>
-                    </ArrayInput>
                 </SimpleForm>
             </Create>
         </>
@@ -108,12 +105,22 @@ const CrEdit = () => {
     return (
         <>
             <Breadcrumb />
-            <SimplePageTitle
-                pageType="edit"
-                crName={`${CR_NUCLIO_APIGATEWAYS}.names.singular`}
-            />
+            <SimplePageTitle pageType="edit" crName={CR_NUCLIO_APIGATEWAYS} />
             <Edit actions={<EditTopToolbar />}>
                 <SimpleForm toolbar={<ViewToolbar />}>
+                    <TextInput source="spec.host" validate={required()} />
+                    <TextInput source="spec.name" validate={required()} />
+                    <TextInput source="spec.description" />
+                    <TextInput source="spec.path" validate={required()} />
+                    <ArrayInput source="spec.upstreams">
+                        <SimpleFormIterator inline>
+                            <TextInput source="kind" validate={required()} />
+                            <TextInput
+                                source="nucliofunction.name"
+                                validate={required()}
+                            />
+                        </SimpleFormIterator>
+                    </ArrayInput>
                     <SelectInput
                         source="spec.authenticationMode"
                         choices={[
@@ -140,19 +147,6 @@ const CrEdit = () => {
                             )
                         }
                     </FormDataConsumer>
-                    <TextInput source="spec.host" validate={required()} />
-                    <TextInput source="spec.name" validate={required()} />
-                    <TextInput source="spec.description" />
-                    <TextInput source="spec.path" validate={required()} />
-                    <ArrayInput source="spec.upstreams">
-                        <SimpleFormIterator inline>
-                            <TextInput source="kind" validate={required()} />
-                            <TextInput
-                                source="nucliofunction.name"
-                                validate={required()}
-                            />
-                        </SimpleFormIterator>
-                    </ArrayInput>
                 </SimpleForm>
             </Edit>
         </>
@@ -163,10 +157,7 @@ const CrList = () => {
     return (
         <>
             <Breadcrumb />
-            <SimplePageTitle
-                pageType="list"
-                crName={`${CR_NUCLIO_APIGATEWAYS}.names.plural`}
-            />
+            <SimplePageTitle pageType="list" crName={CR_NUCLIO_APIGATEWAYS} />
             <List actions={<ListTopToolbar />}>
                 <Datagrid>
                     <TextField source="id" />
@@ -190,19 +181,9 @@ const CrShow = () => {
     return (
         <>
             <Breadcrumb />
-            <SimplePageTitle
-                pageType="show"
-                crName={`${CR_NUCLIO_APIGATEWAYS}.names.singular`}
-            />
+            <SimplePageTitle pageType="show" crName={CR_NUCLIO_APIGATEWAYS} />
             <Show actions={<ShowTopToolbar />}>
                 <SimpleShowLayout>
-                    <TextField source="spec.authenticationMode" />
-                    {record.spec.authenticationMode === 'basicAuth' && (
-                        <TextField source="spec.authentication.basicAuth.username" />
-                    )}
-                    {record.spec.authenticationMode === 'basicAuth' && (
-                        <TextField source="spec.authentication.basicAuth.password" />
-                    )}
                     <TextField source="spec.host" />
                     <TextField source="spec.name" />
                     <TextField source="spec.description" />
@@ -219,6 +200,13 @@ const CrShow = () => {
                             />
                         </Datagrid>
                     </ArrayField>
+                    <TextField source="spec.authenticationMode" />
+                    {record.spec.authenticationMode === 'basicAuth' && (
+                        <TextField source="spec.authentication.basicAuth.username" />
+                    )}
+                    {record.spec.authenticationMode === 'basicAuth' && (
+                        <TextField source="spec.authentication.basicAuth.password" />
+                    )}
                 </SimpleShowLayout>
             </Show>
         </>

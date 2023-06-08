@@ -10,12 +10,15 @@ const messages = {
     resources: {
         crs: {
             name: 'Schema |||| Settings',
+            schemas: 'Schemas',
             fields: {
                 id: 'ID',
                 crdId: 'CRD',
                 version: 'Version',
                 schema: 'Schema',
             },
+            listSubtitle: 'Please add a schema to enable CR management.',
+            createVersionHelp: 'Please select a CRD',
         },
         crd: {
             name: 'CRD |||| CRDs',
@@ -28,6 +31,16 @@ const messages = {
                     uid: 'UID',
                 },
                 managedFields: 'Managed fields',
+            },
+        },
+        cr: {
+            fields: {
+                id: 'ID',
+                apiVersion: 'API Version',
+                kind: 'Kind',
+                metadata: 'Metadata',
+                'metadata.name': 'Name',
+                spec: 'Specification',
             },
         },
         'postgres.db.movetokube.com': {
@@ -45,6 +58,7 @@ const messages = {
         },
         'postgresusers.db.movetokube.com': {
             name: 'Postgres user |||| Postgres users',
+            shortName: 'Users',
             fields: {
                 id: 'ID',
                 spec: {
@@ -71,101 +85,19 @@ const messages = {
                     path: 'Path',
                     upstreams: 'Upstreams',
                     'upstreams.kind': 'Kind',
-                    'upstreams.nucliofunction.name': 'Nuclio function name'
+                    'upstreams.nucliofunction.name': 'Nuclio function name',
                 },
             },
         },
     },
     dashboard: {
-        name: 'Dashboard',
         title: 'Resource Manager',
         message: 'Welcome to the Resource Manager.',
     },
-    button: {
-        list: 'List',
+    buttons: {
         copy: 'Copy',
-    },
-    pages: {
-        schema: {
-            list: {
-                title: 'Settings',
-                subtitle: 'Please add a schema to enable CR management.',
-            },
-            create: {
-                title: 'Create schema',
-                versionHelp: 'Please select a CRD',
-            },
-            edit: {
-                title: 'Edit schema',
-            },
-            show: {
-                title: 'View schema',
-            },
-        },
-        cr: {
-            list: {
-                title: '',
-            },
-            create: {
-                title: 'Create',
-            },
-            edit: {
-                title: 'Edit',
-            },
-            show: {
-                title: 'View',
-            },
-            defaultFields: {
-                id: 'ID',
-                apiVersion: 'API Version',
-                kind: 'Kind',
-                metadata: 'Metadata',
-                metadataName: 'Name',
-                spec: 'Specification',
-            },
-            'postgres.db.movetokube.com': {
-                names: {
-                    singular: 'Postgres DB',
-                    plural: 'Postgres DBs',
-                },
-                users: {
-                    title: 'Users',
-                    createButton: 'Add user',
-                    fields: {
-                        id: 'ID',
-                        role: 'Role',
-                        privileges: 'Privileges',
-                        secretName: 'SecretName',
-                    },
-                },
-            },
-            'postgresusers.db.movetokube.com': {
-                names: {
-                    singular: 'Postgres user',
-                    plural: 'Postgres users',
-                },
-            },
-            'nuclioapigateways.nuclio.io': {
-                names: {
-                    singular: 'Nuclio API Gateway',
-                    plural: 'Nuclio API Gateways',
-                },
-            },
-        },
-        crd: {
-            show: {
-                title: 'View CRD',
-                listCrs: 'List custom resources',
-                createSchema: 'Create schema',
-                crs: {
-                    title: 'Schemas',
-                    fields: {
-                        id: 'ID',
-                        version: 'Version',
-                    },
-                },
-            },
-        },
+        listCrs: 'List custom resources',
+        createUser: 'Add user',
     },
 };
 

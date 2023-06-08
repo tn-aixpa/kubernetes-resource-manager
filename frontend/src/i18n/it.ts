@@ -10,12 +10,16 @@ const messages = {
     resources: {
         crs: {
             name: 'Schema |||| Impostazioni',
+            schemas: 'Schemi',
             fields: {
                 id: 'ID',
                 crdId: 'CRD',
                 version: 'Versione',
                 schema: 'Schema',
             },
+            listSubtitle:
+                'Aggiungere uno schema per abilitare le CR corrispondenti.',
+            createVersionHelp: 'Selezionare una CRD',
         },
         crd: {
             name: 'CRD',
@@ -28,6 +32,16 @@ const messages = {
                     uid: 'UID',
                 },
                 managedFields: 'Campi gestiti',
+            },
+        },
+        cr: {
+            fields: {
+                id: 'ID',
+                apiVersion: 'Versione API',
+                kind: 'Tipo',
+                metadata: 'Metadata',
+                'metadata.name': 'Nome',
+                spec: 'Specifiche',
             },
         },
         'postgres.db.movetokube.com': {
@@ -45,6 +59,7 @@ const messages = {
         },
         'postgresusers.db.movetokube.com': {
             name: 'Utente Postgres |||| Utenti Postgres',
+            shortName: 'Utenti',
             fields: {
                 id: 'ID',
                 spec: {
@@ -71,102 +86,19 @@ const messages = {
                     path: 'Percorso',
                     upstreams: 'Upstreams',
                     'upstreams.kind': 'Tipo',
-                    'upstreams.nucliofunction.name': 'Nome funzione Nuclio'
+                    'upstreams.nucliofunction.name': 'Nome funzione Nuclio',
                 },
             },
         },
     },
     dashboard: {
-        name: 'Cruscotto',
         title: 'Resource Manager',
         message: 'Benvenuto in Resource Manager.',
     },
-    button: {
-        list: 'Elenco',
+    buttons: {
         copy: 'Copia',
-    },
-    pages: {
-        schema: {
-            list: {
-                title: 'Impostazioni',
-                subtitle:
-                    'Aggiungere uno schema per abilitare le CR corrispondenti.',
-            },
-            create: {
-                title: 'Crea schema',
-                versionHelp: 'Selezionare una CRD',
-            },
-            edit: {
-                title: 'Modifica schema',
-            },
-            show: {
-                title: 'Visualizza schema',
-            },
-        },
-        cr: {
-            list: {
-                title: '',
-            },
-            create: {
-                title: 'Crea',
-            },
-            edit: {
-                title: 'Modifica',
-            },
-            show: {
-                title: 'Visualizza',
-            },
-            defaultFields: {
-                id: 'ID',
-                apiVersion: 'Versione API',
-                kind: 'Tipo',
-                metadata: 'Metadata',
-                metadataName: 'Nome',
-                spec: 'Specifiche',
-            },
-            'postgres.db.movetokube.com': {
-                names: {
-                    singular: 'DB Postgres',
-                    plural: 'DB Postgres',
-                },
-                users: {
-                    title: 'Utenti',
-                    createButton: 'Aggiungi utente',
-                    fields: {
-                        id: 'ID',
-                        role: 'Ruolo',
-                        privileges: 'Privilegi',
-                        secretName: 'Nome secret',
-                    },
-                },
-            },
-            'postgresusers.db.movetokube.com': {
-                names: {
-                    singular: 'Utente Postgres',
-                    plural: 'Utenti Postgres',
-                },
-            },
-            'nuclioapigateways.nuclio.io': {
-                names: {
-                    singular: 'Nuclio API Gateway',
-                    plural: 'Nuclio API Gateway',
-                },
-            },
-        },
-        crd: {
-            show: {
-                title: 'Visualizza CRD',
-                listCrs: 'Elenco custom resources',
-                createSchema: 'Crea schema',
-                crs: {
-                    title: 'Schemi',
-                    fields: {
-                        id: 'ID',
-                        version: 'Versione',
-                    },
-                },
-            },
-        },
+        listCrs: 'Elenco custom resources',
+        createUser: 'Aggiungi utente',
     },
 };
 

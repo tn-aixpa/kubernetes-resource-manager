@@ -8,7 +8,6 @@ import {
     SimpleForm,
     TextInput,
     TopToolbar as ReactAdminTopToolbar,
-    useResourceContext,
     required,
     Edit,
     useEditController,
@@ -21,15 +20,22 @@ import {
 import { View } from './index';
 import { ViewToolbar } from '../components/ViewToolbar';
 import { TopToolbarProps } from '../components/toolbars';
-import { ApiVersionInput, KindInput, SimplePageTitle } from './cr';
+import { SimplePageTitle } from './cr';
 import { CR_POSTGRES_DB } from './cr.postgres.db.movetokube.com';
+import { useCrTransform } from '../hooks/useCrTransform';
 
 export const CR_POSTGRES_USERS = 'postgresusers.db.movetokube.com';
 
 const CrCreate = () => {
-    const crdId = useResourceContext();
     const notify = useNotify();
     const redirect = useRedirect();
+    const { apiVersion, kind } = useCrTransform();
+    const transform = (cr: any) => ({
+        ...cr,
+        apiVersion: apiVersion,
+        kind: kind,
+    });
+
     const params = new URLSearchParams(window.location.search);
     const dbId = params.get('db') || '';
 
@@ -40,10 +46,7 @@ const CrCreate = () => {
 
     return (
         <>
-            <SimplePageTitle
-                pageType="create"
-                crName={`${CR_POSTGRES_USERS}.names.singular`}
-            />
+            <SimplePageTitle pageType="create" crName={CR_POSTGRES_USERS} />
             <Create
                 mutationOptions={{ onSuccess }}
                 actions={
@@ -54,17 +57,9 @@ const CrCreate = () => {
                         }}
                     />
                 }
+                transform={transform}
             >
                 <SimpleForm>
-                    {crdId && (
-                        <ApiVersionInput
-                            crdId={crdId}
-                            sx={{ display: 'none' }}
-                        />
-                    )}
-                    {crdId && (
-                        <KindInput crdId={crdId} sx={{ display: 'none' }} />
-                    )}
                     <TextInput source="metadata.name" validate={required()} />
                     <TextInput
                         source="spec.database"
@@ -100,7 +95,7 @@ const CrEdit = () => {
         <>
             <SimplePageTitle
                 pageType="edit"
-                crName={`${CR_POSTGRES_USERS}.names.singular`}
+                crName={CR_POSTGRES_USERS}
                 crId={record.spec.role}
             />
             <Edit
@@ -132,7 +127,7 @@ const CrList = () => {
         <>
             <SimplePageTitle
                 pageType="list"
-                crName={`${CR_POSTGRES_USERS}.names.plural`}
+                crName={CR_POSTGRES_USERS}
             />
             <List actions={<ListTopToolbar />}>
                 <Datagrid>
@@ -157,7 +152,7 @@ const CrShow = () => {
         <>
             <SimplePageTitle
                 pageType="show"
-                crName={`${CR_POSTGRES_USERS}.names.singular`}
+                crName={CR_POSTGRES_USERS}
                 crId={record.spec.role}
             />
             <Show

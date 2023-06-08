@@ -39,7 +39,10 @@ export const CrdShow = () => {
         <>
             <Breadcrumb />
             <Typography variant="h4" className="page-title">
-                {[translate('pages.crd.show.title'), record.id].join(' ')}
+                {translate('ra.page.show', {
+                    name: 'CRD',
+                    recordRepresentation: record.id,
+                })}
             </Typography>
             <Show actions={false}>
                 <SimpleShowLayout>
@@ -80,7 +83,7 @@ const RelatedResources = () => {
     return total ? (
         <>
             <Typography variant="h6">
-                {translate('pages.crd.show.crs.title')}
+                {translate('resources.crs.schemas')}
             </Typography>
             <Datagrid
                 data={data}
@@ -89,25 +92,24 @@ const RelatedResources = () => {
                 bulkActionButtons={false}
                 sort={sort}
             >
-                <TextField
-                    source="id"
-                    label={'pages.crd.show.crs.fields.id'}
-                />
+                <TextField source="id" label={'resources.crs.fields.id'} />
                 <TextField
                     source="version"
-                    label={'pages.crd.show.crs.fields.version'}
+                    label={'resources.crs.fields.version'}
                 />
                 <ShowButton resource="crs" />
             </Datagrid>
             <Button
-                label={'pages.crd.show.listCrs'}
+                label={'buttons.listCrs'}
                 startIcon={<VisibilityIcon />}
                 href={`${window.location.origin}/${record.id}`}
             ></Button>
         </>
     ) : (
         <Button
-            label={'pages.crd.show.createSchema'}
+            label={translate('ra.page.create', {
+                name: translate('resources.crs.name', { smart_count: 1 }),
+            })}
             href={`${window.location.origin}/crs/create?crdId=${record.id}`}
         ></Button>
     );

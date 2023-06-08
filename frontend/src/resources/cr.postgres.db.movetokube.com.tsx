@@ -12,7 +12,6 @@ import {
     Create,
     SimpleForm,
     TextInput,
-    useResourceContext,
     required,
     BooleanInput,
     Edit,
@@ -31,34 +30,32 @@ import {
     ListTopToolbar,
     ShowTopToolbar,
 } from '../components/toolbars';
-import { ApiVersionInput, KindInput, SimplePageTitle } from './cr';
+import { SimplePageTitle } from './cr';
 import { Typography } from '@mui/material';
 import { CR_POSTGRES_USERS } from './cr.postgresusers.db.movetokube.com';
 import Breadcrumb from '../components/Breadcrumb';
+import { useCrTransform } from '../hooks/useCrTransform';
 
 export const CR_POSTGRES_DB = 'postgres.db.movetokube.com';
 
 const CrCreate = () => {
-    const crdId = useResourceContext();
+    const { apiVersion, kind } = useCrTransform();
+    const transform = (cr: any) => ({
+        ...cr,
+        apiVersion: apiVersion,
+        kind: kind,
+    });
 
     return (
         <>
             <Breadcrumb />
-            <SimplePageTitle
-                pageType="create"
-                crName={`${CR_POSTGRES_DB}.names.singular`}
-            />
-            <Create redirect="list" actions={<CreateTopToolbar />}>
+            <SimplePageTitle pageType="create" crName={CR_POSTGRES_DB} />
+            <Create
+                redirect="list"
+                actions={<CreateTopToolbar />}
+                transform={transform}
+            >
                 <SimpleForm>
-                    {crdId && (
-                        <ApiVersionInput
-                            crdId={crdId}
-                            sx={{ display: 'none' }}
-                        />
-                    )}
-                    {crdId && (
-                        <KindInput crdId={crdId} sx={{ display: 'none' }} />
-                    )}
                     <TextInput source="metadata.name" validate={required()} />
                     <TextInput source="spec.database" validate={required()} />
                     <BooleanInput source="spec.dropOnDelete" />
@@ -90,7 +87,7 @@ const CrEdit = () => {
             <Breadcrumb />
             <SimplePageTitle
                 pageType="edit"
-                crName={`${CR_POSTGRES_DB}.names.singular`}
+                crName={CR_POSTGRES_DB}
                 crId={record.spec.database}
             />
             <Edit actions={<EditTopToolbar />}>
@@ -120,10 +117,7 @@ const CrList = () => {
     return (
         <>
             <Breadcrumb />
-            <SimplePageTitle
-                pageType="list"
-                crName={`${CR_POSTGRES_DB}.names.plural`}
-            />
+            <SimplePageTitle pageType="list" crName={CR_POSTGRES_DB} />
             <List actions={<ListTopToolbar />}>
                 <Datagrid>
                     <TextField source="id" />
@@ -146,7 +140,7 @@ const CrShow = () => {
             <Breadcrumb />
             <SimplePageTitle
                 pageType="show"
-                crName={`${CR_POSTGRES_DB}.names.singular`}
+                crName={CR_POSTGRES_DB}
                 crId={record.spec.database}
             />
             <Show actions={<ShowTopToolbar />}>
@@ -183,7 +177,7 @@ const PostgresUsers = () => {
     return (
         <>
             <Typography variant="h6">
-                {translate(`pages.cr.${CR_POSTGRES_DB}.users.title`)}
+                {translate(`resources.${CR_POSTGRES_USERS}.shortName`)}
             </Typography>
             {dbUsers.length > 0 && (
                 <Datagrid
@@ -194,19 +188,19 @@ const PostgresUsers = () => {
                 >
                     <TextField
                         source="id"
-                        label={`pages.cr.${CR_POSTGRES_DB}.users.fields.id`}
+                        label={`resources.${CR_POSTGRES_USERS}.fields.id`}
                     />
                     <TextField
                         source="spec.role"
-                        label={`pages.cr.${CR_POSTGRES_DB}.users.fields.role`}
+                        label={`resources.${CR_POSTGRES_USERS}.fields.spec.role`}
                     />
                     <TextField
                         source="spec.privileges"
-                        label={`pages.cr.${CR_POSTGRES_DB}.users.fields.privileges`}
+                        label={`resources.${CR_POSTGRES_USERS}.fields.spec.privileges`}
                     />
                     <TextField
                         source="spec.secretName"
-                        label={`pages.cr.${CR_POSTGRES_DB}.users.fields.secretName`}
+                        label={`resources.${CR_POSTGRES_USERS}.fields.spec.secretName`}
                     />
                     <EditButton resource={CR_POSTGRES_USERS} />
                     <ShowButton resource={CR_POSTGRES_USERS} />
@@ -217,7 +211,7 @@ const PostgresUsers = () => {
                 </Datagrid>
             )}
             <Button
-                label={`pages.cr.${CR_POSTGRES_DB}.users.createButton`}
+                label={`buttons.createUser`}
                 href={`${window.location.origin}/${CR_POSTGRES_USERS}/create?db=${record.metadata.name}`}
             ></Button>
         </>

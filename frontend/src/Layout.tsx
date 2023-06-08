@@ -5,16 +5,14 @@ import {
     MenuProps,
     ResourceDefinition,
     useResourceDefinitions,
-    useTranslate,
 } from 'react-admin';
 import { Divider } from '@mui/material';
 
 const MyMenu = (props: MenuProps) => {
     const resources = useResourceDefinitions();
-    const translate = useTranslate();
     return (
         <Menu {...props}>
-            <Menu.DashboardItem primaryText={translate('dashboard.name')} />
+            <Menu.DashboardItem />
             {Object.values(resources).map(
                 (resource: ResourceDefinition) =>
                     resource.name !== 'crd' &&

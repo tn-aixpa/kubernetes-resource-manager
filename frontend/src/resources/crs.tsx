@@ -42,7 +42,6 @@ import {
     ListTopToolbar,
     ShowTopToolbar,
 } from '../components/toolbars';
-import { CrdProps } from './cr';
 import Breadcrumb from '../components/Breadcrumb';
 
 export const SchemaCreate = () => {
@@ -65,7 +64,11 @@ export const SchemaCreate = () => {
         <>
             <Breadcrumb />
             <Typography variant="h4" className="page-title">
-                {translate('pages.schema.create.title')}
+                {translate('ra.page.create', {
+                    name: translate('resources.crs.name', {
+                        smart_count: 1,
+                    }).toLowerCase(),
+                })}
             </Typography>
             <Create
                 mutationOptions={{ onSuccess }}
@@ -96,7 +99,7 @@ export const SchemaCreate = () => {
                                 <TextInput
                                     source="version"
                                     helperText={translate(
-                                        'pages.schema.create.versionHelp'
+                                        'resources.crs.createVersionHelp'
                                     )}
                                     disabled
                                 />
@@ -123,7 +126,10 @@ export const SchemaEdit = () => {
         <>
             <Breadcrumb />
             <Typography variant="h4" className="page-title">
-                {[translate('pages.schema.edit.title'), record.id].join(' ')}
+                {translate('ra.page.edit', {
+                    name: translate('resources.crs.name', { smart_count: 1 }),
+                    recordRepresentation: record.id,
+                })}
             </Typography>
             <Edit actions={<EditTopToolbar />}>
                 <SimpleForm toolbar={<ViewToolbar />}>
@@ -156,10 +162,10 @@ export const SchemaList = () => {
         <>
             <Breadcrumb />
             <Typography variant="h4" className="page-title">
-                {translate('pages.schema.list.title')}
+                {translate('resources.crs.name', { smart_count: 2 })}
             </Typography>
             <Typography variant="subtitle1" sx={{ padding: '0px' }}>
-                {translate('pages.schema.list.subtitle')}
+                {translate('resources.crs.listSubtitle')}
             </Typography>
             <List actions={<ListTopToolbar />}>
                 <Datagrid bulkActionButtons={false}>
@@ -184,7 +190,10 @@ export const SchemaShow = () => {
         <>
             <Breadcrumb />
             <Typography variant="h4" className="page-title">
-                {[translate('pages.schema.show.title'), record.id].join(' ')}
+                {translate('ra.page.show', {
+                    name: translate('resources.crs.name', { smart_count: 1 }),
+                    recordRepresentation: record.id,
+                })}
             </Typography>
             <Show actions={<ShowTopToolbar />}>
                 <SimpleShowLayout>
@@ -202,7 +211,7 @@ export const SchemaShow = () => {
     );
 };
 
-const SchemaVersionInput = ({ crdId }: CrdProps) => {
+const SchemaVersionInput = ({ crdId }: { crdId: string }) => {
     const { setValue } = useFormContext();
     const { data } = useGetOne('crd', { id: crdId });
     useEffect(() => {
@@ -220,7 +229,7 @@ const CopyButton = () => {
 
     return (
         <Button
-            label={'button.copy'}
+            label={'buttons.copy'}
             startIcon={<TextSnippetIcon />}
             onClick={() => navigator.clipboard.writeText(schema)}
         />

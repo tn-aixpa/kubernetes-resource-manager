@@ -20,7 +20,7 @@ import {
     useEditController,
 } from 'react-admin';
 import { parseJson, formatJson } from '../utils';
-import { SxProps, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import { ViewToolbar } from '../components/ViewToolbar';
 import {
     AceEditorField,
@@ -33,29 +33,30 @@ import {
     ShowTopToolbar,
 } from '../components/toolbars';
 import Breadcrumb from '../components/Breadcrumb';
+import { useCrTransform } from '../hooks/useCrTransform';
 
 export const CrCreate = () => {
-    const crdId = useResourceContext();
+    const { apiVersion, kind } = useCrTransform();
+    const transform = (cr: any) => ({
+        ...cr,
+        apiVersion: apiVersion,
+        kind: kind,
+    });
 
     return (
         <>
             <Breadcrumb />
             <PageTitle pageType="create" />
-            <Create redirect="list" actions={<CreateTopToolbar />}>
+            <Create
+                redirect="list"
+                actions={<CreateTopToolbar />}
+                transform={transform}
+            >
                 <SimpleForm>
-                    {crdId && (
-                        <ApiVersionInput
-                            crdId={crdId}
-                            sx={{ display: 'none' }}
-                        />
-                    )}
-                    {crdId && (
-                        <KindInput crdId={crdId} sx={{ display: 'none' }} />
-                    )}
                     <TextInput
                         source="metadata.name"
                         validate={required()}
-                        label={'pages.cr.defaultFields.metadataName'}
+                        label={'resources.cr.fields.metadata.name'}
                     />
 
                     <AceEditorInput
@@ -64,6 +65,7 @@ export const CrCreate = () => {
                         theme="monokai"
                         format={formatJson}
                         parse={parseJson}
+                        label={'resources.cr.fields.spec'}
                     />
                 </SimpleForm>
             </Create>
@@ -87,7 +89,7 @@ export const CrEdit = () => {
                         theme="monokai"
                         format={formatJson}
                         parse={parseJson}
-                        label={'pages.cr.defaultFields.spec'}
+                        label={'resources.cr.fields.spec'}
                     />
                 </SimpleForm>
             </Edit>
@@ -102,17 +104,14 @@ export const CrList = () => {
             <PageTitle pageType="list" />
             <List actions={<ListTopToolbar />}>
                 <Datagrid>
-                    <TextField
-                        source="id"
-                        label={'pages.cr.defaultFields.id'}
-                    />
+                    <TextField source="id" label={'resources.cr.fields.id'} />
                     <TextField
                         source="apiVersion"
-                        label={'pages.cr.defaultFields.apiVersion'}
+                        label={'resources.cr.fields.apiVersion'}
                     />
                     <TextField
                         source="kind"
-                        label={'pages.cr.defaultFields.kind'}
+                        label={'resources.cr.fields.kind'}
                     />
                     <EditButton />
                     <ShowButton />
@@ -133,17 +132,14 @@ export const CrShow = () => {
             <PageTitle pageType="show" crId={record.id} />
             <Show actions={<ShowTopToolbar />}>
                 <SimpleShowLayout>
-                    <TextField
-                        source="id"
-                        label={'pages.cr.defaultFields.id'}
-                    />
+                    <TextField source="id" label={'resources.cr.fields.id'} />
                     <TextField
                         source="apiVersion"
-                        label={'pages.cr.defaultFields.apiVersion'}
+                        label={'resources.cr.fields.apiVersion'}
                     />
                     <TextField
                         source="kind"
-                        label={'pages.cr.defaultFields.kind'}
+                        label={'resources.cr.fields.kind'}
                     />
                     <AceEditorField
                         mode="json"
@@ -151,7 +147,7 @@ export const CrShow = () => {
                             metadata: JSON.stringify(record.metadata),
                         }}
                         source="metadata"
-                        label={'pages.cr.defaultFields.metadata'}
+                        label={'resources.cr.fields.metadata'}
                     />
                     <AceEditorField
                         mode="json"
@@ -159,7 +155,7 @@ export const CrShow = () => {
                             spec: JSON.stringify(record.spec),
                         }}
                         source="spec"
-                        label={'pages.cr.defaultFields.spec'}
+                        label={'resources.cr.fields.spec'}
                     />
                 </SimpleShowLayout>
             </Show>
@@ -177,56 +173,13 @@ const PageTitle = ({ pageType, crId }: { pageType: string; crId?: string }) => {
 
     return (
         <Typography variant="h4" className="page-title">
-            {[
-                translate('pages.cr.' + pageType + '.title'),
-                data.spec.names.kind,
-                crId,
-            ]
-                .join(' ')
-                .trim()}
+            {translate(`ra.page.${pageType}`, {
+                name: data.spec.names.kind,
+                recordRepresentation: crId,
+            })}
         </Typography>
     );
 };
-
-export const ApiVersionInput = ({ crdId, sx }: CrdProps) => {
-    const { data, isLoading } = useGetOne('crd', { id: crdId });
-    if (isLoading) return <Loading />;
-    if (!data) return null;
-    const group = data.spec.group;
-    const storedVersion = data.spec.versions.filter(
-        (version: any) => version.storage
-    )[0];
-    const apiVersion = `${group}/${storedVersion.name}`;
-    return (
-        <TextInput
-            source="apiVersion"
-            defaultValue={apiVersion}
-            sx={sx}
-            label={'pages.cr.defaultFields.apiVersion'}
-            disabled
-        />
-    );
-};
-
-export const KindInput = ({ crdId, sx }: CrdProps) => {
-    const { data, isLoading } = useGetOne('crd', { id: crdId });
-    if (isLoading) return <Loading />;
-    if (!data) return null;
-    return (
-        <TextInput
-            source="kind"
-            defaultValue={data.spec.names.kind}
-            sx={sx}
-            label={'pages.cr.defaultFields.kind'}
-            disabled
-        />
-    );
-};
-
-export interface CrdProps {
-    crdId: string;
-    sx?: SxProps;
-}
 
 export const SimplePageTitle = ({
     pageType,
@@ -239,15 +192,17 @@ export const SimplePageTitle = ({
 }) => {
     const translate = useTranslate();
 
+    const smartCount = pageType === 'list' ? 2 : 1;
+    const name = translate(`resources.${crName}.name`, {
+        smart_count: smartCount,
+    });
+
     return (
         <Typography variant="h4" className="page-title">
-            {[
-                translate('pages.cr.' + pageType + '.title'),
-                translate('pages.cr.' + crName),
-                crId,
-            ]
-                .join(' ')
-                .trim()}
+            {translate(`ra.page.${pageType}`, {
+                name: name,
+                recordRepresentation: crId,
+            })}
         </Typography>
     );
 };
