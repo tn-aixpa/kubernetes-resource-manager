@@ -201,8 +201,11 @@ export const SchemaShow = () => {
                     <ReferenceField
                         source="crdId"
                         reference="crd"
-                        link="show"
+                        link={(crd, reference) =>
+                            `/${reference}/${crd.id}/show?schema=${record.id}`
+                        }
                     />
+
                     <TextField source="version" />
                     <AceEditorField mode="json" source="schema" />
                 </SimpleShowLayout>

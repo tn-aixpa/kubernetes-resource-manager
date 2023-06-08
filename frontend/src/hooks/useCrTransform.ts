@@ -8,13 +8,15 @@ export const useCrTransform = () => {
     const { data } = useGetOne('crd', { id: crdId });
 
     useEffect(() => {
-        const group = data.spec.group;
-        const storedVersion = data.spec.versions.filter(
-            (version: any) => version.storage
-        )[0];
-        setApiVersion(`${group}/${storedVersion.name}`);
-
-        setKind(data.spec.names.kind);
+        console.log(data);
+        if (data && data.spec) {
+            const group = data.spec.group;
+            const storedVersion = data.spec.versions.filter(
+                (version: any) => version.storage
+            )[0];
+            setApiVersion(`${group}/${storedVersion.name}`);
+            setKind(data.spec.names.kind);
+        }
     }, [data]);
 
     return { apiVersion, kind };

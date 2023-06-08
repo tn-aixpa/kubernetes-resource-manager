@@ -16,6 +16,7 @@ import {
     ListButton,
     useNotify,
     useRedirect,
+    useTranslate,
 } from 'react-admin';
 import { View } from './index';
 import { ViewToolbar } from '../components/ViewToolbar';
@@ -23,6 +24,8 @@ import { TopToolbarProps } from '../components/toolbars';
 import { SimplePageTitle } from './cr';
 import { CR_POSTGRES_DB } from './cr.postgres.db.movetokube.com';
 import { useCrTransform } from '../hooks/useCrTransform';
+import { Breadcrumbs, Typography } from '@mui/material';
+import { useLocation, Link } from 'react-router-dom';
 
 export const CR_POSTGRES_USERS = 'postgresusers.db.movetokube.com';
 
@@ -46,6 +49,7 @@ const CrCreate = () => {
 
     return (
         <>
+            <BreadcrumbPostgresUser dbId={dbId} />
             <SimplePageTitle pageType="create" crName={CR_POSTGRES_USERS} />
             <Create
                 mutationOptions={{ onSuccess }}
@@ -93,6 +97,7 @@ const CrEdit = () => {
 
     return (
         <>
+            <BreadcrumbPostgresUser dbId={record.spec.database} />
             <SimplePageTitle
                 pageType="edit"
                 crName={CR_POSTGRES_USERS}
@@ -150,6 +155,7 @@ const CrShow = () => {
 
     return (
         <>
+            <BreadcrumbPostgresUser dbId={record.spec.database} />
             <SimplePageTitle
                 pageType="show"
                 crName={CR_POSTGRES_USERS}
@@ -209,6 +215,79 @@ const CustomView: View = {
     show: CrShow,
     create: CrCreate,
     edit: CrEdit,
+};
+
+const BreadcrumbPostgresUser = ({ dbId }: { dbId: string }) => {
+    const translate = useTranslate();
+    const location = useLocation();
+
+    const regexShow = `^/${CR_POSTGRES_USERS}/([^/]*)/show(/.*)?$`;
+    const regexCreate = `^/${CR_POSTGRES_USERS}/create(/.*)?$`;
+    const regexEdit = `^/${CR_POSTGRES_USERS}/([^/]*)(/[^/]*)?$`;
+
+    let links = [];
+
+    links.push({
+        name: translate(`resources.${CR_POSTGRES_DB}.name`, {
+            smart_count: 2,
+        }),
+        ref: `/${CR_POSTGRES_DB}`,
+    });
+    links.push({
+        name: dbId,
+        ref: `/${CR_POSTGRES_DB}/${dbId}/show`,
+    });
+
+    const matchShow = location.pathname.match(regexShow);
+    if (matchShow && matchShow[1]) {
+        // Show
+        links.push({
+            name: matchShow[1],
+            ref: `/${CR_POSTGRES_USERS}/${matchShow[1]}/show`,
+        });
+    } else if (location.pathname.match(regexCreate)) {
+        // Create
+        links.push({
+            name: translate('ra.action.create'),
+            ref: `/${CR_POSTGRES_USERS}/create`,
+        });
+    } else {
+        const matchEdit = location.pathname.match(regexEdit);
+        if (matchEdit && matchEdit[1]) {
+            // Edit
+            links.push({
+                name: matchEdit[1],
+                ref: `/${CR_POSTGRES_USERS}/${matchEdit[1]}/show`,
+            });
+            links.push({
+                name: translate('ra.action.edit'),
+                ref: `/${CR_POSTGRES_USERS}/${matchEdit[1]}`,
+            });
+        }
+    }
+
+    return (
+        <Breadcrumbs aria-label="breadcrumb" sx={{ paddingTop: '10px' }}>
+            <Link to="/" className="breadcrumb-link">
+                {translate('ra.page.dashboard')}
+            </Link>
+            {links.map((page, index) =>
+                index !== links.length - 1 ? (
+                    <Link
+                        key={page.name}
+                        to={page.ref}
+                        className="breadcrumb-link"
+                    >
+                        {page.name}
+                    </Link>
+                ) : (
+                    <Typography key={page.name} color="text.primary">
+                        {page.name}
+                    </Typography>
+                )
+            )}
+        </Breadcrumbs>
+    );
 };
 
 export default CustomView;

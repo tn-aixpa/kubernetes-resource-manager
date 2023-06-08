@@ -176,7 +176,6 @@ const CrList = () => {
 const CrShow = () => {
     const { record } = useShowController();
     if (!record) return null;
-    console.log(record);
 
     return (
         <>

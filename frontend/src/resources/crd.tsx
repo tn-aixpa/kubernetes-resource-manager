@@ -14,9 +14,10 @@ import {
     useTranslate,
 } from 'react-admin';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { Typography } from '@mui/material';
+import { Breadcrumbs, Typography } from '@mui/material';
 import { AceEditorField } from '@smartcommunitylab/ra-ace-editor';
 import Breadcrumb from '../components/Breadcrumb';
+import { useLocation, Link } from 'react-router-dom';
 
 export const CrdList = () => (
     <>
@@ -37,7 +38,7 @@ export const CrdShow = () => {
 
     return (
         <>
-            <Breadcrumb />
+            <BreadcrumbCRD />
             <Typography variant="h4" className="page-title">
                 {translate('ra.page.show', {
                     name: 'CRD',
@@ -112,5 +113,35 @@ const RelatedResources = () => {
             })}
             href={`${window.location.origin}/crs/create?crdId=${record.id}`}
         ></Button>
+    );
+};
+
+const BreadcrumbCRD = () => {
+    const translate = useTranslate();
+    const location = useLocation();
+    const params = new URLSearchParams(location.search);
+    const schema = params.get('schema');
+
+    return (
+        <Breadcrumbs aria-label="breadcrumb" sx={{ paddingTop: '10px' }}>
+            <Link to="/" className="breadcrumb-link">
+                {translate('ra.page.dashboard')}
+            </Link>
+            <Link key="settings" to="/crs" className="breadcrumb-link">
+                {translate('resources.crs.name', { smart_count: 2 })}
+            </Link>
+            {schema && (
+                <Link
+                    key={schema}
+                    to={`/crs/${schema}/show`}
+                    className="breadcrumb-link"
+                >
+                    {schema}
+                </Link>
+            )}
+            <Typography key="CRD" color="text.primary">
+                CRD
+            </Typography>
+        </Breadcrumbs>
     );
 };
