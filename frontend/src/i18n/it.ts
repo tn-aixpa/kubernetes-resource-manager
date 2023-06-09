@@ -43,7 +43,6 @@ const messages = {
                 'metadata.name': 'Nome',
                 spec: 'Specifiche',
             },
-            transformError: 'Campi obbligatori mancanti.',
         },
         'postgres.db.movetokube.com': {
             name: 'DB Postgres',
@@ -80,16 +79,17 @@ const messages = {
                         username: 'Nome utente',
                         password: 'Password',
                     },
-                    authenticationMode: 'Metodo di autenticazione',
+                    authenticationMode: 'Modalità',
                     host: 'Host',
                     name: 'Nome',
                     description: 'Descrizione',
                     path: 'Percorso',
-                    upstreams: 'Upstreams',
+                    upstreams: 'Upstream',
                     'upstreams.kind': 'Tipo',
                     'upstreams.nucliofunction.name': 'Nome funzione Nuclio',
                 },
             },
+            authenticationTitle: 'Autenticazione'
         },
     },
     dashboard: {
