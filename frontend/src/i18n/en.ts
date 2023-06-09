@@ -42,6 +42,7 @@ const messages = {
                 'metadata.name': 'Name',
                 spec: 'Specification',
             },
+            transformError: 'Required values are missing.',
         },
         'postgres.db.movetokube.com': {
             name: 'Postgres DB |||| Postgres DBs',

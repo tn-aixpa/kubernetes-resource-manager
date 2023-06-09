@@ -32,12 +32,27 @@ export const CR_POSTGRES_USERS = 'postgresusers.db.movetokube.com';
 const CrCreate = () => {
     const notify = useNotify();
     const redirect = useRedirect();
+    const translate = useTranslate();
     const { apiVersion, kind } = useCrTransform();
-    const transform = (cr: any) => ({
-        ...cr,
-        apiVersion: apiVersion,
-        kind: kind,
-    });
+
+    const transform = (data: any) => {
+        return {
+            ...data,
+            apiVersion: apiVersion,
+            kind: kind,
+        };
+    };
+
+    const validate = (values: any) => {
+        if (!apiVersion || !kind) {
+            return {
+                apiVersion: translate('resources.cr.transformError'),
+                kind: translate('resources.cr.transformError'),
+            };
+        }
+
+        return {};
+    };
 
     const params = new URLSearchParams(window.location.search);
     const dbId = params.get('db') || '';
@@ -63,7 +78,7 @@ const CrCreate = () => {
                 }
                 transform={transform}
             >
-                <SimpleForm>
+                <SimpleForm validate={validate}>
                     <TextInput source="metadata.name" validate={required()} />
                     <TextInput
                         source="spec.database"

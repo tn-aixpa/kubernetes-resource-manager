@@ -37,11 +37,26 @@ import { useCrTransform } from '../hooks/useCrTransform';
 
 export const CrCreate = () => {
     const { apiVersion, kind } = useCrTransform();
-    const transform = (cr: any) => ({
-        ...cr,
-        apiVersion: apiVersion,
-        kind: kind,
-    });
+    const translate = useTranslate();
+
+    const transform = (data: any) => {
+        return {
+            ...data,
+            apiVersion: apiVersion,
+            kind: kind,
+        };
+    };
+
+    const validate = (values: any) => {
+        if (!apiVersion || !kind) {
+            return {
+                apiVersion: translate('resources.cr.transformError'),
+                kind: translate('resources.cr.transformError'),
+            };
+        }
+
+        return {};
+    };
 
     return (
         <>
@@ -52,7 +67,7 @@ export const CrCreate = () => {
                 actions={<CreateTopToolbar />}
                 transform={transform}
             >
-                <SimpleForm>
+                <SimpleForm validate={validate}>
                     <TextInput
                         source="metadata.name"
                         validate={required()}

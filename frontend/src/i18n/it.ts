@@ -43,6 +43,7 @@ const messages = {
                 'metadata.name': 'Nome',
                 spec: 'Specifiche',
             },
+            transformError: 'Campi obbligatori mancanti.',
         },
         'postgres.db.movetokube.com': {
             name: 'DB Postgres',

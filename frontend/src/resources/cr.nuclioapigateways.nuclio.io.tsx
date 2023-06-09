@@ -19,6 +19,7 @@ import {
     ArrayField,
     SelectInput,
     FormDataConsumer,
+    useTranslate,
 } from 'react-admin';
 import { ViewToolbar } from '../components/ViewToolbar';
 import {
@@ -36,12 +37,28 @@ const CR_NUCLIO_APIGATEWAYS = 'nuclioapigateways.nuclio.io';
 
 const CrCreate = () => {
     const { apiVersion, kind } = useCrTransform();
-    const transform = (cr: any) => ({
-        ...cr,
-        apiVersion: apiVersion,
-        kind: kind,
-    });
+    const translate = useTranslate();
 
+    const transform = (data: any) => {
+        return {
+            ...data,
+            apiVersion: apiVersion,
+            kind: kind,
+        };
+    };
+
+    const validate = (values: any) => {
+        if (!apiVersion || !kind) {
+            return {
+                apiVersion: translate('resources.cr.transformError'),
+                kind: translate('resources.cr.transformError'),
+            };
+        }
+
+        return {};
+    };
+    // TODO test basic > fill fields > none
+    // TODO at least 1 upstream
     return (
         <>
             <Breadcrumb />
@@ -51,7 +68,7 @@ const CrCreate = () => {
                 actions={<CreateTopToolbar />}
                 transform={transform}
             >
-                <SimpleForm>
+                <SimpleForm validate={validate}>
                     <TextInput source="metadata.name" validate={required()} />
                     <TextInput source="spec.host" validate={required()} />
                     <TextInput source="spec.name" validate={required()} />

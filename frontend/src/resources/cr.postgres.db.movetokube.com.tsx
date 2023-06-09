@@ -40,11 +40,26 @@ export const CR_POSTGRES_DB = 'postgres.db.movetokube.com';
 
 const CrCreate = () => {
     const { apiVersion, kind } = useCrTransform();
-    const transform = (cr: any) => ({
-        ...cr,
-        apiVersion: apiVersion,
-        kind: kind,
-    });
+    const translate = useTranslate();
+
+    const transform = (data: any) => {
+        return {
+            ...data,
+            apiVersion: apiVersion,
+            kind: kind,
+        };
+    };
+
+    const validate = (values: any) => {
+        if (!apiVersion || !kind) {
+            return {
+                apiVersion: translate('resources.cr.transformError'),
+                kind: translate('resources.cr.transformError'),
+            };
+        }
+
+        return {};
+    };
 
     return (
         <>
@@ -55,7 +70,7 @@ const CrCreate = () => {
                 actions={<CreateTopToolbar />}
                 transform={transform}
             >
-                <SimpleForm>
+                <SimpleForm validate={validate}>
                     <TextInput source="metadata.name" validate={required()} />
                     <TextInput source="spec.database" validate={required()} />
                     <BooleanInput source="spec.dropOnDelete" />

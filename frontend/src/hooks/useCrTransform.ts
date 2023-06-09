@@ -8,7 +8,6 @@ export const useCrTransform = () => {
     const { data } = useGetOne('crd', { id: crdId });
 
     useEffect(() => {
-        console.log(data);
         if (data && data.spec) {
             const group = data.spec.group;
             const storedVersion = data.spec.versions.filter(
