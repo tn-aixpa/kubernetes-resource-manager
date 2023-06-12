@@ -1,7 +1,7 @@
-import englishMessages from 'ra-language-english';
-// translations for default texts (create, delete, etc.) will be imported from a separate repo
+import italianMessages from '@smartcommunitylab/ra-language-italian';
+
 const messages = {
-    ...englishMessages,
+    ...italianMessages,
     login: {
         basicMessage: 'Autenticarsi per continuare',
         title: 'Resource Manager',
