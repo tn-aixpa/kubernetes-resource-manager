@@ -35,6 +35,9 @@ import { useCrTransform } from '../hooks/useCrTransform';
 import { Typography } from '@mui/material';
 
 const CR_NUCLIO_APIGATEWAYS = 'nuclioapigateways.nuclio.io';
+//TODO tipi di auth: oauth2, apitoken/apikey, jwtAuth -> prende param audience
+//TODO limitare upstreams a 1 (lasciandolo come array) e prevedere kind=service (con .name)
+//TODO nel create, come mutation, aggiungere status.state=null!!undefined e status.name=name per farla creare davvero (probabilmente anche nell'edit)
 
 const CrCreate = () => {
     const { apiVersion, kind } = useCrTransform();
@@ -56,14 +59,14 @@ const CrCreate = () => {
         if (!apiVersion || !kind) {
             return {
                 apiVersion: 'ra.validation.required',
-                kind: 'ra.validation.required'
+                kind: 'ra.validation.required',
             };
         }
 
         if (values.spec.upstreams.length < 1) {
             return {
-                'spec.upstreams': 'ra.validation.required'
-            }
+                'spec.upstreams': 'ra.validation.required',
+            };
         }
 
         return {};
@@ -84,10 +87,16 @@ const CrCreate = () => {
                     <TextInput source="spec.name" validate={required()} />
                     <TextInput source="spec.description" fullWidth />
                     <TextInput source="spec.path" validate={required()} />
-                    <Typography variant="h6"  sx={{ paddingTop: '20px' }}>
-                        {translate(`resources.${CR_NUCLIO_APIGATEWAYS}.fields.spec.upstreams`)}
+                    <Typography variant="h6" sx={{ paddingTop: '20px' }}>
+                        {translate(
+                            `resources.${CR_NUCLIO_APIGATEWAYS}.fields.spec.upstreams`
+                        )}
                     </Typography>
-                    <ArrayInput source="spec.upstreams" validate={required()} label={false} >
+                    <ArrayInput
+                        source="spec.upstreams"
+                        validate={required()}
+                        label={false}
+                    >
                         <SimpleFormIterator inline>
                             <TextInput source="kind" validate={required()} />
                             <TextInput
@@ -96,8 +105,10 @@ const CrCreate = () => {
                             />
                         </SimpleFormIterator>
                     </ArrayInput>
-                    <Typography variant="h6"  sx={{ paddingTop: '20px' }}>
-                        {translate(`resources.${CR_NUCLIO_APIGATEWAYS}.authenticationTitle`)}
+                    <Typography variant="h6" sx={{ paddingTop: '20px' }}>
+                        {translate(
+                            `resources.${CR_NUCLIO_APIGATEWAYS}.authenticationTitle`
+                        )}
                     </Typography>
                     <SelectInput
                         source="spec.authenticationMode"
@@ -140,14 +151,16 @@ const CrEdit = () => {
         <>
             <Breadcrumb />
             <SimplePageTitle pageType="edit" crName={CR_NUCLIO_APIGATEWAYS} />
-            <Edit actions={<EditTopToolbar />}>
+            <Edit actions={<EditTopToolbar hasYaml />}>
                 <SimpleForm toolbar={<ViewToolbar />}>
                     <TextInput source="spec.host" validate={required()} />
                     <TextInput source="spec.name" validate={required()} />
                     <TextInput source="spec.description" fullWidth />
                     <TextInput source="spec.path" validate={required()} />
-                    <Typography variant="h6"  sx={{ paddingTop: '20px' }}>
-                        {translate(`resources.${CR_NUCLIO_APIGATEWAYS}.fields.spec.upstreams`)}
+                    <Typography variant="h6" sx={{ paddingTop: '20px' }}>
+                        {translate(
+                            `resources.${CR_NUCLIO_APIGATEWAYS}.fields.spec.upstreams`
+                        )}
                     </Typography>
                     <ArrayInput source="spec.upstreams" label={false}>
                         <SimpleFormIterator inline>
@@ -158,8 +171,10 @@ const CrEdit = () => {
                             />
                         </SimpleFormIterator>
                     </ArrayInput>
-                    <Typography variant="h6"  sx={{ paddingTop: '20px' }}>
-                        {translate(`resources.${CR_NUCLIO_APIGATEWAYS}.authenticationTitle`)}
+                    <Typography variant="h6" sx={{ paddingTop: '20px' }}>
+                        {translate(
+                            `resources.${CR_NUCLIO_APIGATEWAYS}.authenticationTitle`
+                        )}
                     </Typography>
                     <SelectInput
                         source="spec.authenticationMode"
@@ -204,6 +219,7 @@ const CrList = () => {
                     <TextField source="spec.name" />
                     <TextField source="spec.host" />
                     <TextField source="spec.path" />
+                    <TextField source="status.state" />
                     <EditButton />
                     <ShowButton />
                     <DeleteWithConfirmButton />
@@ -222,16 +238,19 @@ const CrShow = () => {
         <>
             <Breadcrumb />
             <SimplePageTitle pageType="show" crName={CR_NUCLIO_APIGATEWAYS} />
-            <Show actions={<ShowTopToolbar />}>
+            <Show actions={<ShowTopToolbar hasYaml />}>
                 <SimpleShowLayout>
                     <TextField source="spec.host" />
                     <TextField source="spec.name" />
                     <TextField source="spec.description" />
                     <TextField source="spec.path" />
-                    <Typography variant="h6"  sx={{ paddingTop: '20px' }}>
-                        {translate(`resources.${CR_NUCLIO_APIGATEWAYS}.fields.spec.upstreams`)}
+                    <TextField source="status.state" />
+                    <Typography variant="h6" sx={{ paddingTop: '20px' }}>
+                        {translate(
+                            `resources.${CR_NUCLIO_APIGATEWAYS}.fields.spec.upstreams`
+                        )}
                     </Typography>
-                    <ArrayField source="spec.upstreams" label={false} >
+                    <ArrayField source="spec.upstreams" label={false}>
                         <Datagrid bulkActionButtons={false}>
                             <TextField
                                 source="kind"
@@ -244,7 +263,9 @@ const CrShow = () => {
                         </Datagrid>
                     </ArrayField>
                     <Typography variant="h6" sx={{ paddingTop: '20px' }}>
-                        {translate(`resources.${CR_NUCLIO_APIGATEWAYS}.authenticationTitle`)}
+                        {translate(
+                            `resources.${CR_NUCLIO_APIGATEWAYS}.authenticationTitle`
+                        )}
                     </Typography>
                     <TextField source="spec.authenticationMode" />
                     {record.spec.authenticationMode === 'basicAuth' && (

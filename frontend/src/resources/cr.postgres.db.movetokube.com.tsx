@@ -105,7 +105,7 @@ const CrEdit = () => {
                 crName={CR_POSTGRES_DB}
                 crId={record.spec.database}
             />
-            <Edit actions={<EditTopToolbar />}>
+            <Edit actions={<EditTopToolbar hasYaml />}>
                 <SimpleForm toolbar={<ViewToolbar />}>
                     <TextInput source="spec.database" validate={required()} />
                     <BooleanInput source="spec.dropOnDelete" />
@@ -158,7 +158,7 @@ const CrShow = () => {
                 crName={CR_POSTGRES_DB}
                 crId={record.spec.database}
             />
-            <Show actions={<ShowTopToolbar />}>
+            <Show actions={<ShowTopToolbar hasYaml />}>
                 <SimpleShowLayout>
                     <TextField source="spec.database" />
                     <BooleanField source="spec.dropOnDelete" />

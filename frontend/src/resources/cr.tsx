@@ -96,7 +96,7 @@ export const CrEdit = () => {
         <>
             <Breadcrumb />
             <PageTitle pageType="edit" crId={record.id} />
-            <Edit actions={<EditTopToolbar />}>
+            <Edit actions={<EditTopToolbar hasYaml />}>
                 <SimpleForm toolbar={<ViewToolbar />}>
                     <AceEditorInput
                         mode="json"
@@ -145,7 +145,7 @@ export const CrShow = () => {
         <>
             <Breadcrumb />
             <PageTitle pageType="show" crId={record.id} />
-            <Show actions={<ShowTopToolbar />}>
+            <Show actions={<ShowTopToolbar hasYaml />}>
                 <SimpleShowLayout>
                     <TextField source="id" label={'resources.cr.fields.id'} />
                     <TextField

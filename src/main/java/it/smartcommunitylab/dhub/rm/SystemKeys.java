@@ -1,6 +1,12 @@
 package it.smartcommunitylab.dhub.rm;
 
+import org.springframework.http.MediaType;
+
 public final class SystemKeys {
+
+    public static final MediaType MEDIA_TYPE_YML = MediaType.valueOf("text/yml");
+    public static final MediaType MEDIA_TYPE_YAML = MediaType.valueOf("text/yaml");
+    public static final MediaType MEDIA_TYPE_X_YAML = MediaType.valueOf("application/x-yaml");
 
     public static final String API_PATH = "/api";
     public static final String REGEX_CRD_ID = "[a-z0-9-]+(?:\\.[a-z0-9-]+)+";

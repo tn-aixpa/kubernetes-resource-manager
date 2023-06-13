@@ -88,6 +88,9 @@ const messages = {
                     'upstreams.kind': 'Tipo',
                     'upstreams.nucliofunction.name': 'Nome funzione Nuclio',
                 },
+                status: {
+                    state: 'Stato'
+                }
             },
             authenticationTitle: 'Autenticazione'
         },

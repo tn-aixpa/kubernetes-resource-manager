@@ -80,7 +80,22 @@ const dataProvider = (
                 };
             });
         },
-        getOne: (resource, params) => provider.getOne(resource, params),
+        getOne: (resource, params) => {
+            let headers = {};
+            if (params?.meta?.yaml) {
+                headers = new Headers({ Accept: 'application/x-yaml' });
+            }
+            return httpClient(`${apiUrl}/${resource}/${params.id}`, {headers: headers}).then(
+                ({ json, body }) => {
+                    if (params?.meta?.yaml) {
+                        return {data: {id: 'yamltext', yaml: body}}
+                    }
+                    return {
+                        data: json,
+                    }
+                }
+            );
+        },
         getMany: (resource, params) => {
             let url = `${apiUrl}/${resource}`;
             const ids = params.ids;

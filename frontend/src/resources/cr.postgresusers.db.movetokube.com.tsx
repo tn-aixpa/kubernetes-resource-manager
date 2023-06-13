@@ -26,6 +26,7 @@ import { CR_POSTGRES_DB } from './cr.postgres.db.movetokube.com';
 import { useCrTransform } from '../hooks/useCrTransform';
 import { Breadcrumbs, Typography } from '@mui/material';
 import { useLocation, Link } from 'react-router-dom';
+import YamlButton from '../components/YamlButton';
 
 export const CR_POSTGRES_USERS = 'postgresusers.db.movetokube.com';
 
@@ -126,6 +127,7 @@ const CrEdit = () => {
                         buttons={{
                             hasShow: true,
                             hasList: true,
+                            hasYaml: true
                         }}
                     />
                 }
@@ -184,6 +186,7 @@ const CrShow = () => {
                             hasEdit: true,
                             hasList: true,
                             hasDelete: true,
+                            hasYaml: true
                         }}
                     />
                 }
@@ -206,10 +209,11 @@ const UserTopToolbar = ({
     redirect: string;
     buttons: TopToolbarProps;
 }) => {
-    const { hasEdit, hasList, hasShow, hasDelete } = buttons;
+    const { hasEdit, hasList, hasShow, hasDelete, hasYaml } = buttons;
 
     return (
         <ReactAdminTopToolbar>
+            {hasYaml && <YamlButton key="yaml-button" />}
             {hasEdit && <EditButton key="edit-button" />}
             {hasShow && <ShowButton key="show-button" />}
             {hasList && <ListButton key="list-button" resource={redirect} />}

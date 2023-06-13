@@ -59,7 +59,9 @@ const manager = new UserManager({
 
 const httpClient = async (url: string, options: Options = {}) => {
     if (!options.headers) {
-        options.headers = new Headers({ Accept: 'application/json' });
+        options.headers = new Headers({ Accept: 'application/json' }) as Headers;
+    } else {
+        options.headers = new Headers(options.headers) as Headers;
     }
 
     if (authType === AUTH_TYPE_OAUTH) {
@@ -67,19 +69,17 @@ const httpClient = async (url: string, options: Options = {}) => {
         if (!user) {
             return Promise.reject('OAuth: No user found in store');
         }
-        options.user = {
-            authenticated: true,
-            token: 'Bearer ' + user.access_token,
-        };
+        options.headers.set('Authorization', 'Bearer ' + user.access_token);
     } else if (authType === AUTH_TYPE_BASIC) {
         const basicAuth = sessionStorage.getItem('basic-auth');
         if (!basicAuth) {
             return Promise.reject('Basic: No user found in store');
         }
-        options.headers = new Headers({
-            Accept: 'application/json',
-            Authorization: 'Basic ' + basicAuth,
-        });
+        options.headers.set('Authorization', 'Basic ' + basicAuth);
+    }
+
+    if (!options.headers.has('Accept')) {
+        options.headers.set('Accept', 'application/json');
     }
 
     return fetchUtils.fetchJson(url, options);
