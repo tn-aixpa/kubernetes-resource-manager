@@ -75,9 +75,20 @@ const messages = {
             fields: {
                 id: 'ID',
                 spec: {
-                    'authentication.basicAuth': {
-                        username: 'Nome utente',
-                        password: 'Password',
+                    authentication: {
+                        basicAuth: {
+                            username: 'Nome utente',
+                            password: 'Password',
+                        },
+                        oauth2: {
+                            token: 'Token'
+                        },
+                        apikey: {
+                            token: 'API key'
+                        },
+                        jwtAuth: {
+                            audience: 'Audience'
+                        }
                     },
                     authenticationMode: 'Modalità',
                     host: 'Host',
@@ -87,6 +98,7 @@ const messages = {
                     upstreams: 'Upstream',
                     'upstreams.kind': 'Tipo',
                     'upstreams.nucliofunction.name': 'Nome funzione Nuclio',
+                    'upstreams.service.name': 'Nome servizio',
                 },
                 status: {
                     state: 'Stato'

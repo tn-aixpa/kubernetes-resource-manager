@@ -35,9 +35,6 @@ import { useCrTransform } from '../hooks/useCrTransform';
 import { Typography } from '@mui/material';
 
 const CR_NUCLIO_APIGATEWAYS = 'nuclioapigateways.nuclio.io';
-//TODO tipi di auth: oauth2, apitoken/apikey, jwtAuth -> prende param audience
-//TODO limitare upstreams a 1 (lasciandolo come array) e prevedere kind=service (con .name)
-//TODO nel create, come mutation, aggiungere status.state=null!!undefined e status.name=name per farla creare davvero (probabilmente anche nell'edit)
 
 const CrCreate = () => {
     const { apiVersion, kind } = useCrTransform();
@@ -52,6 +49,10 @@ const CrCreate = () => {
             ...data,
             apiVersion: apiVersion,
             kind: kind,
+            status: {
+                name: data.spec.name,
+                state: null,
+            },
         };
     };
 
@@ -92,19 +93,68 @@ const CrCreate = () => {
                             `resources.${CR_NUCLIO_APIGATEWAYS}.fields.spec.upstreams`
                         )}
                     </Typography>
-                    <ArrayInput
-                        source="spec.upstreams"
-                        validate={required()}
-                        label={false}
-                    >
-                        <SimpleFormIterator inline>
-                            <TextInput source="kind" validate={required()} />
-                            <TextInput
-                                source="nucliofunction.name"
+                    <FormDataConsumer>
+                        {({ formData, ...rest }) => (
+                            <ArrayInput
+                                source="spec.upstreams"
                                 validate={required()}
-                            />
-                        </SimpleFormIterator>
-                    </ArrayInput>
+                                label={false}
+                            >
+                                <SimpleFormIterator
+                                    inline
+                                    disableAdd={
+                                        formData.spec?.upstreams &&
+                                        formData.spec.upstreams.length > 0
+                                    }
+                                >
+                                    <SelectInput
+                                        source="kind"
+                                        choices={[
+                                            {
+                                                id: 'nucliofunction',
+                                                name: 'Nuclio function',
+                                            },
+                                            { id: 'service', name: 'Service' },
+                                        ]}
+                                        validate={required()}
+                                    />
+                                    <FormDataConsumer>
+                                        {({
+                                            formData,
+                                            scopedFormData,
+                                            getSource,
+                                            ...rest
+                                        }) => (
+                                            <>
+                                                {scopedFormData.kind &&
+                                                    scopedFormData.kind ===
+                                                        'nucliofunction' &&
+                                                    getSource && (
+                                                        <TextInput
+                                                            source={getSource(
+                                                                'nucliofunction.name'
+                                                            )}
+                                                            validate={required()}
+                                                        />
+                                                    )}
+                                                {scopedFormData.kind &&
+                                                    scopedFormData.kind ===
+                                                        'service' &&
+                                                    getSource && (
+                                                        <TextInput
+                                                            source={getSource(
+                                                                'service.name'
+                                                            )}
+                                                            validate={required()}
+                                                        />
+                                                    )}
+                                            </>
+                                        )}
+                                    </FormDataConsumer>
+                                </SimpleFormIterator>
+                            </ArrayInput>
+                        )}
+                    </FormDataConsumer>
                     <Typography variant="h6" sx={{ paddingTop: '20px' }}>
                         {translate(
                             `resources.${CR_NUCLIO_APIGATEWAYS}.authenticationTitle`
@@ -115,26 +165,55 @@ const CrCreate = () => {
                         choices={[
                             { id: 'none', name: 'None' },
                             { id: 'basicAuth', name: 'Basic' },
+                            { id: 'oauth2', name: 'OAuth2' },
+                            { id: 'apikey', name: 'API key' },
+                            { id: 'jwtAuth', name: 'JWT' },
                         ]}
                         validate={required()}
                     />
                     <FormDataConsumer>
-                        {({ formData, ...rest }) =>
-                            formData.spec?.authenticationMode &&
-                            formData.spec?.authenticationMode ===
-                                'basicAuth' && (
-                                <>
-                                    <TextInput
-                                        source="spec.authentication.basicAuth.username"
-                                        validate={required()}
-                                    />
-                                    <TextInput
-                                        source="spec.authentication.basicAuth.password"
-                                        validate={required()}
-                                    />
-                                </>
-                            )
-                        }
+                        {({ formData, ...rest }) => (
+                            <>
+                                {formData.spec?.authenticationMode &&
+                                    formData.spec?.authenticationMode ===
+                                        'basicAuth' && (
+                                        <>
+                                            <TextInput
+                                                source="spec.authentication.basicAuth.username"
+                                                validate={required()}
+                                            />
+                                            <TextInput
+                                                source="spec.authentication.basicAuth.password"
+                                                validate={required()}
+                                            />
+                                        </>
+                                    )}
+                                {formData.spec?.authenticationMode &&
+                                    formData.spec?.authenticationMode ===
+                                        'oauth2' && (
+                                        <TextInput
+                                            source="spec.authentication.oauth2.token"
+                                            validate={required()}
+                                        />
+                                    )}
+                                {formData.spec?.authenticationMode &&
+                                    formData.spec?.authenticationMode ===
+                                        'apikey' && (
+                                        <TextInput
+                                            source="spec.authentication.apikey.token"
+                                            validate={required()}
+                                        />
+                                    )}
+                                {formData.spec?.authenticationMode &&
+                                    formData.spec?.authenticationMode ===
+                                        'jwtAuth' && (
+                                        <TextInput
+                                            source="spec.authentication.jwtAuth.audience"
+                                            validate={required()}
+                                        />
+                                    )}
+                            </>
+                        )}
                     </FormDataConsumer>
                 </SimpleForm>
             </Create>
@@ -147,12 +226,36 @@ const CrEdit = () => {
     const { record } = useEditController();
     if (!record) return null;
 
+    const transform = (data: any) => {
+        if (data.spec.authenticationMode === 'none') {
+            delete data.spec.authentication;
+        }
+
+        return {
+            ...data,
+            status: {
+                name: data.spec.name,
+                state: 'provisioning',
+            },
+        };
+    };
+
+    const validate = (values: any) => {
+        if (values.spec.upstreams.length < 1) {
+            return {
+                'spec.upstreams': 'ra.validation.required',
+            };
+        }
+
+        return {};
+    };
+
     return (
         <>
             <Breadcrumb />
             <SimplePageTitle pageType="edit" crName={CR_NUCLIO_APIGATEWAYS} />
-            <Edit actions={<EditTopToolbar hasYaml />}>
-                <SimpleForm toolbar={<ViewToolbar />}>
+            <Edit actions={<EditTopToolbar hasYaml />} transform={transform}>
+                <SimpleForm toolbar={<ViewToolbar />} validate={validate}>
                     <TextInput source="spec.host" validate={required()} />
                     <TextInput source="spec.name" validate={required()} />
                     <TextInput source="spec.description" fullWidth />
@@ -181,26 +284,55 @@ const CrEdit = () => {
                         choices={[
                             { id: 'none', name: 'None' },
                             { id: 'basicAuth', name: 'Basic' },
+                            { id: 'oauth2', name: 'OAuth2' },
+                            { id: 'apikey', name: 'API key' },
+                            { id: 'jwtAuth', name: 'JWT' },
                         ]}
                         validate={required()}
                     />
                     <FormDataConsumer>
-                        {({ formData, ...rest }) =>
-                            formData.spec?.authenticationMode &&
-                            formData.spec?.authenticationMode ===
-                                'basicAuth' && (
-                                <>
-                                    <TextInput
-                                        source="spec.authentication.basicAuth.username"
-                                        validate={required()}
-                                    />
-                                    <TextInput
-                                        source="spec.authentication.basicAuth.password"
-                                        validate={required()}
-                                    />
-                                </>
-                            )
-                        }
+                        {({ formData, ...rest }) => (
+                            <>
+                                {formData.spec?.authenticationMode &&
+                                    formData.spec?.authenticationMode ===
+                                        'basicAuth' && (
+                                        <>
+                                            <TextInput
+                                                source="spec.authentication.basicAuth.username"
+                                                validate={required()}
+                                            />
+                                            <TextInput
+                                                source="spec.authentication.basicAuth.password"
+                                                validate={required()}
+                                            />
+                                        </>
+                                    )}
+                                {formData.spec?.authenticationMode &&
+                                    formData.spec?.authenticationMode ===
+                                        'oauth2' && (
+                                        <TextInput
+                                            source="spec.authentication.oauth2.token"
+                                            validate={required()}
+                                        />
+                                    )}
+                                {formData.spec?.authenticationMode &&
+                                    formData.spec?.authenticationMode ===
+                                        'apikey' && (
+                                        <TextInput
+                                            source="spec.authentication.apikey.token"
+                                            validate={required()}
+                                        />
+                                    )}
+                                {formData.spec?.authenticationMode &&
+                                    formData.spec?.authenticationMode ===
+                                        'jwtAuth' && (
+                                        <TextInput
+                                            source="spec.authentication.jwtAuth.audience"
+                                            validate={required()}
+                                        />
+                                    )}
+                            </>
+                        )}
                     </FormDataConsumer>
                 </SimpleForm>
             </Edit>
@@ -273,6 +405,15 @@ const CrShow = () => {
                     )}
                     {record.spec.authenticationMode === 'basicAuth' && (
                         <TextField source="spec.authentication.basicAuth.password" />
+                    )}
+                    {record.spec.authenticationMode === 'oauth2' && (
+                        <TextField source="spec.authentication.oauth2.token" />
+                    )}
+                    {record.spec.authenticationMode === 'apikey' && (
+                        <TextField source="spec.authentication.apikey.token" />
+                    )}
+                    {record.spec.authenticationMode === 'jwtAuth' && (
+                        <TextField source="spec.authentication.jwtAuth.audience" />
                     )}
                 </SimpleShowLayout>
             </Show>
