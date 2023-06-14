@@ -13,7 +13,14 @@ const Breadcrumb = () => {
 
     let links = [];
 
+    // Dashboard
+    links.push({
+        name: translate('ra.page.dashboard'),
+        ref: '/',
+    });
+
     if (resource) {
+        // List
         links.push({
             name: translate(`resources.${resource}.name`, {
                 smart_count: 2,
@@ -54,17 +61,19 @@ const Breadcrumb = () => {
 
     return (
         <Breadcrumbs aria-label="breadcrumb" sx={{ paddingTop: '10px' }}>
-            <Link to="/" className="breadcrumb-link">
-                {translate('ra.page.dashboard')}
-            </Link>
             {links.map((page, index) =>
                 index !== links.length - 1 ? (
                     <Link
                         key={page.name}
                         to={page.ref}
-                        className="breadcrumb-link"
+                        style={{ textDecoration: 'none' }}
                     >
-                        {page.name}
+                        <Typography
+                            color="text.secondary"
+                            sx={{ '&:hover': { textDecoration: 'underline' } }}
+                        >
+                            {page.name}
+                        </Typography>
                     </Link>
                 ) : (
                     <Typography key={page.name} color="text.primary">

@@ -45,12 +45,3 @@
   width: 800px !important;
   height: 200px !important;
 }
-
-.breadcrumb-link {
-  text-decoration: none;
-  color: rgba(0, 0, 0, 0.6);
-}
-
-.breadcrumb-link:hover {
-  text-decoration: underline;
-}
