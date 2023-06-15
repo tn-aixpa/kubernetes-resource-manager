@@ -20,6 +20,8 @@ import {
     SelectInput,
     FormDataConsumer,
     useTranslate,
+    BooleanInput,
+    useGetList,
 } from 'react-admin';
 import { ViewToolbar } from '../components/ViewToolbar';
 import {
@@ -33,12 +35,47 @@ import { View } from '.';
 import Breadcrumb from '../components/Breadcrumb';
 import { useCrTransform } from '../hooks/useCrTransform';
 import { Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
 
 const CR_NUCLIO_APIGATEWAYS = 'nuclioapigateways.nuclio.io';
+
+type Upstream = {
+    [nucliofunctionOrService: string]: { name: string };
+} & {
+    kind: string;
+    id?: string;
+};
 
 const CrCreate = () => {
     const { apiVersion, kind } = useCrTransform();
     const translate = useTranslate();
+    const [upstreams, setUpstreams] = useState<Upstream[]>([]);
+    const { data } = useGetList(CR_NUCLIO_APIGATEWAYS, {
+        pagination: { page: 1, perPage: 1000 },
+    });
+
+    useEffect(() => {
+        if (data) {
+            let newUpstreams: Upstream[] = [];
+            data.forEach(value => {
+                value.spec.upstreams.forEach((upstream: Upstream) => {
+                    const hasSome = newUpstreams.some((u: Upstream) => {
+                        type ObjectKey = keyof Upstream;
+                        const nucliofunctionOrService = u.kind as ObjectKey;
+                        return (
+                            u.kind === upstream.kind &&
+                            u[nucliofunctionOrService]?.name ===
+                                upstream[nucliofunctionOrService]?.name
+                        );
+                    });
+                    if (!hasSome) {
+                        newUpstreams.push(upstream);
+                    }
+                });
+            });
+            setUpstreams(newUpstreams);
+        }
+    }, [data]);
 
     const transform = (data: any) => {
         if (data.spec.authenticationMode === 'none') {
@@ -51,7 +88,7 @@ const CrCreate = () => {
             kind: kind,
             status: {
                 name: data.spec.name,
-                state: null,
+                state: '',
             },
         };
     };
@@ -67,6 +104,23 @@ const CrCreate = () => {
         if (values.spec.upstreams.length < 1) {
             return {
                 'spec.upstreams': 'ra.validation.required',
+            };
+        }
+
+        const hasSome = upstreams.some((u: Upstream) => {
+            type ObjectKey = keyof Upstream;
+            const nucliofunctionOrService = u.kind as ObjectKey;
+            return (
+                values.spec.upstreams[0].kind === u.kind &&
+                u[nucliofunctionOrService]?.name ===
+                    values.spec.upstreams[0][nucliofunctionOrService]?.name
+            );
+        });
+        if (hasSome) {
+            return {
+                'spec.upstreams': translate(
+                    `resources.${CR_NUCLIO_APIGATEWAYS}.alreadyExists`
+                ),
             };
         }
 
@@ -166,7 +220,6 @@ const CrCreate = () => {
                             { id: 'none', name: 'None' },
                             { id: 'basicAuth', name: 'Basic' },
                             { id: 'oauth2', name: 'OAuth2' },
-                            { id: 'apikey', name: 'API key' },
                             { id: 'jwtAuth', name: 'JWT' },
                         ]}
                         validate={required()}
@@ -191,18 +244,10 @@ const CrCreate = () => {
                                 {formData.spec?.authenticationMode &&
                                     formData.spec?.authenticationMode ===
                                         'oauth2' && (
-                                        <TextInput
-                                            source="spec.authentication.oauth2.token"
-                                            validate={required()}
-                                        />
-                                    )}
-                                {formData.spec?.authenticationMode &&
-                                    formData.spec?.authenticationMode ===
-                                        'apikey' && (
-                                        <TextInput
-                                            source="spec.authentication.apikey.token"
-                                            validate={required()}
-                                        />
+                                        <>
+                                            <TextInput source="spec.authentication.dexAuth.oauth2ProxyUrl" />
+                                            <BooleanInput source="spec.authentication.dexAuth.redirectUnauthorizedToSignIn" />
+                                        </>
                                     )}
                                 {formData.spec?.authenticationMode &&
                                     formData.spec?.authenticationMode ===
@@ -224,6 +269,36 @@ const CrCreate = () => {
 const CrEdit = () => {
     const translate = useTranslate();
     const { record } = useEditController();
+
+    const [upstreams, setUpstreams] = useState<Upstream[]>([]);
+    const { data } = useGetList(CR_NUCLIO_APIGATEWAYS, {
+        pagination: { page: 1, perPage: 1000 },
+    });
+
+    useEffect(() => {
+        if (data) {
+            let newUpstreams: Upstream[] = [];
+            data.forEach(value => {
+                value.spec.upstreams.forEach((upstream: Upstream) => {
+                    const hasSome = newUpstreams.some((u: Upstream) => {
+                        type ObjectKey = keyof Upstream;
+                        const nucliofunctionOrService = u.kind as ObjectKey;
+                        return (
+                            u.kind === upstream.kind &&
+                            u[nucliofunctionOrService]?.name ===
+                                upstream[nucliofunctionOrService]?.name
+                        );
+                    });
+                    if (!hasSome) {
+                        upstream.id = value.id;
+                        newUpstreams.push(upstream);
+                    }
+                });
+            });
+            setUpstreams(newUpstreams);
+        }
+    }, [data]);
+
     if (!record) return null;
 
     const transform = (data: any) => {
@@ -235,7 +310,7 @@ const CrEdit = () => {
             ...data,
             status: {
                 name: data.spec.name,
-                state: 'provisioning',
+                state: '',
             },
         };
     };
@@ -244,6 +319,24 @@ const CrEdit = () => {
         if (values.spec.upstreams.length < 1) {
             return {
                 'spec.upstreams': 'ra.validation.required',
+            };
+        }
+
+        const hasSome = upstreams.some((u: Upstream) => {
+            type ObjectKey = keyof Upstream;
+            const nucliofunctionOrService = u.kind as ObjectKey;
+            return (
+                values.id !== u.id &&
+                values.spec.upstreams[0].kind === u.kind &&
+                u[nucliofunctionOrService]?.name ===
+                    values.spec.upstreams[0][nucliofunctionOrService]?.name
+            );
+        });
+        if (hasSome) {
+            return {
+                'spec.upstreams': translate(
+                    `resources.${CR_NUCLIO_APIGATEWAYS}.alreadyExists`
+                ),
             };
         }
 
@@ -285,7 +378,6 @@ const CrEdit = () => {
                             { id: 'none', name: 'None' },
                             { id: 'basicAuth', name: 'Basic' },
                             { id: 'oauth2', name: 'OAuth2' },
-                            { id: 'apikey', name: 'API key' },
                             { id: 'jwtAuth', name: 'JWT' },
                         ]}
                         validate={required()}
@@ -310,18 +402,10 @@ const CrEdit = () => {
                                 {formData.spec?.authenticationMode &&
                                     formData.spec?.authenticationMode ===
                                         'oauth2' && (
-                                        <TextInput
-                                            source="spec.authentication.oauth2.token"
-                                            validate={required()}
-                                        />
-                                    )}
-                                {formData.spec?.authenticationMode &&
-                                    formData.spec?.authenticationMode ===
-                                        'apikey' && (
-                                        <TextInput
-                                            source="spec.authentication.apikey.token"
-                                            validate={required()}
-                                        />
+                                        <>
+                                            <TextInput source="spec.authentication.dexAuth.oauth2ProxyUrl" />
+                                            <BooleanInput source="spec.authentication.dexAuth.redirectUnauthorizedToSignIn" />
+                                        </>
                                     )}
                                 {formData.spec?.authenticationMode &&
                                     formData.spec?.authenticationMode ===

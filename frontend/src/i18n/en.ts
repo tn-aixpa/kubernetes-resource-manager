@@ -79,11 +79,9 @@ const messages = {
                             username: 'Username',
                             password: 'Password',
                         },
-                        oauth2: {
-                            token: 'Token'
-                        },
-                        apikey: {
-                            token: 'API key'
+                        dexAuth: {
+                            oauth2ProxyUrl: 'OAuth2 proxy URL',
+                            redirectUnauthorizedToSignIn: 'Redirect unauthorized to sign in'
                         },
                         jwtAuth: {
                             audience: 'Audience'
@@ -103,7 +101,8 @@ const messages = {
                     state: 'Status'
                 }
             },
-            authenticationTitle: 'Authentication'
+            authenticationTitle: 'Authentication',
+            alreadyExists: 'Already exists'
         },
     },
     dashboard: {

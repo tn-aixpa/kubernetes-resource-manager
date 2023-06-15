@@ -80,11 +80,9 @@ const messages = {
                             username: 'Nome utente',
                             password: 'Password',
                         },
-                        oauth2: {
-                            token: 'Token'
-                        },
-                        apikey: {
-                            token: 'API key'
+                        dexAuth: {
+                            oauth2ProxyUrl: 'OAuth2 proxy URL',
+                            redirectUnauthorizedToSignIn: 'Reindirizzare al sign in quando non autorizzato'
                         },
                         jwtAuth: {
                             audience: 'Audience'
@@ -104,7 +102,8 @@ const messages = {
                     state: 'Stato'
                 }
             },
-            authenticationTitle: 'Autenticazione'
+            authenticationTitle: 'Autenticazione',
+            alreadyExists: 'Esiste già'
         },
     },
     dashboard: {
