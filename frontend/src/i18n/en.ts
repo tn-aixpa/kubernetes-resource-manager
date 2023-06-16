@@ -42,6 +42,7 @@ const messages = {
                 'metadata.name': 'Name',
                 spec: 'Specification',
             },
+            serverError: 'Server error'
         },
         'postgres.db.movetokube.com': {
             name: 'Postgres DB |||| Postgres DBs',

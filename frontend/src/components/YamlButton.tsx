@@ -5,27 +5,26 @@ import {
     useResourceContext,
     Button,
     Identifier,
+    SimpleForm,
+    EditContextProvider,
+    useUpdate,
+    useRefresh,
+    useEditController,
+    EditBase,
+    useNotify,
 } from 'react-admin';
-import { styled, Dialog, DialogTitle, IconButton } from '@mui/material';
+import { Dialog, DialogTitle, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import CodeIcon from '@mui/icons-material/Code';
 import { useState } from 'react';
-import { AceEditorField } from '@smartcommunitylab/ra-ace-editor';
+import { AceEditorInput } from '@smartcommunitylab/ra-ace-editor';
+import { ViewToolbar } from './ViewToolbar';
 
 interface DialogTitleProps {
     id: string;
     children?: React.ReactNode;
     onClose: () => void;
 }
-
-const BootstrapDialog = styled(Dialog)(({ theme }) => ({
-    '& .MuiDialogContent-root': {
-        padding: theme.spacing(2),
-    },
-    '& .MuiDialogActions-root': {
-        padding: theme.spacing(1),
-    },
-}));
 
 const BootstrapDialogTitle = (props: DialogTitleProps) => {
     const { children, onClose, ...other } = props;
@@ -51,34 +50,82 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
     );
 };
 
-const YamlModal = ({
-    recordId,
-    resource,
-    open,
-    toggleOpen,
-}: {
-    recordId: Identifier;
-    resource: string;
-    open: boolean;
-    toggleOpen: Function;
-}) => {
+const YamlEdit = ({ toggleOpen }: { toggleOpen: Function }) => {
+    const notify = useNotify();
+    const resource = useResourceContext();
+    const record = useRecordContext();
+    const editContext = useEditController();
+    const [update] = useUpdate();
+    const refresh = useRefresh();
     const { data, isLoading } = useGetOne(
         resource,
-        { id: recordId, meta: { yaml: true } },
+        { id: record.id, meta: { yaml: true } },
         {}
     );
     if (isLoading) return <Loading />;
     if (!data) return null;
+    if (editContext.isLoading) return null;
 
+    const id = record.id;
+    editContext.record = data;
+
+    const onSubmit = (data: any) => {
+        return update(
+            resource,
+            { id, data: data.yaml, meta: { yaml: true } },
+            {
+                onSuccess: () => {
+                    refresh();
+                    toggleOpen(false);
+                },
+                onError: (error, variables) => {
+                    console.log('Error:', error);
+                    notify('resources.cr.serverError', { type: 'error' });
+                },
+            }
+        );
+    };
+
+    return (
+        <EditContextProvider value={editContext}>
+            <EditBase transform={(data: any) => data.yaml}>
+                <SimpleForm
+                    record={data}
+                    onSubmit={onSubmit}
+                    toolbar={<ViewToolbar />}
+                >
+                    <AceEditorInput
+                        mode="yaml"
+                        source="yaml"
+                        theme="monokai"
+                        label={false}
+                    />
+                </SimpleForm>
+            </EditBase>
+        </EditContextProvider>
+    );
+};
+
+const YamlModal = ({
+    recordId,
+    open,
+    toggleOpen,
+}: {
+    recordId: Identifier;
+    open: boolean;
+    toggleOpen: Function;
+}) => {
     const handleClose = () => {
         toggleOpen(false);
     };
 
     return (
-        <BootstrapDialog
+        <Dialog
             onClose={handleClose}
             aria-labelledby="customized-dialog-title"
             open={open}
+            fullWidth
+            maxWidth="md"
         >
             <BootstrapDialogTitle
                 id="customized-dialog-title"
@@ -86,21 +133,13 @@ const YamlModal = ({
             >
                 {recordId}
             </BootstrapDialogTitle>
-            <AceEditorField
-                mode="yaml"
-                record={{
-                    body: data.yaml,
-                }}
-                source="body"
-                theme="github"
-            />
-        </BootstrapDialog>
+            <YamlEdit toggleOpen={toggleOpen}></YamlEdit>
+        </Dialog>
     );
 };
 
 const YamlButton = () => {
     const record = useRecordContext();
-    const resource = useResourceContext();
     const [open, setOpen] = useState(false);
 
     const handleClickOpen = () => {
@@ -114,12 +153,13 @@ const YamlButton = () => {
                 startIcon={<CodeIcon />}
                 label="YAML"
             />
-            {open && <YamlModal
-                recordId={record.id}
-                resource={resource}
-                open={open}
-                toggleOpen={setOpen}
-            />}
+            {open && (
+                <YamlModal
+                    recordId={record.id}
+                    open={open}
+                    toggleOpen={setOpen}
+                />
+            )}
         </>
     );
 };

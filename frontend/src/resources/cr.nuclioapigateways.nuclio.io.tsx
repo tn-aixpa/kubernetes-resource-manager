@@ -46,10 +46,7 @@ type Upstream = {
     id?: string;
 };
 
-const CrCreate = () => {
-    const { apiVersion, kind } = useCrTransform();
-    const translate = useTranslate();
-    const [upstreams, setUpstreams] = useState<Upstream[]>([]);
+const useGetExistingUpstreams = (setUpstreams: Function) => {
     const { data } = useGetList(CR_NUCLIO_APIGATEWAYS, {
         pagination: { page: 1, perPage: 1000 },
     });
@@ -69,13 +66,24 @@ const CrCreate = () => {
                         );
                     });
                     if (!hasSome) {
+                        upstream.id = value.id;
                         newUpstreams.push(upstream);
                     }
                 });
             });
             setUpstreams(newUpstreams);
         }
-    }, [data]);
+    }, [data, setUpstreams]);
+};
+
+/********************** CRUD components **********************/
+
+const CrCreate = () => {
+    const { apiVersion, kind } = useCrTransform();
+    const translate = useTranslate();
+
+    const [upstreams, setUpstreams] = useState<Upstream[]>([]);
+    useGetExistingUpstreams(setUpstreams);
 
     const transform = (data: any) => {
         if (data.spec.authenticationMode === 'none') {
@@ -271,33 +279,7 @@ const CrEdit = () => {
     const { record } = useEditController();
 
     const [upstreams, setUpstreams] = useState<Upstream[]>([]);
-    const { data } = useGetList(CR_NUCLIO_APIGATEWAYS, {
-        pagination: { page: 1, perPage: 1000 },
-    });
-
-    useEffect(() => {
-        if (data) {
-            let newUpstreams: Upstream[] = [];
-            data.forEach(value => {
-                value.spec.upstreams.forEach((upstream: Upstream) => {
-                    const hasSome = newUpstreams.some((u: Upstream) => {
-                        type ObjectKey = keyof Upstream;
-                        const nucliofunctionOrService = u.kind as ObjectKey;
-                        return (
-                            u.kind === upstream.kind &&
-                            u[nucliofunctionOrService]?.name ===
-                                upstream[nucliofunctionOrService]?.name
-                        );
-                    });
-                    if (!hasSome) {
-                        upstream.id = value.id;
-                        newUpstreams.push(upstream);
-                    }
-                });
-            });
-            setUpstreams(newUpstreams);
-        }
-    }, [data]);
+    useGetExistingUpstreams(setUpstreams);
 
     if (!record) return null;
 

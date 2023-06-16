@@ -85,16 +85,16 @@ const dataProvider = (
             if (params?.meta?.yaml) {
                 headers = new Headers({ Accept: 'application/x-yaml' });
             }
-            return httpClient(`${apiUrl}/${resource}/${params.id}`, {headers: headers}).then(
-                ({ json, body }) => {
-                    if (params?.meta?.yaml) {
-                        return {data: {id: 'yamltext', yaml: body}}
-                    }
-                    return {
-                        data: json,
-                    }
+            return httpClient(`${apiUrl}/${resource}/${params.id}`, {
+                headers: headers,
+            }).then(({ json, body }) => {
+                if (params?.meta?.yaml) {
+                    return { data: { id: 'yamltext', yaml: body } };
                 }
-            );
+                return {
+                    data: json,
+                };
+            });
         },
         getMany: (resource, params) => {
             let url = `${apiUrl}/${resource}`;
@@ -141,7 +141,20 @@ const dataProvider = (
                 };
             });
         },
-        update: (resource, params) => provider.update(resource, params),
+        update: (resource, params) => {
+            let headers = {};
+            if (params?.meta?.yaml) {
+                headers = new Headers({ 'Content-Type': 'application/x-yaml' });
+            }
+            return httpClient(`${apiUrl}/${resource}/${params.id}`, {
+                method: 'PUT',
+                headers: headers,
+                body:
+                    typeof params.data === 'string'
+                        ? params.data
+                        : JSON.stringify(params.data),
+            }).then(({ json }) => ({ data: json }));
+        },
         updateMany: (resource, params) => provider.updateMany(resource, params),
         create: (resource, params) => provider.create(resource, params),
         delete: (resource, params) => provider.delete(resource, params),

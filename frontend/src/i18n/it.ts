@@ -43,6 +43,7 @@ const messages = {
                 'metadata.name': 'Nome',
                 spec: 'Specifiche',
             },
+            serverError: 'Errore dal server'
         },
         'postgres.db.movetokube.com': {
             name: 'DB Postgres',
