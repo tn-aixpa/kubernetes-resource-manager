@@ -12,6 +12,7 @@ import {
     useEditController,
     EditBase,
     useNotify,
+    useTranslate,
 } from 'react-admin';
 import { Dialog, DialogTitle, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
@@ -52,6 +53,7 @@ const BootstrapDialogTitle = (props: DialogTitleProps) => {
 
 const YamlEdit = ({ toggleOpen }: { toggleOpen: Function }) => {
     const notify = useNotify();
+    const translate = useTranslate();
     const resource = useResourceContext();
     const record = useRecordContext();
     const editContext = useEditController();
@@ -77,6 +79,7 @@ const YamlEdit = ({ toggleOpen }: { toggleOpen: Function }) => {
                 onSuccess: () => {
                     refresh();
                     toggleOpen(false);
+                    notify(translate('ra.notification.updated', { smart_count: 1 }));
                 },
                 onError: (error, variables) => {
                     console.log('Error:', error);

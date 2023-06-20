@@ -22,6 +22,7 @@ import {
     useTranslate,
     BooleanInput,
     useGetList,
+    Loading,
 } from 'react-admin';
 import { ViewToolbar } from '../components/ViewToolbar';
 import {
@@ -46,34 +47,95 @@ type Upstream = {
     id?: string;
 };
 
-const useGetExistingUpstreams = (setUpstreams: Function) => {
-    const { data } = useGetList(CR_NUCLIO_APIGATEWAYS, {
-        pagination: { page: 1, perPage: 1000 },
-    });
-
-    useEffect(() => {
-        if (data) {
-            let newUpstreams: Upstream[] = [];
-            data.forEach(value => {
-                value.spec.upstreams.forEach((upstream: Upstream) => {
-                    const hasSome = newUpstreams.some((u: Upstream) => {
-                        type ObjectKey = keyof Upstream;
-                        const nucliofunctionOrService = u.kind as ObjectKey;
-                        return (
-                            u.kind === upstream.kind &&
-                            u[nucliofunctionOrService]?.name ===
-                                upstream[nucliofunctionOrService]?.name
-                        );
-                    });
-                    if (!hasSome) {
-                        upstream.id = value.id;
-                        newUpstreams.push(upstream);
-                    }
-                });
+const getExistingUpstreams = (data: any[] | undefined) => {
+    if (!data) {
+        return [];
+    }
+    let upstreams: Upstream[] = [];
+    data.forEach(value => {
+        value.spec.upstreams.forEach((upstream: Upstream) => {
+            const hasSome = upstreams.some((u: Upstream) => {
+                type ObjectKey = keyof Upstream;
+                const nucliofunctionOrService = u.kind as ObjectKey;
+                return (
+                    u.kind === upstream.kind &&
+                    u[nucliofunctionOrService]?.name ===
+                        upstream[nucliofunctionOrService]?.name
+                );
             });
-            setUpstreams(newUpstreams);
-        }
-    }, [data, setUpstreams]);
+            if (!hasSome) {
+                upstream.id = value.id;
+                upstreams.push(upstream);
+            }
+        });
+    });
+    return upstreams;
+};
+
+const Upstreams = () => {
+    return (
+        <FormDataConsumer>
+            {({ formData, ...rest }) => (
+                <ArrayInput
+                    source="spec.upstreams"
+                    validate={required()}
+                    label={false}
+                >
+                    <SimpleFormIterator
+                        inline
+                        disableAdd={
+                            formData.spec?.upstreams &&
+                            formData.spec.upstreams.length > 0
+                        }
+                    >
+                        <SelectInput
+                            source="kind"
+                            choices={[
+                                {
+                                    id: 'nucliofunction',
+                                    name: 'Nuclio function',
+                                },
+                                { id: 'service', name: 'Service' },
+                            ]}
+                            validate={required()}
+                        />
+                        <FormDataConsumer>
+                            {({
+                                formData,
+                                scopedFormData,
+                                getSource,
+                                ...rest
+                            }) => (
+                                <>
+                                    {scopedFormData.kind &&
+                                        scopedFormData.kind ===
+                                            'nucliofunction' &&
+                                        getSource && (
+                                            <TextInput
+                                                source={getSource(
+                                                    'nucliofunction.name'
+                                                )}
+                                                validate={required()}
+                                            />
+                                        )}
+                                    {scopedFormData.kind &&
+                                        scopedFormData.kind === 'service' &&
+                                        getSource && (
+                                            <TextInput
+                                                source={getSource(
+                                                    'service.name'
+                                                )}
+                                                validate={required()}
+                                            />
+                                        )}
+                                </>
+                            )}
+                        </FormDataConsumer>
+                    </SimpleFormIterator>
+                </ArrayInput>
+            )}
+        </FormDataConsumer>
+    );
 };
 
 /********************** CRUD components **********************/
@@ -83,7 +145,16 @@ const CrCreate = () => {
     const translate = useTranslate();
 
     const [upstreams, setUpstreams] = useState<Upstream[]>([]);
-    useGetExistingUpstreams(setUpstreams);
+    const { data } = useGetList(CR_NUCLIO_APIGATEWAYS, {
+        pagination: { page: 1, perPage: 1000 },
+    });
+
+    useEffect(() => {
+        const existingUpstreams = getExistingUpstreams(data);
+        if (existingUpstreams.length > 0) {
+            setUpstreams(existingUpstreams);
+        }
+    }, [data]);
 
     const transform = (data: any) => {
         if (data.spec.authenticationMode === 'none') {
@@ -155,68 +226,7 @@ const CrCreate = () => {
                             `resources.${CR_NUCLIO_APIGATEWAYS}.fields.spec.upstreams`
                         )}
                     </Typography>
-                    <FormDataConsumer>
-                        {({ formData, ...rest }) => (
-                            <ArrayInput
-                                source="spec.upstreams"
-                                validate={required()}
-                                label={false}
-                            >
-                                <SimpleFormIterator
-                                    inline
-                                    disableAdd={
-                                        formData.spec?.upstreams &&
-                                        formData.spec.upstreams.length > 0
-                                    }
-                                >
-                                    <SelectInput
-                                        source="kind"
-                                        choices={[
-                                            {
-                                                id: 'nucliofunction',
-                                                name: 'Nuclio function',
-                                            },
-                                            { id: 'service', name: 'Service' },
-                                        ]}
-                                        validate={required()}
-                                    />
-                                    <FormDataConsumer>
-                                        {({
-                                            formData,
-                                            scopedFormData,
-                                            getSource,
-                                            ...rest
-                                        }) => (
-                                            <>
-                                                {scopedFormData.kind &&
-                                                    scopedFormData.kind ===
-                                                        'nucliofunction' &&
-                                                    getSource && (
-                                                        <TextInput
-                                                            source={getSource(
-                                                                'nucliofunction.name'
-                                                            )}
-                                                            validate={required()}
-                                                        />
-                                                    )}
-                                                {scopedFormData.kind &&
-                                                    scopedFormData.kind ===
-                                                        'service' &&
-                                                    getSource && (
-                                                        <TextInput
-                                                            source={getSource(
-                                                                'service.name'
-                                                            )}
-                                                            validate={required()}
-                                                        />
-                                                    )}
-                                            </>
-                                        )}
-                                    </FormDataConsumer>
-                                </SimpleFormIterator>
-                            </ArrayInput>
-                        )}
-                    </FormDataConsumer>
+                    <Upstreams />
                     <Typography variant="h6" sx={{ paddingTop: '20px' }}>
                         {translate(
                             `resources.${CR_NUCLIO_APIGATEWAYS}.authenticationTitle`
@@ -279,7 +289,16 @@ const CrEdit = () => {
     const { record } = useEditController();
 
     const [upstreams, setUpstreams] = useState<Upstream[]>([]);
-    useGetExistingUpstreams(setUpstreams);
+    const { data } = useGetList(CR_NUCLIO_APIGATEWAYS, {
+        pagination: { page: 1, perPage: 1000 },
+    });
+
+    useEffect(() => {
+        const existingUpstreams = getExistingUpstreams(data);
+        if (existingUpstreams.length > 0) {
+            setUpstreams(existingUpstreams);
+        }
+    }, [data]);
 
     if (!record) return null;
 
@@ -340,15 +359,7 @@ const CrEdit = () => {
                             `resources.${CR_NUCLIO_APIGATEWAYS}.fields.spec.upstreams`
                         )}
                     </Typography>
-                    <ArrayInput source="spec.upstreams" label={false}>
-                        <SimpleFormIterator inline>
-                            <TextInput source="kind" validate={required()} />
-                            <TextInput
-                                source="nucliofunction.name"
-                                validate={required()}
-                            />
-                        </SimpleFormIterator>
-                    </ArrayInput>
+                    <Upstreams />
                     <Typography variant="h6" sx={{ paddingTop: '20px' }}>
                         {translate(
                             `resources.${CR_NUCLIO_APIGATEWAYS}.authenticationTitle`
