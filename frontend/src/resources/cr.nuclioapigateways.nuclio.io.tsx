@@ -37,6 +37,7 @@ import Breadcrumb from '../components/Breadcrumb';
 import { useCrTransform } from '../hooks/useCrTransform';
 import { Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
+import CableIcon from '@mui/icons-material/Cable';
 
 const CR_NUCLIO_APIGATEWAYS = 'nuclioapigateways.nuclio.io';
 
@@ -500,11 +501,12 @@ const CrShow = () => {
 
 const CustomView: View = {
     key: CR_NUCLIO_APIGATEWAYS,
-    name: 'Nuclio API Gateways',
+    name: 'API Gateways',
     list: CrList,
     show: CrShow,
     create: CrCreate,
     edit: CrEdit,
+    icon: CableIcon,
 };
 
 export default CustomView;

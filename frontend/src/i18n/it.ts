@@ -72,7 +72,7 @@ const messages = {
             },
         },
         'nuclioapigateways.nuclio.io': {
-            name: 'Nuclio API Gateway',
+            name: 'API Gateway',
             fields: {
                 id: 'ID',
                 spec: {
@@ -110,6 +110,9 @@ const messages = {
     dashboard: {
         title: 'Resource Manager',
         message: 'Benvenuto in Resource Manager.',
+        emptyTitle: 'Non ci sono ancora Custom Resource.',
+        emptySubtitle: 'Devi creare uno schema prima di creare delle Custom Resource.',
+        goToResource: 'Vai alla risorsa'
     },
     buttons: {
         copy: 'Copia',

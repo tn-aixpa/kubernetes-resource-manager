@@ -35,6 +35,7 @@ import { Typography } from '@mui/material';
 import { CR_POSTGRES_USERS } from './cr.postgresusers.db.movetokube.com';
 import Breadcrumb from '../components/Breadcrumb';
 import { useCrTransform } from '../hooks/useCrTransform';
+import DatasetIcon from '@mui/icons-material/Dataset';
 
 export const CR_POSTGRES_DB = 'postgres.db.movetokube.com';
 
@@ -240,6 +241,7 @@ const CustomView: View = {
     show: CrShow,
     create: CrCreate,
     edit: CrEdit,
+    icon: DatasetIcon,
 };
 
 export default CustomView;
