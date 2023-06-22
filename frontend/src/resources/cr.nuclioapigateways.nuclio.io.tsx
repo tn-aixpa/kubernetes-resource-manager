@@ -22,7 +22,6 @@ import {
     useTranslate,
     BooleanInput,
     useGetList,
-    Loading,
 } from 'react-admin';
 import { ViewToolbar } from '../components/ViewToolbar';
 import {
@@ -33,7 +32,7 @@ import {
 } from '../components/toolbars';
 import { SimplePageTitle } from './cr';
 import { View } from '.';
-import Breadcrumb from '../components/Breadcrumb';
+import { Breadcrumb } from '../components/Breadcrumb';
 import { useCrTransform } from '../hooks/useCrTransform';
 import { Typography } from '@mui/material';
 import { useEffect, useState } from 'react';

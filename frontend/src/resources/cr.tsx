@@ -32,7 +32,7 @@ import {
     ListTopToolbar,
     ShowTopToolbar,
 } from '../components/toolbars';
-import Breadcrumb from '../components/Breadcrumb';
+import { Breadcrumb } from '../components/Breadcrumb';
 import { useCrTransform } from '../hooks/useCrTransform';
 
 export const CrCreate = () => {

@@ -33,7 +33,7 @@ import {
 import { SimplePageTitle } from './cr';
 import { Typography } from '@mui/material';
 import { CR_POSTGRES_USERS } from './cr.postgresusers.db.movetokube.com';
-import Breadcrumb from '../components/Breadcrumb';
+import { Breadcrumb } from '../components/Breadcrumb';
 import { useCrTransform } from '../hooks/useCrTransform';
 import DatasetIcon from '@mui/icons-material/Dataset';
 
