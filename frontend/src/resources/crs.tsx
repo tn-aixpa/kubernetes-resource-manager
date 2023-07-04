@@ -42,7 +42,7 @@ import {
     ListTopToolbar,
     ShowTopToolbar,
 } from '../components/toolbars';
-import { Breadcrumb } from '../components/Breadcrumb';
+import { Breadcrumb } from '@smartcommunitylab/ra-breadcrumb';
 
 export const SchemaCreate = () => {
     const notify = useNotify();

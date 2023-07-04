@@ -33,9 +33,9 @@ import {
 import { SimplePageTitle } from './cr';
 import { Typography } from '@mui/material';
 import { CR_POSTGRES_USERS } from './cr.postgresusers.db.movetokube.com';
-import { Breadcrumb } from '../components/Breadcrumb';
 import { useCrTransform } from '../hooks/useCrTransform';
 import DatasetIcon from '@mui/icons-material/Dataset';
+import { Breadcrumb } from '@smartcommunitylab/ra-breadcrumb';
 
 export const CR_POSTGRES_DB = 'postgres.db.movetokube.com';
 

@@ -5,6 +5,7 @@
   "dependencies": {
     "@mui/material": "^5.12.3",
     "@smartcommunitylab/ra-ace-editor": "^1.0.0",
+    "@smartcommunitylab/ra-breadcrumb": "^1.0.0",
     "@smartcommunitylab/ra-language-italian": "^1.0.0",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^13.0.0",

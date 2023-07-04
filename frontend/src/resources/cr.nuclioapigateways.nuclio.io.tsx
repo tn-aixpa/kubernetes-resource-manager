@@ -32,11 +32,11 @@ import {
 } from '../components/toolbars';
 import { SimplePageTitle } from './cr';
 import { View } from '.';
-import { Breadcrumb } from '../components/Breadcrumb';
 import { useCrTransform } from '../hooks/useCrTransform';
 import { Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import CableIcon from '@mui/icons-material/Cable';
+import { Breadcrumb } from '@smartcommunitylab/ra-breadcrumb';
 
 const CR_NUCLIO_APIGATEWAYS = 'nuclioapigateways.nuclio.io';
 

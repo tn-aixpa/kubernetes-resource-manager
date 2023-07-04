@@ -32,8 +32,8 @@ import {
     ListTopToolbar,
     ShowTopToolbar,
 } from '../components/toolbars';
-import { Breadcrumb } from '../components/Breadcrumb';
 import { useCrTransform } from '../hooks/useCrTransform';
+import { Breadcrumb } from '@smartcommunitylab/ra-breadcrumb';
 
 export const CrCreate = () => {
     const { apiVersion, kind } = useCrTransform();
