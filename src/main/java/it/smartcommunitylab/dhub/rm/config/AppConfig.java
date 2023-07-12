@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
-import org.springframework.util.Assert;
 
 @Configuration
 @Import(JacksonAutoConfiguration.class)
@@ -22,8 +21,12 @@ public class AppConfig {
 
     @Bean
     public KubernetesClient kubernetesClient() throws IOException {
-        Assert.notNull(configPath, "Kubernetes config path must be provided");
-        return new KubernetesClientBuilder().withConfig(configPath.getInputStream()).build();
+        //support either auto-configuration or explicit config
+        if (configPath != null && configPath.exists()) {
+            return new KubernetesClientBuilder().withConfig(configPath.getInputStream()).build();
+        }
+
+        return new KubernetesClientBuilder().build();
     }
 
     @Bean
