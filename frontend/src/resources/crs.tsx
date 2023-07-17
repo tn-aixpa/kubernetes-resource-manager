@@ -35,14 +35,14 @@ import { ViewToolbar } from '../components/ViewToolbar';
 import {
     AceEditorField,
     AceEditorInput,
-} from '@smartcommunitylab/ra-ace-editor';
+} from '@dslab/ra-ace-editor';
 import {
     CreateTopToolbar,
     EditTopToolbar,
     ListTopToolbar,
     ShowTopToolbar,
 } from '../components/toolbars';
-import { Breadcrumb } from '@smartcommunitylab/ra-breadcrumb';
+import { Breadcrumb } from '@dslab/ra-breadcrumb';
 
 export const SchemaCreate = () => {
     const notify = useNotify();

@@ -1,4 +1,4 @@
-import italianMessages from '@smartcommunitylab/ra-language-italian';
+import italianMessages from '@dslab/ra-language-italian';
 
 const messages = {
     ...italianMessages,

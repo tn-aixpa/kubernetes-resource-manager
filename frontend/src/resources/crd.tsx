@@ -15,9 +15,9 @@ import {
 } from 'react-admin';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Breadcrumbs, Typography } from '@mui/material';
-import { AceEditorField } from '@smartcommunitylab/ra-ace-editor';
+import { AceEditorField } from '@dslab/ra-ace-editor';
 import { useLocation, Link } from 'react-router-dom';
-import { Breadcrumb } from '@smartcommunitylab/ra-breadcrumb';
+import { Breadcrumb } from '@dslab/ra-breadcrumb';
 
 export const CrdList = () => (
     <>

@@ -36,7 +36,7 @@ import { useCrTransform } from '../hooks/useCrTransform';
 import { Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import CableIcon from '@mui/icons-material/Cable';
-import { Breadcrumb } from '@smartcommunitylab/ra-breadcrumb';
+import { Breadcrumb } from '@dslab/ra-breadcrumb';
 
 const CR_NUCLIO_APIGATEWAYS = 'nuclioapigateways.nuclio.io';
 

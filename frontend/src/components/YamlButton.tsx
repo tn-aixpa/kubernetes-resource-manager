@@ -18,7 +18,7 @@ import { Dialog, DialogTitle, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import CodeIcon from '@mui/icons-material/Code';
 import { useState } from 'react';
-import { AceEditorInput } from '@smartcommunitylab/ra-ace-editor';
+import { AceEditorInput } from '@dslab/ra-ace-editor';
 import { ViewToolbar } from './ViewToolbar';
 
 interface DialogTitleProps {

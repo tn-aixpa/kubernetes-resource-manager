@@ -25,7 +25,7 @@ import { ViewToolbar } from '../components/ViewToolbar';
 import {
     AceEditorField,
     AceEditorInput,
-} from '@smartcommunitylab/ra-ace-editor';
+} from '@dslab/ra-ace-editor';
 import {
     CreateTopToolbar,
     EditTopToolbar,
@@ -33,7 +33,7 @@ import {
     ShowTopToolbar,
 } from '../components/toolbars';
 import { useCrTransform } from '../hooks/useCrTransform';
-import { Breadcrumb } from '@smartcommunitylab/ra-breadcrumb';
+import { Breadcrumb } from '@dslab/ra-breadcrumb';
 
 export const CrCreate = () => {
     const { apiVersion, kind } = useCrTransform();
