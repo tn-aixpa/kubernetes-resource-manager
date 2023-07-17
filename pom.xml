@@ -159,7 +159,7 @@
 						<goals>
 							<goal>yarn</goal>
 						</goals>
-						<phase>package</phase>
+						<phase>prepare-package</phase>
 						<configuration>
 							<arguments>build</arguments>
 							<workingDirectory>${project.basedir}/frontend</workingDirectory>
@@ -176,7 +176,7 @@
 						<goals>
 							<goal>copy-resources</goal>
 						</goals>
-						<phase>process-classes</phase>
+						<phase>prepare-package</phase>
 						<configuration>
 							<outputDirectory>${project.build.outputDirectory}/frontend</outputDirectory>
 							<resources>
