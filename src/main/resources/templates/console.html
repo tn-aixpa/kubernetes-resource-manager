@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head th:replace="~{index.html :: head}">
+    <title>App</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <script th:inline="javascript">
+      //inject config into global from spring env
+      var config  = [[${config}]];
+      for (c in config) {
+        console.log(c, config[c]);
+        globalThis[c] = config[c];
+      }
+    </script>
+  </body>
+</html>

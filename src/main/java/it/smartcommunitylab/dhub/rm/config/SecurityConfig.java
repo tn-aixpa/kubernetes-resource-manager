@@ -56,10 +56,28 @@ public class SecurityConfig {
     private String corsOrigins;
 
     @Autowired
-    AuthenticationProperties authProps;
+    AuthenticationProperties authenticationProperties;
+
+    @Bean("consoleSecurityFilterChain")
+    public SecurityFilterChain consoleFilterChain(HttpSecurity http) throws Exception {
+        //base config
+        http
+            .securityMatcher(new AntPathRequestMatcher(SystemKeys.CONSOLE_PATH + "/**"))
+            // disable csrf
+            .csrf(csrf -> csrf.disable())
+            // we don't want a session for these endpoints
+            .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+        if (StringUtils.hasText(corsOrigins)) {
+            logger.info("CORS origins configured, enabled.");
+            http.cors(cors -> cors.configurationSource(corsConfigurationSource(corsOrigins)));
+        }
+
+        return http.build();
+    }
 
     @Bean("apiSecurityFilterChain")
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
         //base config
         http
             .securityMatcher(new AntPathRequestMatcher(SystemKeys.API_PATH + "/**"))
@@ -75,17 +93,17 @@ public class SecurityConfig {
         }
 
         //authentication (when configured)
-        if (authProps.isRequired()) {
+        if (authenticationProperties.isRequired()) {
             logger.debug("Authentication required, enabled.");
             http.authorizeHttpRequests(requests -> requests.anyRequest().authenticated());
 
-            if (authProps.isBasicAuthEnabled()) {
+            if (authenticationProperties.isBasicAuthEnabled()) {
                 logger.info("Enable basic authentication");
-                http.httpBasic(withDefaults());
+                http.httpBasic(withDefaults()).userDetailsService(userDetailsService());
             }
 
-            if (authProps.isOAuthEnabled()) {
-                logger.info("Enable JWT authentication");
+            if (authenticationProperties.isOAuth2Enabled()) {
+                logger.info("Enable OAuth2 JWT authentication");
                 http.oauth2ResourceServer(oauth2 ->
                     oauth2.jwt().decoder(jwtDecoder()).jwtAuthenticationConverter(jwtAuthenticationConverter())
                 );
@@ -98,13 +116,12 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        if (authProps.isBasicAuthEnabled()) {
+    private UserDetailsService userDetailsService() {
+        if (authenticationProperties.isBasicAuthEnabled()) {
             UserDetails user = User
                 .withDefaultPasswordEncoder()
-                .username(authProps.getBasicUsername())
-                .password(authProps.getBasicPassword())
+                .username(authenticationProperties.getBasic().getUsername())
+                .password(authenticationProperties.getBasic().getPassword())
                 .roles("USER", "ADMIN")
                 .build();
             return new InMemoryUserDetailsManager(user);
@@ -114,13 +131,17 @@ public class SecurityConfig {
     }
 
     private JwtDecoder jwtDecoder() {
-        NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder) JwtDecoders.fromIssuerLocation(authProps.getOauth2IssuerUri());
+        NimbusJwtDecoder jwtDecoder = (NimbusJwtDecoder) JwtDecoders.fromIssuerLocation(
+            authenticationProperties.getOauth2().getIssuerUri()
+        );
 
         Predicate<List<String>> testClaimValue = claimValue ->
-            (claimValue != null) && claimValue.contains(authProps.getOauth2Audience());
+            (claimValue != null) && claimValue.contains(authenticationProperties.getOauth2().getAudience());
         OAuth2TokenValidator<Jwt> audienceValidator = new JwtClaimValidator<>(JwtClaimNames.AUD, testClaimValue);
 
-        OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(authProps.getOauth2IssuerUri());
+        OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(
+            authenticationProperties.getOauth2().getIssuerUri()
+        );
         OAuth2TokenValidator<Jwt> withAudience = new DelegatingOAuth2TokenValidator<>(withIssuer, audienceValidator);
 
         jwtDecoder.setJwtValidator(withAudience);

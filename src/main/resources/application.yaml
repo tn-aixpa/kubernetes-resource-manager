@@ -10,7 +10,19 @@ spring:
     hibernate.ddl-auto: update
 
 # server
-server.port: ${HTTP_PORT:8080}
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: ${SERVER_CONTEXT:/}
+  tomcat:
+    remoteip:
+      remote_ip_header: ${SERVER_TOMCAT_REMOTE_IP_HEADER:x-forwarded-for}
+      protocol_header: ${SERVER_TOMCAT_PROTOCOL_HEADER:x-forwarded-proto}
+  error:
+    include-stacktrace: ON_PARAM
+
+# application
+application.url: ${APPLICATION_URL:}
 
 #kubernetes
 kubernetes:
@@ -22,9 +34,25 @@ kubernetes:
 
 # authentication and authorization config
 auth:
-  basic-username:
-  basic-password:
-  oauth2-issuer-uri:
-  oauth2-audience:
+  basic:
+    username:
+    password:
+  oauth2:
+    issuer-uri:
+    audience:
 
 security.cors.origins:
+
+management:
+  server:
+    port: ${MANAGEMENT_PORT:8081}
+  endpoints:
+    enabled-by-default: false
+    web:
+      base-path:
+      exposure.include: "health,info"
+  endpoint:
+    info:
+      enabled: true
+    health:
+      enabled: true

@@ -1,59 +1,106 @@
 package it.smartcommunitylab.dhub.rm.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 
-@Component
-@ConfigurationProperties(prefix = "auth")
+@Configuration
+@ConfigurationProperties(prefix = "auth", ignoreUnknownFields = true)
 public class AuthenticationProperties {
 
-    String basicUsername;
-    String basicPassword;
-    String oauth2IssuerUri;
-    String oauth2Audience;
+    @NestedConfigurationProperty
+    private BasicAuthenticationProperties basic;
 
-    public String getBasicUsername() {
-        return basicUsername;
+    @NestedConfigurationProperty
+    private OAuth2AuthenticationProperties oauth2;
+
+    public BasicAuthenticationProperties getBasic() {
+        return basic;
     }
 
-    public void setBasicUsername(String basicUsername) {
-        this.basicUsername = basicUsername;
+    public void setBasic(BasicAuthenticationProperties basic) {
+        this.basic = basic;
     }
 
-    public String getBasicPassword() {
-        return basicPassword;
+    public OAuth2AuthenticationProperties getOauth2() {
+        return oauth2;
     }
 
-    public void setBasicPassword(String basicPassword) {
-        this.basicPassword = basicPassword;
-    }
-
-    public String getOauth2IssuerUri() {
-        return oauth2IssuerUri;
-    }
-
-    public void setOauth2IssuerUri(String oauth2IssuerUri) {
-        this.oauth2IssuerUri = oauth2IssuerUri;
-    }
-
-    public String getOauth2Audience() {
-        return oauth2Audience;
-    }
-
-    public void setOauth2Audience(String oauth2Audience) {
-        this.oauth2Audience = oauth2Audience;
+    public void setOauth2(OAuth2AuthenticationProperties oauth2) {
+        this.oauth2 = oauth2;
     }
 
     public boolean isBasicAuthEnabled() {
-        return StringUtils.hasText(basicUsername) && StringUtils.hasText(basicPassword);
+        return basic != null && basic.isEnabled();
     }
 
-    public boolean isOAuthEnabled() {
-        return StringUtils.hasText(oauth2IssuerUri) && StringUtils.hasText(oauth2Audience);
+    public boolean isOAuth2Enabled() {
+        return oauth2 != null && oauth2.isEnabled();
     }
 
     public boolean isRequired() {
-        return isBasicAuthEnabled() || isOAuthEnabled();
+        return isBasicAuthEnabled() || isOAuth2Enabled();
+    }
+
+    public static class BasicAuthenticationProperties {
+
+        private String username;
+        private String password;
+
+        public String getUsername() {
+            return username;
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+        public boolean isEnabled() {
+            return StringUtils.hasText(username) && StringUtils.hasText(password);
+        }
+    }
+
+    public static class OAuth2AuthenticationProperties {
+
+        private String issuerUri;
+        private String audience;
+        private String[] scopes;
+
+        public String getIssuerUri() {
+            return issuerUri;
+        }
+
+        public void setIssuerUri(String issuerUri) {
+            this.issuerUri = issuerUri;
+        }
+
+        public String getAudience() {
+            return audience;
+        }
+
+        public void setAudience(String audience) {
+            this.audience = audience;
+        }
+
+        public boolean isEnabled() {
+            return StringUtils.hasText(issuerUri) && StringUtils.hasText(audience);
+        }
+
+        public String[] getScopes() {
+            return scopes;
+        }
+
+        public void setScopes(String[] scopes) {
+            this.scopes = scopes;
+        }
     }
 }

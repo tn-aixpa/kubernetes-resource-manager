@@ -37,12 +37,32 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // user console
         registry
-            .addResourceHandler("/**")
+            .addResourceHandler("/public/**")
             .addResourceLocations("classpath:/frontend/")
             .setCachePeriod(60 * 60 * 24 * 365)/* one year */
             .resourceChain(true)
             .addResolver(new EncodedResourceResolver())
             .addResolver(new PathResourceResolver());
+        // registry
+        //     .addResourceHandler("/console/**")
+        //     .addResourceLocations("classpath:/frontend/", "file:frontend/build/")
+        //     .setCachePeriod(60 * 60 * 24 * 365)/* one year */
+        //     .resourceChain(true)
+        //     .addResolver(
+        //         new PathResourceResolver() {
+        //             @Override
+        //             protected Resource getResource(String resourcePath, Resource location) throws IOException {
+        //                 //lookup for a static file matching the path
+        //                 Resource requestedResource = location.createRelative(resourcePath);
+        //                 if (requestedResource.exists() && requestedResource.isReadable()) {
+        //                     return requestedResource;
+        //                 }
+
+        //                 // return the index, the path is a logical route
+        //                 return new ClassPathResource("/frontend/index.html");
+        //             }
+        //         }
+        //     );
     }
 
     @Override
@@ -50,9 +70,7 @@ public class WebConfig implements WebMvcConfigurer {
         // configure a sane path mapping by disabling content negotiation via extensions
         // the default breaks every single mapping which receives a path ending with
         // '.x', like 'user.roles.me'
-        configurer// disable path extension, as of 5.3 is false by default
-        //                .favorPathExtension(false)
-        .favorParameter(false);
+        configurer.favorParameter(false); //                .favorPathExtension(false) // disable path extension, as of 5.3 is false by default
 
         // add mediatypes
         configurer
@@ -75,7 +93,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
         MappingJackson2HttpMessageConverter yamlConverter = new MappingJackson2HttpMessageConverter(yamlObjectMapper);
-        yamlConverter.setSupportedMediaTypes(Arrays.asList(SystemKeys.MEDIA_TYPE_YML, SystemKeys.MEDIA_TYPE_YAML, SystemKeys.MEDIA_TYPE_X_YAML));
+        yamlConverter.setSupportedMediaTypes(
+            Arrays.asList(SystemKeys.MEDIA_TYPE_YML, SystemKeys.MEDIA_TYPE_YAML, SystemKeys.MEDIA_TYPE_X_YAML)
+        );
         converters.add(yamlConverter);
     }
 }

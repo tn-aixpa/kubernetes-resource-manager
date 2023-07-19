@@ -40,37 +40,59 @@ const customViews: { [index: string]: View } = {
 };
 
 export const AUTH_TYPE_BASIC = 'basic';
-export const AUTH_TYPE_OAUTH = 'oauth';
+export const AUTH_TYPE_OAUTH = 'oauth2';
 
-const API_URL: string = process.env.REACT_APP_API_URL as string;
+//read config from ENV
+const CONTEXT_PATH =
+    (globalThis as any).REACT_APP_CONTEXT_PATH ||
+    (process.env.REACT_APP_CONTEXT_PATH as string);
+const API_URL: string =
+    (globalThis as any).REACT_APP_API_URL ||
+    (process.env.REACT_APP_API_URL as string);
+const AUTH_CALLBACK_PATH: string = process.env
+    .REACT_APP_AUTH_CALLBACK_PATH as string;
 
-const authType = process.env.REACT_APP_AUTH;
+const APPLICATION_URL: string =
+    (globalThis as any).REACT_APP_APPLICATION_URL ||
+    (process.env.REACT_APP_APPLICATION_URL as string);
+const AUTH_TYPE =
+    (globalThis as any).REACT_APP_AUTH ||
+    (process.env.REACT_APP_AUTH as string);
+
+//build full config
+const OAUTH2_REDIRECT_URL = APPLICATION_URL + AUTH_CALLBACK_PATH;
+const OAUTH2_AUTHORITY =
+    (globalThis as any).REACT_APP_AUTHORITY || process.env.REACT_APP_AUTHORITY;
+const OAUTH2_CLIENT_ID =
+    (globalThis as any).REACT_APP_CLIENT_ID || process.env.REACT_APP_CLIENT_ID;
+const OAUTH2_SCOPE =
+    (globalThis as any).REACT_APP_SCOPE || process.env.REACT_APP_SCOPE;
 
 const manager = new UserManager({
-    authority: process.env.REACT_APP_AUTHORITY || '',
-    client_id: process.env.REACT_APP_CLIENT_ID || '',
-    redirect_uri:
-        process.env.REACT_APP_REDIRECT_URI ||
-        `${window.location.origin}/auth-callback`,
-    scope: process.env.REACT_APP_SCOPE,
+    authority: OAUTH2_AUTHORITY || '',
+    client_id: OAUTH2_CLIENT_ID || '',
+    redirect_uri: OAUTH2_REDIRECT_URL,
+    scope: OAUTH2_SCOPE,
     userStore: new WebStorageStateStore({ store: localStorage }),
     loadUserInfo: true,
 });
 
 const httpClient = async (url: string, options: Options = {}) => {
     if (!options.headers) {
-        options.headers = new Headers({ Accept: 'application/json' }) as Headers;
+        options.headers = new Headers({
+            Accept: 'application/json',
+        }) as Headers;
     } else {
         options.headers = new Headers(options.headers) as Headers;
     }
 
-    if (authType === AUTH_TYPE_OAUTH) {
+    if (AUTH_TYPE === AUTH_TYPE_OAUTH) {
         const user = await manager.getUser();
         if (!user) {
             return Promise.reject('OAuth: No user found in store');
         }
         options.headers.set('Authorization', 'Bearer ' + user.access_token);
-    } else if (authType === AUTH_TYPE_BASIC) {
+    } else if (AUTH_TYPE === AUTH_TYPE_BASIC) {
         const basicAuth = sessionStorage.getItem('basic-auth');
         if (!basicAuth) {
             return Promise.reject('Basic: No user found in store');
@@ -88,15 +110,15 @@ const httpClient = async (url: string, options: Options = {}) => {
 const dataProvider = appDataProvider(API_URL, manager, httpClient);
 
 const getAuthProvider = () => {
-    if (authType === AUTH_TYPE_OAUTH) {
+    if (AUTH_TYPE === AUTH_TYPE_OAUTH) {
         return authProviderOAuth(manager);
-    } else if (authType === AUTH_TYPE_BASIC) {
+    } else if (AUTH_TYPE === AUTH_TYPE_BASIC) {
         return authProviderBasic();
     }
 };
 
 const isAuthEnabled = () => {
-    if (authType === AUTH_TYPE_OAUTH || authType === AUTH_TYPE_BASIC) {
+    if (AUTH_TYPE === AUTH_TYPE_OAUTH || AUTH_TYPE === AUTH_TYPE_BASIC) {
         return true;
     }
 
@@ -119,7 +141,7 @@ export const themeOptions = {
 
 function App() {
     return (
-        <BrowserRouter>
+        <BrowserRouter basename={CONTEXT_PATH}>
             <AdminContext
                 dataProvider={dataProvider}
                 authProvider={getAuthProvider()}
