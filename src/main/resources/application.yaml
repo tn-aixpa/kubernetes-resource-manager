@@ -26,11 +26,11 @@ application.url: ${APPLICATION_URL:}
 
 #kubernetes
 kubernetes:
-  namespace: default
+  namespace: ${K8S_CONFIG:default}
   config: ${K8S_CONFIG:}
   crd:
-    allowed: >
-    denied: >
+    allowed: ${K8S_CRD_ALLOWED:}
+    denied:  ${K8S_CRD_DENIED:}
 
 # authentication and authorization config
 auth:
