@@ -1,6 +1,6 @@
 import polyglotI18nProvider from 'ra-i18n-polyglot';
-import en from './i18n/en';
-import it from './i18n/it';
+import en from '../i18n/en';
+import it from '../i18n/it';
 
 const translations = { en, it };
 

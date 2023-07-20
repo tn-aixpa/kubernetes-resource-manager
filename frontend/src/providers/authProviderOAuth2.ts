@@ -1,8 +1,30 @@
-import { UserManager } from 'oidc-client-ts';
-import { AuthProvider } from 'react-admin';
+import { UserManager, WebStorageStateStore } from 'oidc-client-ts';
+import { AuthProvider } from './authProvider';
 
-const authProviderOAuth = (userManager: UserManager): AuthProvider => {
+export const OAuth2AuthProvider = (
+    authority: string,
+    clientId: string,
+    redirectUri: string,
+    scope: string = 'openid'
+): AuthProvider => {
+    const userManager = new UserManager({
+        authority: authority,
+        client_id: clientId,
+        redirect_uri: redirectUri,
+        scope: scope,
+        userStore: new WebStorageStateStore({ store: window.localStorage }),
+        loadUserInfo: true,
+    });
+
     return {
+        getAuthorization: async () => {
+            const user = await userManager.getUser();
+            if (user) {
+                return Promise.resolve('Bearer ' + user.access_token);
+            }
+
+            return Promise.reject();
+        },
         login: () => {
             return userManager.signinRedirect();
         },
@@ -52,4 +74,4 @@ const authProviderOAuth = (userManager: UserManager): AuthProvider => {
     };
 };
 
-export default authProviderOAuth;
+export default OAuth2AuthProvider;

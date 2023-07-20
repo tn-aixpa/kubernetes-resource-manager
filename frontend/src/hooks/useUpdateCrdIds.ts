@@ -1,27 +1,46 @@
 import { useCallback, useEffect } from 'react';
-import { useDataProvider, useStore } from 'react-admin';
+import { useAuthProvider, useDataProvider, useStore } from 'react-admin';
 
 export const useUpdateCrdIds = () => {
     const dataProvider = useDataProvider();
+    const authProvider = useAuthProvider();
     const [crdIds, setCrdIds] = useStore<string[]>('crdIds', []);
 
     const updateCrdIds = useCallback(() => {
+        console.log('updateCrdIds called');
+        if (authProvider) {
+            authProvider.checkAuth({}).catch(() => {
+                console.log('unauthorized, return');
+                return;
+            });
+        }
+
+        console.log('call dataProvider..');
         dataProvider
-        .fetchResources()
-        .then((res: any) => {
-            setCrdIds(res);
-        })
-        .catch((error: any) => {
-            console.log('Error updating CRD IDs:', error);
-        });
-    }, [dataProvider, setCrdIds])
+            .fetchResources()
+            .then((res: string[]) => {
+                if (Array.isArray(res)) {
+                    setCrdIds(res);
+                }
+            })
+            .catch((error: any) => {
+                console.log('Error updating CRD IDs:', error);
+            });
+    }, [dataProvider, authProvider, setCrdIds]);
 
     useEffect(() => {
-        updateCrdIds();
-    }, [dataProvider, setCrdIds, updateCrdIds]);
+        if (authProvider) {
+            authProvider.checkAuth({}).catch(() => {
+                console.log('unauthorized, return');
+                return;
+            });
+        }
 
-    return {crdIds, updateCrdIds};
-}
+        updateCrdIds();
+    }, [dataProvider, authProvider, setCrdIds, updateCrdIds]);
+
+    return { crdIds, updateCrdIds };
+};
 
 /*
 import { createContext, useCallback, useContext, useEffect } from 'react';

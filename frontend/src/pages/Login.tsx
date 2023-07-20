@@ -21,9 +21,11 @@ import {
 } from 'react-admin';
 
 import Box from '@mui/material/Box';
-import { AUTH_TYPE_BASIC } from '../App';
+import { AUTH_TYPE_BASIC } from '../providers/authProvider';
 
-const authType = process.env.REACT_APP_AUTH;
+const AUTH_TYPE =
+    (globalThis as any).REACT_APP_AUTH ||
+    (process.env.REACT_APP_AUTH as string);
 
 const Login = () => {
     const [loading, setLoading] = useState(false);
@@ -91,7 +93,7 @@ const Login = () => {
                     >
                         {translate('login.basicMessage')}
                     </Box>
-                    {authType === AUTH_TYPE_BASIC && (
+                    {AUTH_TYPE === AUTH_TYPE_BASIC && (
                         <Box sx={{ padding: '0 1em 0em 1em' }}>
                             <Box sx={{ marginTop: '1em' }}>
                                 <TextInput

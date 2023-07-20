@@ -1,5 +1,5 @@
 import './App.css';
-import appDataProvider from './dataProvider';
+import appDataProvider from './providers/dataProvider';
 import { BrowserRouter } from 'react-router-dom';
 import {
     AdminContext,
@@ -17,21 +17,34 @@ import {
     SchemaCreate,
     SchemaShow,
 } from './resources/crs';
-import authProviderOAuth from './authProviderOAuth';
-import authProviderBasic from './authProviderBasic';
+
 import Login from './pages/Login';
-import { UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import { useUpdateCrdIds } from './hooks/useUpdateCrdIds';
-import { i18nProvider } from './i18nProvider';
+import { i18nProvider } from './providers/i18nProvider';
 import SettingsIcon from '@mui/icons-material/Settings';
 import MyLayout from './Layout';
 import MyDashboard from './pages/Dashboard';
 import { CrdShow } from './resources/crd';
 import { useContext, useState } from 'react';
 import { View, ViewsContext, fetchViews } from './resources';
+
+//import config
+import { Config } from './providers/configProvider';
+import { buildAuthProvider } from './providers/authProvider';
 import crPostgres from './resources/cr.postgres.db.movetokube.com';
 import crPostgresUsers from './resources/cr.postgresusers.db.movetokube.com';
 import crNuclioApiGateways from './resources/cr.nuclioapigateways.nuclio.io';
+import { httpClientProvider } from './providers/httpClientProvider';
+
+console.log('Config', Config);
+
+//build providers
+const authProvider = buildAuthProvider(Config);
+
+//build http client for provider
+const httpClient = httpClientProvider(authProvider);
+const dataProvider = appDataProvider(Config.application.apiUrl, httpClient);
+const store = localStorageStore();
 
 const customViews: { [index: string]: View } = {
     'postgres.db.movetokube.com': crPostgres,
@@ -39,94 +52,7 @@ const customViews: { [index: string]: View } = {
     'nuclioapigateways.nuclio.io': crNuclioApiGateways,
 };
 
-export const AUTH_TYPE_BASIC = 'basic';
-export const AUTH_TYPE_OAUTH = 'oauth2';
-
-//read config from ENV
-const CONTEXT_PATH =
-    (globalThis as any).REACT_APP_CONTEXT_PATH ||
-    (process.env.REACT_APP_CONTEXT_PATH as string);
-const API_URL: string =
-    (globalThis as any).REACT_APP_API_URL ||
-    (process.env.REACT_APP_API_URL as string);
-const AUTH_CALLBACK_PATH: string = process.env
-    .REACT_APP_AUTH_CALLBACK_PATH as string;
-
-const APPLICATION_URL: string =
-    (globalThis as any).REACT_APP_APPLICATION_URL ||
-    (process.env.REACT_APP_APPLICATION_URL as string);
-const AUTH_TYPE =
-    (globalThis as any).REACT_APP_AUTH ||
-    (process.env.REACT_APP_AUTH as string);
-
-//build full config
-const OAUTH2_REDIRECT_URL = APPLICATION_URL + AUTH_CALLBACK_PATH;
-const OAUTH2_AUTHORITY =
-    (globalThis as any).REACT_APP_AUTHORITY || process.env.REACT_APP_AUTHORITY;
-const OAUTH2_CLIENT_ID =
-    (globalThis as any).REACT_APP_CLIENT_ID || process.env.REACT_APP_CLIENT_ID;
-const OAUTH2_SCOPE =
-    (globalThis as any).REACT_APP_SCOPE || process.env.REACT_APP_SCOPE;
-
-const manager = new UserManager({
-    authority: OAUTH2_AUTHORITY || '',
-    client_id: OAUTH2_CLIENT_ID || '',
-    redirect_uri: OAUTH2_REDIRECT_URL,
-    scope: OAUTH2_SCOPE,
-    userStore: new WebStorageStateStore({ store: localStorage }),
-    loadUserInfo: true,
-});
-
-const httpClient = async (url: string, options: Options = {}) => {
-    if (!options.headers) {
-        options.headers = new Headers({
-            Accept: 'application/json',
-        }) as Headers;
-    } else {
-        options.headers = new Headers(options.headers) as Headers;
-    }
-
-    if (AUTH_TYPE === AUTH_TYPE_OAUTH) {
-        const user = await manager.getUser();
-        if (!user) {
-            return Promise.reject('OAuth: No user found in store');
-        }
-        options.headers.set('Authorization', 'Bearer ' + user.access_token);
-    } else if (AUTH_TYPE === AUTH_TYPE_BASIC) {
-        const basicAuth = sessionStorage.getItem('basic-auth');
-        if (!basicAuth) {
-            return Promise.reject('Basic: No user found in store');
-        }
-        options.headers.set('Authorization', 'Basic ' + basicAuth);
-    }
-
-    if (!options.headers.has('Accept')) {
-        options.headers.set('Accept', 'application/json');
-    }
-
-    return fetchUtils.fetchJson(url, options);
-};
-
-const dataProvider = appDataProvider(API_URL, manager, httpClient);
-
-const getAuthProvider = () => {
-    if (AUTH_TYPE === AUTH_TYPE_OAUTH) {
-        return authProviderOAuth(manager);
-    } else if (AUTH_TYPE === AUTH_TYPE_BASIC) {
-        return authProviderBasic();
-    }
-};
-
-const isAuthEnabled = () => {
-    if (AUTH_TYPE === AUTH_TYPE_OAUTH || AUTH_TYPE === AUTH_TYPE_BASIC) {
-        return true;
-    }
-
-    return false;
-};
-
-const store = localStorageStore();
-
+//theming
 export const themeOptions = {
     ...defaultTheme,
     palette: {
@@ -141,10 +67,10 @@ export const themeOptions = {
 
 function App() {
     return (
-        <BrowserRouter basename={CONTEXT_PATH}>
+        <BrowserRouter basename={Config.application.contextPath}>
             <AdminContext
                 dataProvider={dataProvider}
-                authProvider={getAuthProvider()}
+                authProvider={authProvider}
                 i18nProvider={i18nProvider}
                 store={store}
                 theme={themeOptions}
@@ -160,6 +86,7 @@ function DynamicAdminUI() {
     const { crdIds } = useUpdateCrdIds();
 
     const viewsContext = useContext(ViewsContext);
+
     for (const crdId of crdIds) {
         try {
             if (
@@ -186,7 +113,7 @@ function DynamicAdminUI() {
             dashboard={MyDashboard}
             loginPage={Login}
             layout={MyLayout}
-            requireAuth={isAuthEnabled()}
+            requireAuth={true}
         >
             {views.map((v: any) => (
                 <Resource

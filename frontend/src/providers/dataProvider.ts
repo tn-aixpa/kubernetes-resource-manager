@@ -1,13 +1,9 @@
-import { UserManager } from 'oidc-client-ts';
 import { stringify } from 'querystring';
 import { fetchUtils, DataProvider } from 'ra-core';
 import jsonServerProvider from 'ra-data-json-server';
-import { Options } from 'react-admin';
-import { AUTH_TYPE_BASIC, AUTH_TYPE_OAUTH } from './App';
 
-const dataProvider = (
+export const dataProvider = (
     baseUrl: string,
-    userManager: UserManager,
     httpClient: (
         url: any,
         options?: fetchUtils.Options | undefined
@@ -18,24 +14,11 @@ const dataProvider = (
         json: any;
     }>
 ): DataProvider => {
-    const authType = process.env.REACT_APP_AUTH;
-
     const apiUrl = baseUrl + '/api';
     const provider = jsonServerProvider(apiUrl, httpClient);
 
     return {
         fetchResources: async (): Promise<string[]> => {
-            if (authType === AUTH_TYPE_OAUTH) {
-                const user = await userManager.getUser();
-                if (!user) {
-                    return [];
-                }
-            } else if (authType === AUTH_TYPE_BASIC) {
-                if (!sessionStorage.getItem('basic-auth')) {
-                    return [];
-                }
-            }
-
             return httpClient(`${apiUrl}/crs?size=1000`).then(
                 ({ headers, json }) => {
                     if (!json.content) {
