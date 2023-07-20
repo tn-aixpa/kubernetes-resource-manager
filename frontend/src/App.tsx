@@ -5,10 +5,8 @@ import {
     AdminContext,
     AdminUI,
     Loading,
-    Options,
     Resource,
     defaultTheme,
-    fetchUtils,
     localStorageStore,
 } from 'react-admin';
 import {

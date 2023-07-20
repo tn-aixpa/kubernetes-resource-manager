@@ -53,7 +53,7 @@ export const OAuth2AuthProvider = (
             const user = await userManager.getUser();
 
             return Promise.resolve({
-                id: user?.profile.sub || '',
+                id: user?.profile.sub ?? '',
                 fullName: user?.profile.preferred_username,
             });
         },
@@ -62,14 +62,9 @@ export const OAuth2AuthProvider = (
             return Promise.resolve();
         },
         handleCallback: async () => {
-            try {
-                // get an access token based on the query paramaters
-                const user = await userManager.signinRedirectCallback();
-                userManager.storeUser(user);
-                return;
-            } catch (error) {
-                throw error;
-            }
+            // get an access token based on the query paramaters
+            const user = await userManager.signinRedirectCallback();
+            userManager.storeUser(user);
         },
     };
 };

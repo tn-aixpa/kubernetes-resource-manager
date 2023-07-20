@@ -14,11 +14,9 @@ export const httpClientProvider = (
 }>) => {
     return async (url: string, options: fetchUtils.Options = {}) => {
         if (!options.headers) {
-            options.headers = new Headers({
-                Accept: 'application/json',
-            }) as Headers;
+            options.headers = new Headers({ Accept: 'application/json' });
         } else {
-            options.headers = new Headers(options.headers) as Headers;
+            options.headers = new Headers(options.headers);
         }
 
         const authHeader = await authProvider.getAuthorization();

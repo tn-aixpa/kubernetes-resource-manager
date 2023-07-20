@@ -45,7 +45,7 @@ const Login = () => {
                 if (typeof error === 'string') {
                     message = error;
                     messageArg = error;
-                } else if (error && error.message) {
+                } else if (error && 'message' in error) {
                     message = error.message;
                     messageArg = error.message;
                 }
