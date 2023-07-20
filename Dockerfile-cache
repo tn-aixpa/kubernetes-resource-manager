@@ -1,0 +1,17 @@
+FROM maven:3-eclipse-temurin-17 as mvn
+ARG GITHUB_TOKEN
+ENV TOKEN=$GITHUB_TOKEN
+COPY src/ /tmp/src
+COPY pom.xml /tmp/pom.xml
+COPY frontend/ /tmp/frontend
+RUN cat /tmp/frontend/.npmrc
+WORKDIR /tmp/
+RUN mvn package -DskipTests
+
+FROM scratch
+COPY --from=mvn /tmp/frontend/node_modules /node_modules
+COPY --from=mvn /tmp/frontend/yarn.lock /yarn.lock
+COPY --from=mvn /root/.m2 /.m2
+
+
+
