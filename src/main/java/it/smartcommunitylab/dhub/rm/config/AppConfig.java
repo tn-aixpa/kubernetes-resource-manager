@@ -1,6 +1,7 @@
 package it.smartcommunitylab.dhub.rm.config;
 
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import java.io.IOException;
@@ -19,6 +20,15 @@ public class AppConfig {
     @Value("${kubernetes.config}")
     private Resource configPath;
 
+    @Value("${kubernetes.config}")
+    private String kubeConfig;
+
+    @Value("${kubernetes.namespace}")
+    private String namespace;
+
+    @Value("${security.cors.origins}")
+    private String corsOrigins;
+
     @Bean
     public KubernetesClient kubernetesClient() throws IOException {
         //support either auto-configuration or explicit config
@@ -26,7 +36,10 @@ public class AppConfig {
             return new KubernetesClientBuilder().withConfig(configPath.getInputStream()).build();
         }
 
-        return new KubernetesClientBuilder().build();
+        ConfigBuilder config = new ConfigBuilder();
+        config.withNamespace(namespace);
+
+        return new KubernetesClientBuilder().withConfig(config.build()).build();
     }
 
     @Bean
