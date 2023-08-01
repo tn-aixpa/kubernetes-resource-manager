@@ -1,6 +1,7 @@
 package it.smartcommunitylab.dhub.rm.config;
 
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
@@ -36,10 +37,9 @@ public class AppConfig {
             return new KubernetesClientBuilder().withConfig(configPath.getInputStream()).build();
         }
 
-        ConfigBuilder config = new ConfigBuilder();
-        config.withNamespace(namespace);
+        Config config = new ConfigBuilder().withNamespace(namespace).build();
 
-        return new KubernetesClientBuilder().withConfig(config.build()).build();
+        return new KubernetesClientBuilder().withConfig(config).build();
     }
 
     @Bean
