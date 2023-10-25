@@ -20,6 +20,7 @@ import {
     Loading,
     useTranslate,
     Button,
+    SortPayload,
 } from 'react-admin';
 import { View } from './index';
 import { formatArray, parseArray } from '../utils';
@@ -177,7 +178,7 @@ const PostgresUsers = () => {
     const translate = useTranslate();
     const { record } = useShowController();
 
-    const sort = { field: 'id', order: 'ASC' };
+    const sort : SortPayload = { field: 'id', order: 'ASC' };
     const { data, total, isLoading } = useGetList(CR_POSTGRES_USERS, {
         pagination: { page: 1, perPage: 1000 },
         sort: sort,
