@@ -11,6 +11,7 @@ import io.fabric8.kubernetes.api.model.GenericKubernetesResourceList;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.NamespaceableResource;
 import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
+import io.fabric8.kubernetes.model.Scope;
 import it.smartcommunitylab.dhub.rm.SystemKeys;
 import it.smartcommunitylab.dhub.rm.exception.ValidationException;
 import it.smartcommunitylab.dhub.rm.model.CustomResourceSchema;
@@ -76,6 +77,7 @@ public class CustomResourceService {
         String group = crdMeta[1];
 
         return new CustomResourceDefinitionContext.Builder()
+            .withScope(Scope.NAMESPACED.value())
             .withGroup(group)
             .withName(crdId)
             .withPlural(plural)
