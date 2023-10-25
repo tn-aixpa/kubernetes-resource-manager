@@ -107,7 +107,7 @@ const Upstreams = () => {
                                 ...rest
                             }) => (
                                 <>
-                                    {scopedFormData.kind &&
+                                    {scopedFormData?.kind &&
                                         scopedFormData.kind ===
                                             'nucliofunction' &&
                                         getSource && (
@@ -118,7 +118,7 @@ const Upstreams = () => {
                                                 validate={required()}
                                             />
                                         )}
-                                    {scopedFormData.kind &&
+                                    {scopedFormData?.kind &&
                                         scopedFormData.kind === 'service' &&
                                         getSource && (
                                             <TextInput
