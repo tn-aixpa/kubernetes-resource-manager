@@ -85,23 +85,27 @@ function DynamicAdminUI() {
 
     const viewsContext = useContext(ViewsContext);
 
-    for (const crdId of crdIds) {
-        try {
-            if (
-                crdId in customViews &&
-                !viewsContext.list().some(v => v.key === crdId)
-            ) {
-                viewsContext.put(customViews[crdId]);
+    if (crdIds.length === 0 && views.length > 0) {
+        setViews([]);
+    } else {
+        for (const crdId of crdIds) {
+            try {
+                if (
+                    crdId in customViews &&
+                    !viewsContext.list().some(v => v.key === crdId)
+                ) {
+                    viewsContext.put(customViews[crdId]);
+                }
+            } catch (error) {
+                console.log('No custom view for', crdId);
             }
-        } catch (error) {
-            console.log('No custom view for', crdId);
-        }
 
-        if (
-            views.length !== crdIds.length ||
-            !views.every((s: View) => crdIds.includes(s.key))
-        ) {
-            setViews(fetchViews(crdIds));
+            if (
+                views.length !== crdIds.length ||
+                !views.every((s: View) => crdIds.includes(s.key))
+            ) {
+                setViews(fetchViews(crdIds));
+            }
         }
     }
 
