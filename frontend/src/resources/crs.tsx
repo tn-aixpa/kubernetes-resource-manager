@@ -79,6 +79,7 @@ export const SchemaCreate = () => {
                         source="crdId"
                         reference="crd"
                         filter={{ onlyWithoutSchema: true }}
+                        perPage={1000}
                     >
                         <AutocompleteInput
                             validate={required()}

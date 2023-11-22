@@ -69,7 +69,10 @@ public class CustomResourceDefinitionService {
         if (crd == null) {
             throw new NoSuchElementException(SystemKeys.ERROR_NO_CRD);
         }
+        return fetchStoredVersionName(crd);
+    }
 
+    public String fetchStoredVersionName(CustomResourceDefinition crd) {
         Optional<CustomResourceDefinitionVersion> storedVersion = crd
             .getSpec()
             .getVersions()
@@ -80,12 +83,9 @@ public class CustomResourceDefinitionService {
         if (!storedVersion.isPresent()) {
             throw new NoSuchElementException(SystemKeys.ERROR_NO_STORED_VERSION);
         }
-
         return storedVersion.get().getName();
     }
-
-    public Map<String, Serializable> getCrdSchema(String crdId, String versionName) {
-        CustomResourceDefinitionVersion version = fetchVersion(crdId, versionName);
+    private Map<String, Serializable> getCrdSchemaFromVersion(CustomResourceDefinitionVersion version) {
         Map<String, Serializable> map = null;
 
         //convert stored CRD schema to map
@@ -108,6 +108,27 @@ public class CustomResourceDefinitionService {
         }
         return map;
     }
+
+    public Map<String, Serializable> getCrdSchema(String crdId, String versionName) {
+        CustomResourceDefinitionVersion version = fetchVersion(crdId, versionName);
+        return getCrdSchemaFromVersion(version);
+    }
+
+
+
+    public Map<String, Serializable> getCrdSchema(CustomResourceDefinition crd) {
+        Optional<CustomResourceDefinitionVersion> storedVersion = crd
+            .getSpec()
+            .getVersions()
+            .stream()
+            .filter(version -> version.getStorage())
+            .findAny();
+
+        if (!storedVersion.isPresent()) {
+            throw new NoSuchElementException(SystemKeys.ERROR_NO_STORED_VERSION);
+        }
+        return getCrdSchemaFromVersion(storedVersion.get());
+    }    
 
     public boolean crdExists(String crdId, String version) {
         CustomResourceDefinition crd = client.apiextensions().v1().customResourceDefinitions().withName(crdId).get();

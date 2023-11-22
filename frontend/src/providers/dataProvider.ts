@@ -19,7 +19,7 @@ export const dataProvider = (
 
     return {
         fetchResources: async (): Promise<string[]> => {
-            return httpClient(`${apiUrl}/crs?size=1000`).then(
+            return httpClient(`${apiUrl}/crs?all=true&size=1000`).then(
                 ({ headers, json }) => {
                     if (!json.content) {
                         throw new Error('the response must match page<> model');

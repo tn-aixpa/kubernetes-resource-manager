@@ -20,9 +20,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -35,7 +36,7 @@ import org.springframework.util.Assert;
 @Service
 public class CustomResourceService {
 
-    Logger logger = LoggerFactory.getLogger(CustomResourceService.class);
+    public static final Logger logger = LoggerFactory.getLogger(CustomResourceService.class);
 
     private final KubernetesClient client;
     private final CustomResourceDefinitionService crdService;
@@ -56,12 +57,7 @@ public class CustomResourceService {
     }
 
     private CustomResourceSchema checkSchema(String crdId, String version) {
-        Optional<CustomResourceSchema> schema = schemaService.fetchByCrdIdAndVersion(crdId, version);
-
-        if (!schema.isPresent()) {
-            throw new NoSuchElementException(SystemKeys.ERROR_NO_SCHEMA_WITH_VERSION);
-        }
-        return schema.get();
+        return schemaService.findCRDByCrdIdAndVersion(crdId, version);
     }
 
     /**
@@ -126,9 +122,13 @@ public class CustomResourceService {
 
         List<IdAwareCustomResource> crs;
         if (ids == null) {
-            GenericKubernetesResourceList list = client.genericKubernetesResources(context).inNamespace(namespace).list();
+            List<GenericKubernetesResource> list = Collections.emptyList();
+            try {
+                list = client.genericKubernetesResources(context).inNamespace(namespace).list().getItems();
+            } catch (Exception e) {
+                logger.warn("No CRD {} resources in namespace {}", crdId, namespace);
+            }
             crs = list
-                .getItems()
                 .stream()
                 .map(IdAwareCustomResource::new)
                 .collect(Collectors.toList());

@@ -36,10 +36,11 @@ public class CustomResourceSchemaApi {
     @GetMapping
     public Page<CustomResourceSchemaDTO> findAll(
         @RequestParam(required = false) Collection<String> id,
+        @RequestParam(required = false) Boolean all,
         Pageable pageable
     ) {
         //TODO aggiungere parametri di ricerca per keyword
-        return service.findAll(id, pageable);
+        return service.findAll(id, Boolean.TRUE.equals(all), pageable);
     }
 
     @GetMapping("/{id}")
