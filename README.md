@@ -60,3 +60,10 @@ registry=https://registry.yarnpkg.com/ # for yarn
 ```
 
 A browser page pointing to `localhost:3000` should automatically open. If you didn't change credentials, log in with `user` and `password`.
+
+### Creating a schema from the UI
+
+Go to *Settings* and pick a *CRD*. You can leave the *Schema* field empty and click *Save*, and the schema enabled in Kubernetes will be automatically picked up. However, you need to go edit the generated schema to add the following property at root level, otherwise you will be unable to manage the corresponding CRs:
+```
+"$schema":"https://json-schema.org/draft/2020-12/schema"
+```
