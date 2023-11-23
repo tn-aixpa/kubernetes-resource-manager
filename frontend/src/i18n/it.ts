@@ -45,6 +45,22 @@ const messages = {
             },
             serverError: 'Errore dal server'
         },
+        k8s_service: {
+            name: 'Servizio |||| Servizi',
+            fields: {
+                metadata: {
+                    creationTimestamp: 'Creazione',
+                    generation: 'Generazione',
+                    name: 'Nome',
+                    resourceVersion: 'Versione risorsa',
+                    uid: 'UID',
+                },
+                spec: {
+                    'ports[0].port': 'Porta',
+                    'ports[0].name': 'Nome porta' 
+                }
+            },
+        },
         'postgres.db.movetokube.com': {
             name: 'DB Postgres',
             fields: {

@@ -3,6 +3,7 @@ package it.smartcommunitylab.dhub.rm.service;
 import java.util.List;
 import java.util.Collection;
 import java.util.stream.Collectors;
+import java.util.NoSuchElementException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -12,7 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
+import it.smartcommunitylab.dhub.rm.SystemKeys;
 import it.smartcommunitylab.dhub.rm.model.IdAwareService;
+import jakarta.validation.constraints.Pattern;
 
 @Service
 public class K8SServiceService {
@@ -46,6 +49,15 @@ public class K8SServiceService {
         int toIndex = Math.min(offset + pageSize, items.size());
 
         return new PageImpl<>(items.subList(offset, toIndex), pageable, items.size());
+    }
+
+    public IdAwareService findById(String namespace, @Pattern(regexp = "[a-z0-9-]+") String serviceId) {
+        io.fabric8.kubernetes.api.model.Service service = client.services().inNamespace(namespace).withLabelSelector(authService.getServiceSelector()).list().getItems().stream().filter(s -> s.getMetadata().getName().equals(serviceId)).findAny().orElse(null);
+        if (service == null) {
+            throw new NoSuchElementException(SystemKeys.ERROR_NO_SERVICE);
+        }
+        return new IdAwareService(service);
+
     }
 
 }

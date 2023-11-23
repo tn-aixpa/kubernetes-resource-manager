@@ -16,10 +16,16 @@ import {
     SchemaShow,
 } from './resources/crs';
 
+import {
+    K8SServiceList,
+    K8SServiceShow,
+} from './resources/k8s_service';
+
 import Login from './pages/Login';
 import { useUpdateCrdIds } from './hooks/useUpdateCrdIds';
 import { i18nProvider } from './providers/i18nProvider';
 import SettingsIcon from '@mui/icons-material/Settings';
+import LinkIcon from '@mui/icons-material/Link';
 import MyLayout from './Layout';
 import MyDashboard from './pages/Dashboard';
 import { CrdShow } from './resources/crd';
@@ -138,6 +144,12 @@ function DynamicAdminUI() {
                 icon={SettingsIcon}
             />
             <Resource name="crd" show={CrdShow} recordRepresentation="id" />
+            <Resource
+                name="k8s_service"
+                list={K8SServiceList}
+                show={K8SServiceShow}
+                icon={LinkIcon}
+            />
         </AdminUI>
     );
 }

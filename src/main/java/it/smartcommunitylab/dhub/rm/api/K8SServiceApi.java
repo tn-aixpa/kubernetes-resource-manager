@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import it.smartcommunitylab.dhub.rm.SystemKeys;
 import it.smartcommunitylab.dhub.rm.model.IdAwareService;
 import it.smartcommunitylab.dhub.rm.service.K8SServiceService;
+import jakarta.validation.constraints.Pattern;
 
 @RestController
 @PreAuthorize("hasAuthority('ROLE_USER')")
@@ -38,5 +39,10 @@ public class K8SServiceApi {
         Pageable pageable
     ) {
         return service.findAll(namespace, id, pageable);
+    }
+
+    @GetMapping("/{serviceId}")
+    public IdAwareService findById(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String serviceId) {
+        return service.findById(namespace, serviceId);
     }
 }

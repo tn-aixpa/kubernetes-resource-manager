@@ -1,4 +1,3 @@
-import { View } from '../resources';
 import crPostgres from '../resources/cr.postgres.db.movetokube.com';
 import crPostgresUsers from '../resources/cr.postgresusers.db.movetokube.com';
 import crNuclioApiGateways from '../resources/cr.nuclioapigateways.nuclio.io';
