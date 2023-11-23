@@ -208,7 +208,13 @@ export const SchemaShow = () => {
                     />
 
                     <TextField source="version" />
-                    <AceEditorField mode="json" source="schema" />
+                    <AceEditorField mode="json" 
+                    source="schema" 
+                    record={{
+                        schema: JSON.stringify(
+                            record.schema
+                        ),
+                    }}/>
                 </SimpleShowLayout>
             </Show>
         </>
