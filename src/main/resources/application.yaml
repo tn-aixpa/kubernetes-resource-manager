@@ -31,7 +31,11 @@ kubernetes:
   crd:
     allowed: ${K8S_CRD_ALLOWED:}
     denied:  ${K8S_CRD_DENIED:}
-
+  selector:
+    service: ${K8S_SELECTOR_SERVICE:}
+    deployment: ${K8S_SELECTOR_DEPLOYMENT:}
+    volume: ${K8S_SELECTOR_VOLUME:}
+    job: ${K8S_SELECTOR_JOB:}
 # authentication and authorization config
 auth:
   basic:
@@ -41,7 +45,7 @@ auth:
     issuer-uri:
     audience:
 
-security.cors.origins:
+security.cors.origins: ${SECURITY_CORS_ORIGINS:http://localhost:3000}
 
 management:
   server:
