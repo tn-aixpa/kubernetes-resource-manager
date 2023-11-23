@@ -19,12 +19,10 @@ import {
     useShowController,
     useEditController,
 } from 'react-admin';
-import { parseJson, formatJson } from '../utils';
 import { Typography } from '@mui/material';
 import { ViewToolbar } from '../components/ViewToolbar';
 import {
     AceEditorField,
-    AceEditorInput,
 } from '@dslab/ra-ace-editor';
 import {
     CreateTopToolbar,
@@ -34,9 +32,12 @@ import {
 } from '../components/toolbars';
 import { useCrTransform } from '../hooks/useCrTransform';
 import { Breadcrumb } from '@dslab/ra-breadcrumb';
+import { JsonSchemaInput } from '@dslab/ra-jsonschema-input';
+import { useGetCrdJsonSchema } from '../hooks/useGetCrdJsonSchema';
 
 export const CrCreate = () => {
     const { apiVersion, kind } = useCrTransform();
+    const { jsonSchema } = useGetCrdJsonSchema();
     const translate = useTranslate();
 
     const transform = (data: any) => {
@@ -74,14 +75,12 @@ export const CrCreate = () => {
                         label={'resources.cr.fields.metadata.name'}
                     />
 
-                    <AceEditorInput
-                        mode="json"
-                        source="spec"
-                        theme="monokai"
-                        format={formatJson}
-                        parse={parseJson}
-                        label={'resources.cr.fields.spec'}
-                    />
+                    {jsonSchema ? (
+                        <JsonSchemaInput
+                            source="spec"
+                            schema={jsonSchema}
+                        />
+                    ) : null}
                 </SimpleForm>
             </Create>
         </>
@@ -89,6 +88,7 @@ export const CrCreate = () => {
 };
 
 export const CrEdit = () => {
+    const { jsonSchema } = useGetCrdJsonSchema();
     const { record } = useEditController();
     if (!record) return null;
 
@@ -98,14 +98,13 @@ export const CrEdit = () => {
             <PageTitle pageType="edit" crId={record.id} />
             <Edit actions={<EditTopToolbar hasYaml />}>
                 <SimpleForm toolbar={<ViewToolbar />}>
-                    <AceEditorInput
-                        mode="json"
-                        source="spec"
-                        theme="monokai"
-                        format={formatJson}
-                        parse={parseJson}
-                        label={'resources.cr.fields.spec'}
-                    />
+                    {jsonSchema ? (
+                        <JsonSchemaInput
+                            source="spec"
+                            schema={jsonSchema}
+                        />
+                    ) : null}
+                    
                 </SimpleForm>
             </Edit>
         </>
