@@ -26,7 +26,7 @@ auth:
 
 security.cors.origins: http://localhost:3000
 ```
-`kubernetes.crd.allowed` and `kubernetes.crd.denied` are meant to be mutually exclusive: you either specify one or the other (or leave both empty). Defining `allowed` will let the resource manager handle only the CRDs listed in it, while `denied` will allow all CRDs not listed in it. Leaving both empty lets the resource manager handle all CRDs. `kubernetes.selector.service` defines the label selector for filtering the K8S services to read.
+`kubernetes.crd.allowed` and `kubernetes.crd.denied` are meant to be mutually exclusive: you either specify one or the other (or leave both empty). Defining `allowed` will let the resource manager handle only the CRDs listed in it, while `denied` will allow all CRDs not listed in it. Leaving both empty lets the resource manager handle all CRDs. `kubernetes.selector.service` defines the label selectors (separated by `|`) for filtering the K8S services to read.
 
 Start the server:
 ```

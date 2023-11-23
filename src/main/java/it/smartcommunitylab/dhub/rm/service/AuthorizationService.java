@@ -16,6 +16,12 @@ public class AuthorizationService {
     @Value("${kubernetes.selector.service}")
     private String serviceSelector;
 
+    @Value("${kubernetes.namespace}")
+    private String namespace;
+
+    public String getNamespace() {
+        return namespace;
+    }
 
     public boolean isCrdAllowed(String crdId) {
         return allowedCrds.contains(crdId) || (allowedCrds.isEmpty() && !deniedCrds.contains(crdId));
