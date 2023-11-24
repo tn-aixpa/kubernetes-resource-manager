@@ -13,37 +13,37 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.fabric8.kubernetes.api.model.Service;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import it.smartcommunitylab.dhub.rm.SystemKeys;
 import it.smartcommunitylab.dhub.rm.model.IdAwareResource;
-import it.smartcommunitylab.dhub.rm.service.K8SSvcService;
+import it.smartcommunitylab.dhub.rm.service.K8SDeploymentService;
 import jakarta.validation.constraints.Pattern;
 
 @RestController
 @PreAuthorize("hasAuthority('ROLE_USER')")
 @SecurityRequirement(name = "basicAuth")
 @SecurityRequirement(name = "jwtAuth")
-@RequestMapping(SystemKeys.API_PATH + "/k8s_service")
+@RequestMapping(SystemKeys.API_PATH + "/k8s_deployment")
 @Validated
-public class K8SServiceApi {
+public class K8SDeploymentApi {
 
     @Autowired
-    private K8SSvcService service;
+    private K8SDeploymentService service;
     
     @Value("${kubernetes.namespace}")
     private String namespace;
 
     @GetMapping
-    public Page<IdAwareResource<Service>> findAll(
+    public Page<IdAwareResource<Deployment>> findAll(
         @RequestParam(required = false) Collection<String> id,
         Pageable pageable
     ) {
         return service.findAll(namespace, id, pageable);
     }
 
-    @GetMapping("/{serviceId}")
-    public IdAwareResource<Service> findById(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String serviceId) {
-        return service.findById(namespace, serviceId);
+    @GetMapping("/{deploymentId}")
+    public IdAwareResource<Deployment> findById(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String deploymentId) {
+        return service.findById(namespace, deploymentId);
     }
 }

@@ -79,7 +79,7 @@ const MyDashboard = () => {
                                 )}
                             </Grid>
                             <Grid item xs={11}>
-                                {resource.options.label}
+                                {resource.options ? resource.options.label : ''}
                             </Grid>
                             <NumberOfResources resource={resource.name} />
                             <Grid item xs={12}>

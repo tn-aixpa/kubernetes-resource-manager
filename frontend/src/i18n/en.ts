@@ -57,7 +57,21 @@ const messages = {
                 spec: {
                     'ports[0].port': 'Port',
                     'ports[0].name': 'Port name' 
-                }
+                },
+                type: 'Type'
+            },
+        },
+        k8s_deployment: {
+            name: 'Deployment |||| Deployments',
+            fields: {
+                metadata: {
+                    creationTimestamp: 'Created',
+                    generation: 'Generation',
+                    name: 'Name',
+                    resourceVersion: 'Resource version',
+                    uid: 'UID',
+                },
+                status: 'Ready'
             },
         },
         'postgres.db.movetokube.com': {
@@ -134,6 +148,10 @@ const messages = {
         listCrs: 'List custom resources',
         createUser: 'Add user',
     },
+    label: {
+        name: 'Label Name',
+        value: 'Label Value'
+    }
 };
 
 export default messages;

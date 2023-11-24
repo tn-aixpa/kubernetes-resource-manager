@@ -26,6 +26,7 @@ import { useUpdateCrdIds } from './hooks/useUpdateCrdIds';
 import { i18nProvider } from './providers/i18nProvider';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LinkIcon from '@mui/icons-material/Link';
+import AppIcon from '@mui/icons-material/Apps';
 import MyLayout from './Layout';
 import MyDashboard from './pages/Dashboard';
 import { CrdShow } from './resources/crd';
@@ -39,6 +40,7 @@ import crPostgres from './resources/cr.postgres.db.movetokube.com';
 import crPostgresUsers from './resources/cr.postgresusers.db.movetokube.com';
 import crNuclioApiGateways from './resources/cr.nuclioapigateways.nuclio.io';
 import { httpClientProvider } from './providers/httpClientProvider';
+import { K8SDeploymentList, K8SDeploymentShow } from './resources/k8s_deployment';
 
 console.log('Config', Config);
 
@@ -149,6 +151,12 @@ function DynamicAdminUI() {
                 list={K8SServiceList}
                 show={K8SServiceShow}
                 icon={LinkIcon}
+            />
+            <Resource
+                name="k8s_deployment"
+                list={K8SDeploymentList}
+                show={K8SDeploymentShow}
+                icon={AppIcon}
             />
         </AdminUI>
     );

@@ -15,6 +15,10 @@ public class AuthorizationService {
 
     @Value("${kubernetes.selector.service}")
     private String serviceSelector;
+    @Value("${kubernetes.selector.deployment}")
+    private String deploymentSelector;
+    @Value("${kubernetes.selector.job}")
+    private String jobSelector;
 
     @Value("${kubernetes.namespace}")
     private String namespace;
@@ -29,5 +33,13 @@ public class AuthorizationService {
 
     public String getServiceSelector() {
         return serviceSelector;
+    }
+
+    public String getDeploymentSelector() {
+        return deploymentSelector;
+    }
+
+    public String getJobSelector() {
+        return jobSelector;
     }
 }
