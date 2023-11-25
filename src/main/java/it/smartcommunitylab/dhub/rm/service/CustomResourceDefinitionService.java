@@ -38,6 +38,9 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.ConcurrentHashMap;
+/**
+ * Service for K8S CRD objects
+ */
 @Service
 public class CustomResourceDefinitionService {
 

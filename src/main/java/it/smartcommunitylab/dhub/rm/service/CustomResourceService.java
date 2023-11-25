@@ -33,6 +33,9 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+/**
+ * K8S Custom Resource service. CRUD operations over CRs.
+ */
 @Service
 public class CustomResourceService {
 
@@ -110,6 +113,14 @@ public class CustomResourceService {
         return jsonSchema.validate(crAdditionalProps);
     }
 
+    /**
+     * Find all CRs in namespace (paginated), possibly filtered by list of specified Ids
+     * @param crdId
+     * @param namespace
+     * @param ids
+     * @param pageable
+     * @return
+     */
     public Page<IdAwareCustomResource> findAll(String crdId, String namespace, Collection<String> ids, Pageable pageable) {
         if (!authService.isCrdAllowed(crdId)) {
             throw new AccessDeniedException(SystemKeys.ERROR_CRD_NOT_ALLOWED);
@@ -153,6 +164,13 @@ public class CustomResourceService {
         return new PageImpl<>(crs.subList(offset, toIndex), pageable, crs.size());
     }
 
+    /**
+     * Find a single CR given CRD, namespace and ID of the CR
+     * @param crdId
+     * @param id
+     * @param namespace
+     * @return
+     */
     public IdAwareCustomResource findById(String crdId, String id, String namespace) {
         if (!authService.isCrdAllowed(crdId)) {
             throw new AccessDeniedException(SystemKeys.ERROR_CRD_NOT_ALLOWED);
@@ -170,6 +188,13 @@ public class CustomResourceService {
         return new IdAwareCustomResource(cr.get());
     }
 
+    /**
+     * Create new CR for the specified CRD and namespace
+     * @param crdId
+     * @param request
+     * @param namespace
+     * @return
+     */
     public IdAwareCustomResource add(String crdId, IdAwareCustomResource request, String namespace) {
         if (!authService.isCrdAllowed(crdId)) {
             throw new AccessDeniedException(SystemKeys.ERROR_CRD_NOT_ALLOWED);
@@ -193,6 +218,14 @@ public class CustomResourceService {
         return new IdAwareCustomResource(client.resource(request.getCr()).inNamespace(namespace).create());
     }
 
+    /**
+     * Update existing CR with the specified ID of the specified CRD and namespace.
+     * @param crdId
+     * @param id
+     * @param request
+     * @param namespace
+     * @return
+     */
     public IdAwareCustomResource update(String crdId, String id, IdAwareCustomResource request, String namespace) {
         if (!authService.isCrdAllowed(crdId)) {
             throw new AccessDeniedException(SystemKeys.ERROR_CRD_NOT_ALLOWED);
@@ -228,6 +261,12 @@ public class CustomResourceService {
         );
     }
 
+    /**
+     * Update existing CR with the specified ID of the specified CRD and namespace.
+     * @param crdId
+     * @param id
+     * @param namespace
+     */
     public void delete(String crdId, String id, String namespace) {
         if (!authService.isCrdAllowed(crdId)) {
             throw new AccessDeniedException(SystemKeys.ERROR_CRD_NOT_ALLOWED);

@@ -26,6 +26,7 @@ import jakarta.validation.constraints.Pattern;
 
 /**
  * Base class for service facade for the K8S resources.
+ * Defines resource cache grouping resources to namespaces.
  */
 public abstract class K8SResourceService<T extends HasMetadata> {
     
@@ -46,6 +47,7 @@ public abstract class K8SResourceService<T extends HasMetadata> {
         this.client = client;
         this.authService = authService;
 
+        // loading cache to group resources for the namespace
         resourceCache = CacheBuilder.newBuilder()
         .expireAfterWrite(cacheExpirationSec, TimeUnit.SECONDS)
         .build(
@@ -69,20 +71,33 @@ public abstract class K8SResourceService<T extends HasMetadata> {
     }
 
     /**
-     * Retrieve the list of K8S resource corresponding to the namespace.
+     * Retrieve from K8S API the list of K8S resource corresponding to the namespace.
      * @param namespace
      * @return
      */
     protected abstract List<T> getItems(String namespace);
 
+    /**
+     * Reference to auth service
+     * @return
+     */
     protected AuthorizationService getAuthService() {
         return authService;
     }
 
+    /**
+     * Reference to K8S Client
+     * @return
+     */
     protected KubernetesClient getKubernetesClient() {
         return client;
     }
     
+    /**
+     * Get all namespace resources
+     * @param namespace
+     * @return
+     */
     protected List<IdAwareResource<T>> readResources(String namespace) {
         try {
             return new java.util.LinkedList<>(resourceCache.get(namespace).values());
@@ -91,6 +106,12 @@ public abstract class K8SResourceService<T extends HasMetadata> {
         }
     }
 
+    /**
+     * Get a single resource by name
+     * @param name
+     * @param namespace
+     * @return
+     */
     protected IdAwareResource<T> readResource(String name, String namespace) {
         try {
             return resourceCache.get(namespace).get(name);
@@ -99,6 +120,13 @@ public abstract class K8SResourceService<T extends HasMetadata> {
         }
     }
 
+    /**
+     * Find all namespace resources paginated and optionally filtered by list of IDs.
+     * @param namespace
+     * @param ids
+     * @param pageable
+     * @return
+     */
     public Page< IdAwareResource<T>> findAll(String namespace, Collection<String> ids, Pageable pageable) {
         List< IdAwareResource<T>> items = readResources(namespace); 
 
@@ -115,12 +143,18 @@ public abstract class K8SResourceService<T extends HasMetadata> {
         return new PageImpl<>(items.subList(offset, toIndex), pageable, items.size());
     }
 
-    public  IdAwareResource<T> findById(String namespace, @Pattern(regexp = "[a-z0-9-]+") String serviceId) {
-         IdAwareResource<T> service = readResource(serviceId, namespace);
-        if (service == null) {
-            throw new NoSuchElementException(SystemKeys.ERROR_NO_SERVICE);
+    /**
+     * Find a single resource provided namespace and resource Id
+     * @param namespace
+     * @param resourceId
+     * @return
+     */
+    public  IdAwareResource<T> findById(String namespace, @Pattern(regexp = "[a-z0-9-]+") String resourceId) {
+         IdAwareResource<T> resource = readResource(resourceId, namespace);
+        if (resource == null) {
+            throw new NoSuchElementException(SystemKeys.ERROR_NO_RESOURCE);
         }
-        return service;
+        return resource;
 
     }
 

@@ -38,6 +38,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinition;
 
+/**
+ * Service for managing the custom schemas for CRDs
+ */
 @Service
 public class CustomResourceSchemaService {
 
@@ -61,6 +64,9 @@ public class CustomResourceSchemaService {
         this.authService = authService;
     }
 
+    /**
+     * Load and stores pre-defined schemas from json files.
+     */
     @PostConstruct
     public void bootstrapSchemas() {
         Page<IdAwareCustomResourceDefinition> crds = crdService.findAll(null, true, PageRequest.ofSize(1000));
@@ -70,12 +76,14 @@ public class CustomResourceSchemaService {
                 CustomResourceSchemaDTO req = new CustomResourceSchemaDTO();
                 req.setCrdId(crd.getId());
                 req.setVersion(crdService.fetchStoredVersionName(crd.getCrd()));
-                try {
-                    req.setSchemaAsString(new BufferedReader(new InputStreamReader(resource)).lines().collect(Collectors.joining("\n")));
-                } catch (JsonProcessingException e) {
-                    logger.error("Error loading schema from file", e);
+                if (fetchByCrdIdAndVersion(req.getCrdId(), req.getVersion()).isEmpty()) {
+                    try {
+                        req.setSchemaAsString(new BufferedReader(new InputStreamReader(resource)).lines().collect(Collectors.joining("\n")));
+                    } catch (JsonProcessingException e) {
+                        logger.error("Error loading schema from file", e);
+                    }
+                    add(null, req);
                 }
-                this.add(null, req);
             }
         });
     }
@@ -88,6 +96,14 @@ public class CustomResourceSchemaService {
         return customResourceSchemaRepository.findByCrdIdAndVersion(crdId, version);
     }
 
+    /**
+     * Find all schemas, potentially filtered by IDs. If 'all' parameter is set to false,
+     * search only stored custom versions. Otherwise, take the schemas both from DB and from the CRD definition.
+     * @param ids
+     * @param all
+     * @param pageable
+     * @return
+     */
     public Page<CustomResourceSchemaDTO> findAll(Collection<String> ids, boolean all, Pageable pageable) {
         if (ids == null && all) {
             // search for CRDs and their schemas
@@ -126,6 +142,11 @@ public class CustomResourceSchemaService {
         }
     }
 
+    /**
+     * Get schema by ID
+     * @param id
+     * @return
+     */
     public CustomResourceSchemaDTO findById(String id) {
         Optional<CustomResourceSchema> result = fetchById(id);
         if (!result.isPresent()) {
@@ -134,9 +155,21 @@ public class CustomResourceSchemaService {
         return schemaToDTOConverter.convert(result.get());
     }
 
+    /**
+     * Find schema by CRD and version. Check DB and if not exists, return K8S CRD definition.
+     * @param crdId
+     * @param version
+     * @return
+     */
     public CustomResourceSchemaDTO findByCrdIdAndVersion(String crdId, String version) {
         return schemaToDTOConverter.convert(findCRDByCrdIdAndVersion(crdId, version));
     }
+    /**
+     * Find schema by CRD and version. Check DB and if not exists, return K8S CRD definition.
+     * @param crdId
+     * @param version
+     * @return
+     */
     public CustomResourceSchema findCRDByCrdIdAndVersion(String crdId, String version) {
         Optional<CustomResourceSchema> result = fetchByCrdIdAndVersion(crdId, version);
         if (!result.isPresent()) {
@@ -153,6 +186,12 @@ public class CustomResourceSchemaService {
         return result.get();
     }
 
+    /**
+     * Find all stored schemas for the specified CRD
+     * @param crdId
+     * @param pageable
+     * @return
+     */
     public Page<CustomResourceSchemaDTO> findByCrdId(String crdId, Pageable pageable) {
         Page<CustomResourceSchema> schemas = customResourceSchemaRepository.findByCrdId(crdId, pageable);
         List<CustomResourceSchemaDTO> dtos = schemas
@@ -162,6 +201,12 @@ public class CustomResourceSchemaService {
         return new PageImpl<>(dtos, pageable, dtos.size());
     }
 
+    /**
+     * Create new schema
+     * @param id
+     * @param request
+     * @return
+     */
     public CustomResourceSchemaDTO add(@Nullable String id, CustomResourceSchemaDTO request) {
         if (!authService.isCrdAllowed(request.getCrdId())) {
             throw new AccessDeniedException(SystemKeys.ERROR_CRD_NOT_ALLOWED);
@@ -192,6 +237,12 @@ public class CustomResourceSchemaService {
         return schemaToDTOConverter.convert(customResourceSchemaRepository.save(result));
     }
 
+    /**
+     * Update existing schema.
+     * @param id
+     * @param request
+     * @return
+     */
     public CustomResourceSchemaDTO update(String id, CustomResourceSchemaDTO request) {
         Optional<CustomResourceSchema> result = fetchById(id);
         if (!result.isPresent()) {
@@ -216,6 +267,10 @@ public class CustomResourceSchemaService {
         return schemaToDTOConverter.convert(customResourceSchemaRepository.save(currentSchema));
     }
 
+    /**
+     * Delete custom schema from DB
+     * @param id
+     */
     public void delete(String id) {
         if (fetchById(id).isPresent()) {
             customResourceSchemaRepository.deleteById(id);

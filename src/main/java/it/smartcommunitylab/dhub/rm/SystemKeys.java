@@ -25,7 +25,7 @@ public final class SystemKeys {
     public static final String ERROR_NULL_INPUT = "Input cannot be null";
     public static final String ERROR_K8S_NO_CRD = "No such CRD exists in Kubernetes";
 
-    public static final String ERROR_NO_SERVICE = "No Service with this ID";
+    public static final String ERROR_NO_RESOURCE = "No Resource with this ID";
 
     private SystemKeys() {}
 }

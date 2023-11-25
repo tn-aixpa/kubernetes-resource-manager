@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 
 import io.fabric8.kubernetes.client.KubernetesClient;
 
+/**
+ * Service for K8S Svc resource
+ */
 @Service
 public class K8SSvcService extends K8SResourceService<io.fabric8.kubernetes.api.model.Service> {
     

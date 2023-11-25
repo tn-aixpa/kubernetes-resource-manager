@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.client.KubernetesClient;
-
+/**
+ * Service for K8S Job resource
+ */
 @Service
 public class K8SJobService extends K8SResourceService<Job> {
     

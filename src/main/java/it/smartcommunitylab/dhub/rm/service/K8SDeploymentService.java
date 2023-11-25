@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.client.KubernetesClient;
 
+/**
+ * Service for K8S Deployment resource
+ */
 @Service
 public class K8SDeploymentService extends K8SResourceService<Deployment> {
     
