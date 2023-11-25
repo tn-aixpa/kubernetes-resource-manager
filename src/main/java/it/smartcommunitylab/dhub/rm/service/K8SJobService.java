@@ -15,7 +15,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 public class K8SJobService extends K8SResourceService<Job> {
     
     public K8SJobService(KubernetesClient client, AuthorizationService authService) {
-        super(client, authService, 1);
+        super(client, authService, 60);
     }
 
     public static final Logger logger = LoggerFactory.getLogger(K8SSvcService.class);

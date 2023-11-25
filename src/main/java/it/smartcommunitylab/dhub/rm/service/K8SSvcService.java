@@ -14,7 +14,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 public class K8SSvcService extends K8SResourceService<io.fabric8.kubernetes.api.model.Service> {
     
     public K8SSvcService(KubernetesClient client, AuthorizationService authService) {
-        super(client, authService, 1);
+        super(client, authService, 60);
     }
 
     public static final Logger logger = LoggerFactory.getLogger(K8SSvcService.class);

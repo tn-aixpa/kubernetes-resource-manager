@@ -40,14 +40,14 @@ public abstract class K8SResourceService<T extends HasMetadata> {
     public K8SResourceService(
         KubernetesClient client,
         AuthorizationService authService,
-        int cacheExpirationMins
+        int cacheExpirationSec
     ) {
         Assert.notNull(client, "Client required");
         this.client = client;
         this.authService = authService;
 
         resourceCache = CacheBuilder.newBuilder()
-        .expireAfterWrite(1, TimeUnit.MINUTES)
+        .expireAfterWrite(cacheExpirationSec, TimeUnit.SECONDS)
         .build(
             new CacheLoader<String, java.util.Map<String, IdAwareResource<T>>>() {
                 @Override
