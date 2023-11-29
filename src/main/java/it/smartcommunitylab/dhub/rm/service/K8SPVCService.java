@@ -77,7 +77,7 @@ public class K8SPVCService extends K8SResourceService<PersistentVolumeClaim> {
         PersistentVolumeClaim persistentVolumeClaim = new PersistentVolumeClaimBuilder()
         .withNewMetadata()
             .withName(dto.getName())
-            .addToLabels("managed-by", managedByLabel)
+            .addToLabels("app.kubernetes.io/managed-by", managedByLabel)
         .endMetadata()
         .withNewSpec()
         .withStorageClassName(dto.getStorageClassName())
