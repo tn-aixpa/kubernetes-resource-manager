@@ -8,6 +8,7 @@ export const useGetCrdJsonSchema = () => {
 
     useEffect(() => {
         if (data && data.spec) {
+            console.log(data.spec);
             const storedVersion = data.spec.versions.filter(
                 (version: any) => version.storage
             )[0];

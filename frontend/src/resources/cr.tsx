@@ -32,7 +32,7 @@ import {
 } from '../components/toolbars';
 import { useCrTransform } from '../hooks/useCrTransform';
 import { Breadcrumb } from '@dslab/ra-breadcrumb';
-import { JsonSchemaInput } from '@dslab/ra-jsonschema-input';
+import { JsonSchemaInput, JsonSchemaField } from '@dslab/ra-jsonschema-input';
 import { useGetCrdJsonSchema } from '../hooks/useGetCrdJsonSchema';
 
 export const CrCreate = () => {
@@ -137,6 +137,7 @@ export const CrList = () => {
 };
 
 export const CrShow = () => {
+    const { jsonSchema } = useGetCrdJsonSchema();
     const { record } = useShowController();
     if (!record) return null;
 
@@ -155,22 +156,13 @@ export const CrShow = () => {
                         source="kind"
                         label={'resources.cr.fields.kind'}
                     />
-                    <AceEditorField
-                        mode="json"
-                        record={{
-                            metadata: JSON.stringify(record.metadata),
-                        }}
-                        source="metadata"
-                        label={'resources.cr.fields.metadata'}
-                    />
-                    <AceEditorField
-                        mode="json"
-                        record={{
-                            spec: JSON.stringify(record.spec),
-                        }}
-                        source="spec"
-                        label={'resources.cr.fields.spec'}
-                    />
+                    {jsonSchema ? (
+                        <JsonSchemaField
+                            source="spec"
+                            schema={jsonSchema}
+                        />
+                    ) : null}
+
                 </SimpleShowLayout>
             </Show>
         </>

@@ -11,7 +11,6 @@ import {
     TextInput,
     required,
     SelectArrayInput,
-    ChipField,
     DeleteWithConfirmButton,
     useShowController,
     useTranslate,
@@ -23,9 +22,7 @@ import { Grid, Typography } from '@mui/material';
 import { Breadcrumb } from '@dslab/ra-breadcrumb';
 import {
     CreateTopToolbar,
-    EditTopToolbar,
     ListTopToolbar,
-    ShowTopToolbar,
 } from '../components/toolbars';
 
 export const K8SPvcCreate = () => {

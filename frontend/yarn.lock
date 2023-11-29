@@ -1305,10 +1305,10 @@
   dependencies:
     ra-core "^4.11.0"
 
-"@dslab/ra-jsonschema-input@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@dslab/ra-jsonschema-input/-/ra-jsonschema-input-1.0.0.tgz#fdf560d06c2f492aa73d0bf7bf91ab92572b8747"
-  integrity sha512-a50ryFWCBRIM4YCK8PA8OuBJ3mUrDKPhGktewNt1B4fRQyoy9lMFI6ESrihxQXekHbh7Vstg5s9wrEbrj5FMsw==
+"@dslab/ra-jsonschema-input@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@dslab/ra-jsonschema-input/-/ra-jsonschema-input-1.1.0.tgz#6b7f74c7a4a2f51d7c2c2be439518fe1e110ccc3"
+  integrity sha512-SgBIofGJRnXFkRE8xUhQRNsd4+mMVWckfQ3o9SA2YaFbFGB5Orqch3aZj70NmX4IW2oEE82PjufcyHobdp4gFQ==
   dependencies:
     "@rjsf/core" "^5.13.0"
     "@rjsf/mui" "^5.13.0"
