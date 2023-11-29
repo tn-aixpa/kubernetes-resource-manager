@@ -1,5 +1,5 @@
-# CustomResource Manager
-A manager for custom resources in kubernetes.
+# K8S Resource Manager
+A manager for resources in Kubernetes. The tool allows for monitoring and managing some of the standard Kubernetes resources (PersistentVolumeClaim, Services, Deployments, Jobs) as well as for managing a selection of Custom Resources.
 
 ## Back-end
 Create an `application-local.yaml` file under `src/main/resources` and configure it as follows (notably, change `kubernetes.config` to point to your local configuration file):
@@ -26,7 +26,19 @@ auth:
 
 security.cors.origins: http://localhost:3000
 ```
-`kubernetes.crd.allowed` and `kubernetes.crd.denied` are meant to be mutually exclusive: you either specify one or the other (or leave both empty). Defining `allowed` will let the resource manager handle only the CRDs listed in it, while `denied` will allow all CRDs not listed in it. Leaving both empty lets the resource manager handle all CRDs. `kubernetes.selector.service` defines the label selectors (separated by `|`) for filtering the K8S services to read.
+`kubernetes.crd.allowed` and `kubernetes.crd.denied` are meant to be mutually exclusive: you either specify one or the other (or leave both empty). Defining `allowed` will let the resource manager handle only the CRDs listed in it, while `denied` will allow all CRDs not listed in it. Leaving both empty lets the resource manager handle all CRDs. 
+
+To control which standard resources are available to the Resource Manager, use the specific label selectors in the following way:
+
+- `kubernetes.selector.service` defines the label selectors (separated by `|`) for filtering the K8S Services to read.
+- `kubernetes.selector.deployment` defines the label selectors (separated by `|`) for filtering the K8S Deployments to read.
+- `kubernetes.selector.job` defines the label selectors (separated by `|`) for filtering the K8S Jobs to read.
+- `kubernetes.selector.pvc` defines the label selectors (separated by `|`) for filtering the K8S Persistent Volume Claims to read.
+
+To control the creation of the Persistent Volume Claims, it is possible additional to define the following properties
+
+- `kubernetes.pvc.managed-by` to define the label to be associated with the K8S Resoruce Manager
+- `kubernetes.pvc.storage-classes` to define a subset of Storage Classes that can be created with K*S Resource Manager. If not specified, all classes are allowed.
 
 Start the server:
 ```

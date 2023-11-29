@@ -27,6 +27,7 @@ import { i18nProvider } from './providers/i18nProvider';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LinkIcon from '@mui/icons-material/Link';
 import AppIcon from '@mui/icons-material/Apps';
+import AlbumIcon from '@mui/icons-material/Album';
 import MyLayout from './Layout';
 import MyDashboard from './pages/Dashboard';
 import { CrdShow } from './resources/crd';
@@ -41,6 +42,7 @@ import crPostgresUsers from './resources/cr.postgresusers.db.movetokube.com';
 import crNuclioApiGateways from './resources/cr.nuclioapigateways.nuclio.io';
 import { httpClientProvider } from './providers/httpClientProvider';
 import { K8SDeploymentList, K8SDeploymentShow } from './resources/k8s_deployment';
+import { K8SPvcCreate, K8SPvcList, K8SPvcShow } from './resources/k8s_pvc';
 
 console.log('Config', Config);
 
@@ -157,6 +159,13 @@ function DynamicAdminUI() {
                 list={K8SDeploymentList}
                 show={K8SDeploymentShow}
                 icon={AppIcon}
+            />
+            <Resource
+                name="k8s_pvc"
+                create={K8SPvcCreate}
+                list={K8SPvcList}
+                show={K8SPvcShow}
+                icon={AlbumIcon}
             />
         </AdminUI>
     );

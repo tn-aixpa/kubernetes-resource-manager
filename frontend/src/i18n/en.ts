@@ -74,6 +74,32 @@ const messages = {
                 status: 'Ready'
             },
         },
+        k8s_pvc: {
+            name: 'Persistent Volume Claim |||| Persistent Volume Claims',
+            fields: {
+                metadata: {
+                    creationTimestamp: 'Created',
+                    generation: 'Generation',
+                    name: 'Name',
+                    resourceVersion: 'Resource version',
+                    uid: 'UID',
+                },
+                status: {
+                    phase: 'Status',
+                },
+                spec: {
+                    storageClassName: 'Storage Class',
+                    volumeName: 'Volume',
+                    volumeMode:'Mode',
+                    accessModes: 'Access Modes',
+                    resources: {
+                        requests: {
+                            storage: 'Space (Gi)'
+                        }
+                    }
+                }
+            },
+        },
         'postgres.db.movetokube.com': {
             name: 'Postgres DB |||| Postgres DBs',
             fields: {

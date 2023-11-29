@@ -22,6 +22,8 @@ public class AuthorizationService {
     private String deploymentSelector;
     @Value("${kubernetes.selector.job}")
     private String jobSelector;
+    @Value("${kubernetes.selector.pvc}")
+    private String pvcSelector;
 
     public boolean isCrdAllowed(String crdId) {
         return allowedCrds.contains(crdId) || (allowedCrds.isEmpty() && !deniedCrds.contains(crdId));
@@ -37,5 +39,9 @@ public class AuthorizationService {
 
     public String getJobSelector() {
         return jobSelector;
+    }
+
+    public String getPVCSelector() {
+        return pvcSelector;
     }
 }

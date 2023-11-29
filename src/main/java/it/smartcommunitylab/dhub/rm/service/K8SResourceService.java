@@ -121,6 +121,14 @@ public abstract class K8SResourceService<T extends HasMetadata> {
     }
 
     /**
+     * Access return cache
+     * @return
+     */
+    protected LoadingCache<String, java.util.Map<String, IdAwareResource<T>>> getResourceCache() {
+        return resourceCache;
+    }
+
+    /**
      * Find all namespace resources paginated and optionally filtered by list of IDs.
      * @param namespace
      * @param ids

@@ -34,8 +34,12 @@ kubernetes:
   selector:
     service: ${K8S_SELECTOR_SERVICE:}
     deployment: ${K8S_SELECTOR_DEPLOYMENT:}
-    volume: ${K8S_SELECTOR_VOLUME:}
     job: ${K8S_SELECTOR_JOB:}
+    pvc: ${K8S_SELECTOR_PVC:}
+  pvc:
+    managed-by: ${K8S_PVC_MANAGED_BY:krm}
+    storage-classes: ${K8S_PVC_STORAGE_CLASSES:krm}
+
 # authentication and authorization config
 auth:
   basic:
