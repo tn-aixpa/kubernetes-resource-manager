@@ -6,9 +6,9 @@ COPY pom.xml /tmp/pom.xml
 COPY frontend/ /tmp/frontend
 RUN cat /tmp/frontend/.npmrc
 WORKDIR /tmp/
-RUN --mount=type=cache,target=/root/.m2,source=/root/.m2,from=smartcommunitylab/custom-resource-manager:cache \ 
-    --mount=type=cache,target=/tmp/frontend/node_modules,source=/tmp/frontend/node_modules,from=smartcommunitylab/custom-resource-manager:cache \ 
-    --mount=type=cache,target=/tmp/frontend/yarn.lock,source=/tmp/frontend/yarn.lock,from=smartcommunitylab/custom-resource-manager:cache \
+RUN --mount=type=cache,target=/root/.m2,source=/.m2,from=ghcr.io/scc-digitalhub/custom-resource-manager:cache \ 
+    --mount=type=cache,target=/tmp/frontend/node_modules,source=/node_modules,from=ghcr.io/scc-digitalhub/custom-resource-manager:cache \ 
+    --mount=type=cache,target=/tmp/frontend/yarn.lock,source=/yarn.lock,from=ghcr.io/scc-digitalhub/custom-resource-manager:cache \
     mvn package -DskipTests
 
 FROM gcr.io/distroless/java17-debian12:nonroot

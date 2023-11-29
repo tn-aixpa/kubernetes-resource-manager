@@ -8,10 +8,10 @@ RUN cat /tmp/frontend/.npmrc
 WORKDIR /tmp/
 RUN mvn package -DskipTests
 
-# FROM scratch
-# COPY --from=mvn /tmp/frontend/node_modules /node_modules
-# COPY --from=mvn /tmp/frontend/yarn.lock /yarn.lock
-# COPY --from=mvn /root/.m2 /.m2
+FROM scratch
+COPY --from=mvn /tmp/frontend/node_modules /node_modules
+COPY --from=mvn /tmp/frontend/yarn.lock /yarn.lock
+COPY --from=mvn /root/.m2 /.m2
 
 
 
