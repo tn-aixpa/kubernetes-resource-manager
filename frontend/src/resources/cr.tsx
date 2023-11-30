@@ -21,9 +21,7 @@ import {
 } from 'react-admin';
 import { Typography } from '@mui/material';
 import { ViewToolbar } from '../components/ViewToolbar';
-import {
-    AceEditorField,
-} from '@dslab/ra-ace-editor';
+
 import {
     CreateTopToolbar,
     EditTopToolbar,

@@ -7,8 +7,6 @@ import {
     SimpleShowLayout,
     TextField,
     ArrayField,
-    SingleFieldList,
-    ChipField,
     useShowController,
     useTranslate,
     useRecordContext,

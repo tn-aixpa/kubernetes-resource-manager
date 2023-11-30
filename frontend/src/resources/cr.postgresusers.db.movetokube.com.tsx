@@ -17,6 +17,7 @@ import {
     useNotify,
     useRedirect,
     useTranslate,
+    SelectInput,
 } from 'react-admin';
 import { View } from './index';
 import { ViewToolbar } from '../components/ViewToolbar';
@@ -24,7 +25,7 @@ import { TopToolbarProps } from '../components/toolbars';
 import { SimplePageTitle } from './cr';
 import { CR_POSTGRES_DB } from './cr.postgres.db.movetokube.com';
 import { useCrTransform } from '../hooks/useCrTransform';
-import { Breadcrumbs, Typography } from '@mui/material';
+import { Breadcrumbs, Grid, Typography } from '@mui/material';
 import { useLocation, Link } from 'react-router-dom';
 import YamlButton from '../components/YamlButton';
 
@@ -80,17 +81,33 @@ const CrCreate = () => {
                 transform={transform}
             >
                 <SimpleForm validate={validate}>
-                    <TextInput source="metadata.name" validate={required()} />
-                    <TextInput
-                        source="spec.database"
-                        validate={required()}
-                        defaultValue={dbId}
-                        disabled
-                        sx={{ display: 'none' }}
-                    />
-                    <TextInput source="spec.role" validate={required()} />
-                    <TextInput source="spec.privileges" validate={required()} />
-                    <TextInput source="spec.secretName" validate={required()} />
+                    <Grid container  spacing={2}>
+                        <Grid item xs={3}>
+                            <TextInput fullWidth source="metadata.name" validate={required()} />
+                            <TextInput
+                                source="spec.database"
+                                validate={required()}
+                                defaultValue={dbId}
+                                disabled
+                                sx={{ display: 'none' }}
+                            />
+                        </Grid>
+                        <Grid item xs={3}>
+                            <TextInput fullWidth source="spec.role" validate={required()} 
+                            helperText={`resources.${CR_POSTGRES_USERS}.fields.spec.roleHint`}/>
+                        </Grid>
+                        <Grid item xs={2}>
+                            <SelectInput fullWidth source="spec.privileges" validate={required()} choices={[
+                                {id: 'OWNER', name: 'Owner'},
+                                {id: 'READ', name: 'Read'},
+                                {id: 'WRITE', name: 'Write'},
+                            ]}/>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <TextInput fullWidth source="spec.secretName" validate={required()} 
+                            helperText={`resources.${CR_POSTGRES_USERS}.fields.spec.secretNameHint`}/>
+                        </Grid>
+                    </Grid>
                 </SimpleForm>
             </Create>
         </>
@@ -133,10 +150,27 @@ const CrEdit = () => {
                 }
             >
                 <SimpleForm toolbar={<ViewToolbar />}>
-                    <TextInput source="spec.database" validate={required()} />
-                    <TextInput source="spec.role" validate={required()} />
-                    <TextInput source="spec.privileges" validate={required()} />
-                    <TextInput source="spec.secretName" validate={required()} />
+                    <Grid container  spacing={2}>
+                        <Grid item xs={3}>
+                            <TextInput fullWidth disabled source="spec.database" validate={required()} />
+                        </Grid>
+                        <Grid item xs={3}>
+                            <TextInput fullWidth source="spec.role" validate={required()} 
+                            helperText={`resources.${CR_POSTGRES_USERS}.fields.spec.roleHint`}/>
+                        </Grid>
+                        <Grid item xs={2}>
+                            <SelectInput fullWidth source="spec.privileges" validate={required()} choices={[
+                                {id: 'OWNER', name: 'Owner'},
+                                {id: 'READ', name: 'Read'},
+                                {id: 'WRITE', name: 'Write'},
+                            ]}/>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <TextInput fullWidth source="spec.secretName" validate={required()} 
+                            helperText={`resources.${CR_POSTGRES_USERS}.fields.spec.secretNameHint`}/>
+                        </Grid>
+                    </Grid>
+
                 </SimpleForm>
             </Edit>
         </>

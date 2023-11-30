@@ -22,6 +22,7 @@ import {
     useTranslate,
     BooleanInput,
     useGetList,
+    ReferenceInput,
 } from 'react-admin';
 import { ViewToolbar } from '../components/ViewToolbar';
 import {
@@ -33,7 +34,7 @@ import {
 import { SimplePageTitle } from './cr';
 import { View } from '.';
 import { useCrTransform } from '../hooks/useCrTransform';
-import { Typography } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import CableIcon from '@mui/icons-material/Cable';
 import { Breadcrumb } from '@dslab/ra-breadcrumb';
@@ -76,7 +77,7 @@ const Upstreams = () => {
     return (
         <FormDataConsumer>
             {({ formData, ...rest }) => (
-                <ArrayInput
+                <ArrayInput fullWidth
                     source="spec.upstreams"
                     validate={required()}
                     label={false}
@@ -116,15 +117,18 @@ const Upstreams = () => {
                                                     'nucliofunction.name'
                                                 )}
                                                 validate={required()}
+                                                sx={{'min-width': '300px'}}
                                             />
                                         )}
                                     {scopedFormData?.kind &&
                                         scopedFormData.kind === 'service' &&
                                         getSource && (
-                                            <TextInput
+                                            <ReferenceInput
                                                 source={getSource(
                                                     'service.name'
                                                 )}
+                                                fullWidth perPage={1000}
+                                                reference='k8s_service'
                                                 validate={required()}
                                             />
                                         )}
@@ -216,68 +220,102 @@ const CrCreate = () => {
                 transform={transform}
             >
                 <SimpleForm validate={validate}>
-                    <TextInput source="metadata.name" validate={required()} />
-                    <TextInput source="spec.host" validate={required()} />
-                    <TextInput source="spec.name" validate={required()} />
-                    <TextInput source="spec.description" fullWidth />
-                    <TextInput source="spec.path" validate={required()} />
+                    <Grid container  spacing={2}>
+                        <Grid item xs={2}>
+                            <TextInput fullWidth source="metadata.name" validate={required()} />
+                         </Grid>
+                         <Grid item xs={2}>
+                            <TextInput fullWidth source="spec.name" validate={required()} />
+                         </Grid>
+                        <Grid item xs={5}>
+                            <TextInput fullWidth source="spec.host" validate={required()} />
+                        </Grid> 
+                        <Grid item xs={3}>
+                            <TextInput fullWidth source="spec.path" validate={required()} />
+                        </Grid> 
+
+                        <Grid item xs={12}>
+                            <TextInput source="spec.description" fullWidth />
+                        </Grid>
+                    </Grid>   
                     <Typography variant="h6" sx={{ paddingTop: '20px' }}>
                         {translate(
                             `resources.${CR_NUCLIO_APIGATEWAYS}.fields.spec.upstreams`
                         )}
                     </Typography>
                     <Upstreams />
+
                     <Typography variant="h6" sx={{ paddingTop: '20px' }}>
                         {translate(
                             `resources.${CR_NUCLIO_APIGATEWAYS}.authenticationTitle`
                         )}
                     </Typography>
-                    <SelectInput
-                        source="spec.authenticationMode"
-                        choices={[
-                            { id: 'none', name: 'None' },
-                            { id: 'basicAuth', name: 'Basic' },
-                            { id: 'oauth2', name: 'OAuth2' },
-                            { id: 'jwtAuth', name: 'JWT' },
-                        ]}
-                        validate={required()}
-                    />
-                    <FormDataConsumer>
-                        {({ formData, ...rest }) => (
-                            <>
-                                {formData.spec?.authenticationMode &&
-                                    formData.spec?.authenticationMode ===
-                                        'basicAuth' && (
-                                        <>
-                                            <TextInput
-                                                source="spec.authentication.basicAuth.username"
-                                                validate={required()}
-                                            />
-                                            <TextInput
-                                                source="spec.authentication.basicAuth.password"
-                                                validate={required()}
-                                            />
-                                        </>
-                                    )}
-                                {formData.spec?.authenticationMode &&
-                                    formData.spec?.authenticationMode ===
-                                        'oauth2' && (
-                                        <>
-                                            <TextInput source="spec.authentication.dexAuth.oauth2ProxyUrl" />
-                                            <BooleanInput source="spec.authentication.dexAuth.redirectUnauthorizedToSignIn" />
-                                        </>
-                                    )}
-                                {formData.spec?.authenticationMode &&
-                                    formData.spec?.authenticationMode ===
-                                        'jwtAuth' && (
-                                        <TextInput
-                                            source="spec.authentication.jwtAuth.audience"
-                                            validate={required()}
-                                        />
-                                    )}
-                            </>
-                        )}
-                    </FormDataConsumer>
+
+                    <Grid container  spacing={2}>
+                        <Grid item xs={2}>
+                            <SelectInput fullWidth
+                                source="spec.authenticationMode"
+                                choices={[
+                                    { id: 'none', name: 'None' },
+                                    { id: 'basicAuth', name: 'Basic' },
+                                    { id: 'oauth2', name: 'OAuth2' },
+                                    { id: 'jwtAuth', name: 'JWT' },
+                                ]}
+                                validate={required()}
+                            />
+                        </Grid>
+                        <Grid item xs={10}>
+                            <FormDataConsumer>
+                            {({ formData, ...rest }) => (
+                                <>
+                                    {formData.spec?.authenticationMode &&
+                                        formData.spec?.authenticationMode ===
+                                            'basicAuth' && (
+                                            <Grid container spacing={2}>
+                                                <Grid item xs={3}>
+                                                    <TextInput fullWidth
+                                                        source="spec.authentication.basicAuth.username"
+                                                        validate={required()}
+                                                    />
+                                                </Grid>
+                                                <Grid item xs={3}>
+                                                    <TextInput fullWidth
+                                                        source="spec.authentication.basicAuth.password"
+                                                        validate={required()}
+                                                    />
+                                                </Grid>
+                                            </Grid>
+                                        )}
+                                    {formData.spec?.authenticationMode &&
+                                        formData.spec?.authenticationMode ===
+                                            'oauth2' && (
+                                            <Grid container alignItems="center" spacing={2}>
+                                                <Grid item xs={6}>
+                                                    <TextInput fullWidth source="spec.authentication.dexAuth.oauth2ProxyUrl" />
+                                                </Grid>
+                                                <Grid item xs={3}>
+                                                    <BooleanInput fullWidth source="spec.authentication.dexAuth.redirectUnauthorizedToSignIn" />
+                                                </Grid>
+                                            </Grid>
+                                        )}
+                                    {formData.spec?.authenticationMode &&
+                                        formData.spec?.authenticationMode ===
+                                            'jwtAuth' && (
+                                                <Grid container alignItems="center" spacing={2}>
+                                                    <Grid item xs={6}>
+                                                        <TextInput fullWidth
+                                                            source="spec.authentication.jwtAuth.audience"
+                                                            validate={required()}
+                                                        />
+                                                    </Grid>
+                                                </Grid>
+                                        )}
+                                </>
+                            )}
+                            </FormDataConsumer>
+                        </Grid>
+                    </Grid>
+
                 </SimpleForm>
             </Create>
         </>
@@ -350,10 +388,25 @@ const CrEdit = () => {
             <SimplePageTitle pageType="edit" crName={CR_NUCLIO_APIGATEWAYS} />
             <Edit actions={<EditTopToolbar hasYaml />} transform={transform}>
                 <SimpleForm toolbar={<ViewToolbar />} validate={validate}>
-                    <TextInput source="spec.host" validate={required()} />
-                    <TextInput source="spec.name" validate={required()} />
-                    <TextInput source="spec.description" fullWidth />
-                    <TextInput source="spec.path" validate={required()} />
+                    <Grid container  spacing={2}>
+                        <Grid item xs={2}>
+                            <TextInput fullWidth disabled source="metadata.name" validate={required()} />
+                         </Grid>
+                         <Grid item xs={2}>
+                            <TextInput fullWidth source="spec.name" validate={required()} />
+                         </Grid>
+                        <Grid item xs={5}>
+                            <TextInput fullWidth source="spec.host" validate={required()} />
+                        </Grid> 
+                        <Grid item xs={3}>
+                            <TextInput fullWidth source="spec.path" validate={required()} />
+                        </Grid> 
+
+                        <Grid item xs={12}>
+                            <TextInput source="spec.description" fullWidth />
+                        </Grid>
+                    </Grid>  
+
                     <Typography variant="h6" sx={{ paddingTop: '20px' }}>
                         {translate(
                             `resources.${CR_NUCLIO_APIGATEWAYS}.fields.spec.upstreams`
@@ -365,52 +418,73 @@ const CrEdit = () => {
                             `resources.${CR_NUCLIO_APIGATEWAYS}.authenticationTitle`
                         )}
                     </Typography>
-                    <SelectInput
-                        source="spec.authenticationMode"
-                        choices={[
-                            { id: 'none', name: 'None' },
-                            { id: 'basicAuth', name: 'Basic' },
-                            { id: 'oauth2', name: 'OAuth2' },
-                            { id: 'jwtAuth', name: 'JWT' },
-                        ]}
-                        validate={required()}
-                    />
-                    <FormDataConsumer>
-                        {({ formData, ...rest }) => (
-                            <>
-                                {formData.spec?.authenticationMode &&
-                                    formData.spec?.authenticationMode ===
-                                        'basicAuth' && (
-                                        <>
-                                            <TextInput
-                                                source="spec.authentication.basicAuth.username"
-                                                validate={required()}
-                                            />
-                                            <TextInput
-                                                source="spec.authentication.basicAuth.password"
-                                                validate={required()}
-                                            />
-                                        </>
-                                    )}
-                                {formData.spec?.authenticationMode &&
-                                    formData.spec?.authenticationMode ===
-                                        'oauth2' && (
-                                        <>
-                                            <TextInput source="spec.authentication.dexAuth.oauth2ProxyUrl" />
-                                            <BooleanInput source="spec.authentication.dexAuth.redirectUnauthorizedToSignIn" />
-                                        </>
-                                    )}
-                                {formData.spec?.authenticationMode &&
-                                    formData.spec?.authenticationMode ===
-                                        'jwtAuth' && (
-                                        <TextInput
-                                            source="spec.authentication.jwtAuth.audience"
-                                            validate={required()}
-                                        />
-                                    )}
-                            </>
-                        )}
-                    </FormDataConsumer>
+                    <Grid container  spacing={2}>
+                        <Grid item xs={2}>
+                            <SelectInput fullWidth
+                                source="spec.authenticationMode"
+                                choices={[
+                                    { id: 'none', name: 'None' },
+                                    { id: 'basicAuth', name: 'Basic' },
+                                    { id: 'oauth2', name: 'OAuth2' },
+                                    { id: 'jwtAuth', name: 'JWT' },
+                                ]}
+                                validate={required()}
+                            />
+                        </Grid>
+                        <Grid item xs={10}>
+                            <FormDataConsumer>
+                            
+                                {({ formData, ...rest }) => (
+                                    <>
+                                        {formData.spec?.authenticationMode &&
+                                            formData.spec?.authenticationMode ===
+                                                'basicAuth' && (
+                                                <Grid container spacing={2}>
+                                                    <Grid item xs={3}>
+                                                        <TextInput fullWidth
+                                                        source="spec.authentication.basicAuth.username"
+                                                        validate={required()}
+                                                    />
+                                                    </Grid>
+                                                    <Grid item xs={3}>
+                                                        <TextInput fullWidth
+                                                            source="spec.authentication.basicAuth.password"
+                                                            validate={required()}
+                                                        />
+                                                    </Grid>
+                                                </Grid>
+                                            )}
+                                        {formData.spec?.authenticationMode &&
+                                            formData.spec?.authenticationMode ===
+                                                'oauth2' && (
+                                                <Grid container alignItems="center" spacing={2}>
+                                                    <Grid item xs={6}>
+                                                        <TextInput fullWidth source="spec.authentication.dexAuth.oauth2ProxyUrl" />
+                                                    </Grid>
+                                                    <Grid item xs={3}>
+                                                        <BooleanInput fullWidth source="spec.authentication.dexAuth.redirectUnauthorizedToSignIn" />
+                                                    </Grid>
+                                                </Grid>
+
+                                            )}
+                                        {formData.spec?.authenticationMode &&
+                                            formData.spec?.authenticationMode ===
+                                                'jwtAuth' && (
+                                            <Grid container alignItems="center" spacing={2}>
+                                                <Grid item xs={6}>
+                                                    <TextInput fullWidth
+                                                        source="spec.authentication.jwtAuth.audience"
+                                                        validate={required()}
+                                                    />
+                                                </Grid>
+                                            </Grid>
+
+                                            )}
+                                    </>
+                                )}
+                            </FormDataConsumer>
+                        </Grid>
+                    </Grid>
                 </SimpleForm>
             </Edit>
         </>

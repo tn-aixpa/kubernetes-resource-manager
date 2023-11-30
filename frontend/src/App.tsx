@@ -40,6 +40,7 @@ import { buildAuthProvider } from './providers/authProvider';
 import crPostgres from './resources/cr.postgres.db.movetokube.com';
 import crPostgresUsers from './resources/cr.postgresusers.db.movetokube.com';
 import crNuclioApiGateways from './resources/cr.nuclioapigateways.nuclio.io';
+import crPostgrest from './resources/cr.postgrests.operator.postgrest.org';
 import { httpClientProvider } from './providers/httpClientProvider';
 import { K8SDeploymentList, K8SDeploymentShow } from './resources/k8s_deployment';
 import { K8SPvcCreate, K8SPvcList, K8SPvcShow } from './resources/k8s_pvc';
@@ -58,6 +59,7 @@ const customViews: { [index: string]: View } = {
     'postgres.db.movetokube.com': crPostgres,
     'postgresusers.db.movetokube.com': crPostgresUsers,
     'nuclioapigateways.nuclio.io': crNuclioApiGateways,
+    'postgrests.operator.postgrest.org': crPostgrest,
 };
 
 //theming

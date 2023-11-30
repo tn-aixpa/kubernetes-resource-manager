@@ -41,10 +41,9 @@ export const K8SPvcCreate = () => {
         if (!values.storageClassName) {
             errors.storageClassName = 'ra.validation.required';
         }
-        if (!values.accessModes || values.accessModes.length == 0) {
+        if (!values.accessModes || values.accessModes.length === 0) {
             errors.accessModes = 'ra.validation.required';
         }
-        console.log(errors);
         return errors;
     };
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import {
     Datagrid,
     List,
@@ -7,7 +6,6 @@ import {
     SimpleShowLayout,
     TextField,
     ArrayField,
-    SingleFieldList,
     ChipField,
     useShowController,
     useTranslate,

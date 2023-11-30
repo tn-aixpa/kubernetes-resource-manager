@@ -111,6 +111,11 @@ const messages = {
                     extensions: 'Estensioni',
                     masterRole: 'Ruolo master',
                     schemas: 'Schemi',
+                    masterRoleHint: 'Role to set as DB owner. Defaults to <database-name>-group',
+                    databaseHint: 'In base a questo nome, si creano i ruoli owner, reader, e writer.',
+                    extensionsHint: 'Lista delle estensioni (separati da virgola) da installare opzionalmente.',
+                    schemasHint: 'Lista di schemi (separati da virgola) da creare opzionalmente.',
+
                 },
             },
         },
@@ -124,7 +129,27 @@ const messages = {
                     privileges: 'Privilegi',
                     role: 'Ruolo',
                     secretName: 'Nome secret',
+                    roleHint: 'Nome utente per DB login',
+                    secretNameHint: 'Il secret si crea con la forma <metadata-name>-<secret-name>',
+
                 },
+            },
+        },
+        'postgrests.operator.postgrest.org': {
+            name: 'Servizio PostgREST |||| Servizi PostgREST',
+            shortName: 'PostgREST',
+            fields: {
+                id: 'ID',
+                spec: {
+                    database: 'Database ID',
+                    schemas: 'Schema DB',
+                    anonRole: 'Nome utente DB esisente',
+                    tables: 'Tabelle DB esposte',
+                    grants: 'Permessi DB',
+                    },
+                tables: 'Tabelle DB esposte',
+                grants: 'Permessi DB',
+                existing: 'Con utente DB esistent',
             },
         },
         'nuclioapigateways.nuclio.io': {

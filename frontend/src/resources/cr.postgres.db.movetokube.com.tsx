@@ -33,7 +33,7 @@ import {
     ShowTopToolbar,
 } from '../components/toolbars';
 import { SimplePageTitle } from './cr';
-import { Typography } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
 import { CR_POSTGRES_USERS } from './cr.postgresusers.db.movetokube.com';
 import { useCrTransform } from '../hooks/useCrTransform';
 import DatasetIcon from '@mui/icons-material/Dataset';
@@ -74,22 +74,45 @@ const CrCreate = () => {
                 transform={transform}
             >
                 <SimpleForm validate={validate}>
-                    <TextInput source="metadata.name" validate={required()} />
-                    <TextInput source="spec.database" validate={required()} />
-                    <BooleanInput source="spec.dropOnDelete" />
-                    <TextInput
-                        fullWidth
-                        source="spec.extensions"
-                        format={formatArray}
-                        parse={parseArray}
-                    />
-                    <TextInput source="spec.masterRole" />
-                    <TextInput
-                        fullWidth
-                        source="spec.schemas"
-                        format={formatArray}
-                        parse={parseArray}
-                    />
+                    <Grid container alignItems="center" spacing={2}>
+                        <Grid item xs={4}>
+                            <TextInput fullWidth source="metadata.name" validate={required()} />
+                        </Grid>
+                        <Grid item xs={4}>
+                            <TextInput fullWidth source="spec.database" validate={required()} 
+                                helperText={`resources.${CR_POSTGRES_DB}.fields.spec.databaseHint`}/>
+                        </Grid>
+                        <Grid item xs={4}>
+                            <BooleanInput source="spec.dropOnDelete" />
+                        </Grid>
+
+                        <Grid item xs={4}>
+                            <TextInput
+                                fullWidth
+                                source="spec.extensions"
+                                format={formatArray}
+                                parse={parseArray}
+                                helperText={`resources.${CR_POSTGRES_DB}.fields.spec.extensionsHint`}
+                            />
+                        </Grid>
+                        <Grid item xs={4}>
+                            <TextInput
+                                fullWidth
+                                source="spec.schemas"
+                                format={formatArray}
+                                parse={parseArray}
+                                helperText={`resources.${CR_POSTGRES_DB}.fields.spec.schemasHint`}
+                            />
+                        </Grid>
+                        <Grid item xs={4}>
+                            <TextInput fullWidth 
+                            source="spec.masterRole" 
+                            helperText={`resources.${CR_POSTGRES_DB}.fields.spec.masterRoleHint`}/>
+                        </Grid>
+
+
+
+                    </Grid>
                 </SimpleForm>
             </Create>
         </>
@@ -110,21 +133,40 @@ const CrEdit = () => {
             />
             <Edit actions={<EditTopToolbar hasYaml />}>
                 <SimpleForm toolbar={<ViewToolbar />}>
-                    <TextInput source="spec.database" validate={required()} />
-                    <BooleanInput source="spec.dropOnDelete" />
-                    <TextInput
-                        fullWidth
-                        source="spec.extensions"
-                        format={formatArray}
-                        parse={parseArray}
-                    />
-                    <TextInput source="spec.masterRole" />
-                    <TextInput
-                        fullWidth
-                        source="spec.schemas"
-                        format={formatArray}
-                        parse={parseArray}
-                    />
+                    <Grid container alignItems="center" spacing={2}>
+                        <Grid item xs={4}>
+                            <TextInput source="spec.database" validate={required()} fullWidth
+                            helperText={`resources.${CR_POSTGRES_DB}.fields.spec.databaseHint`}/>
+                        </Grid>
+                        <Grid item xs={8}>
+                            <BooleanInput source="spec.dropOnDelete" />
+                        </Grid>
+
+                        <Grid item xs={4}>
+                            <TextInput
+                                fullWidth
+                                source="spec.extensions"
+                                format={formatArray}
+                                parse={parseArray}
+                                helperText={`resources.${CR_POSTGRES_DB}.fields.spec.extensionsHint`}
+                            />
+                        </Grid>
+                        <Grid item xs={4}>
+                            <TextInput
+                                fullWidth
+                                source="spec.schemas"
+                                format={formatArray}
+                                parse={parseArray}
+                                helperText={`resources.${CR_POSTGRES_DB}.fields.spec.schemasHint`}
+                            />
+                        </Grid>
+                        <Grid item xs={4}>
+                            <TextInput fullWidth 
+                            source="spec.masterRole" 
+                            helperText={`resources.${CR_POSTGRES_DB}.fields.spec.masterRoleHint`}/>
+                        </Grid>
+                    </Grid>
+
                 </SimpleForm>
             </Edit>
         </>
