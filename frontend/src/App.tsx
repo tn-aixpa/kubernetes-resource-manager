@@ -29,7 +29,7 @@ import LinkIcon from '@mui/icons-material/Link';
 import AppIcon from '@mui/icons-material/Apps';
 import AlbumIcon from '@mui/icons-material/Album';
 import MyLayout from './Layout';
-import MyDashboard from './pages/Dashboard';
+import AppDashboard from './pages/Dashboard';
 import { CrdShow } from './resources/crd';
 import { useContext, useState } from 'react';
 import { View, ViewsContext, fetchViews } from './resources';
@@ -93,6 +93,7 @@ function DynamicAdminUI() {
     const [views, setViews] = useState<View[]>([]);
     const { crdIds } = useUpdateCrdIds();
 
+
     const viewsContext = useContext(ViewsContext);
 
     if (crdIds.length === 0 && views.length > 0) {
@@ -109,20 +110,19 @@ function DynamicAdminUI() {
             } catch (error) {
                 console.log('No custom view for', crdId);
             }
-
-            if (
-                views.length !== crdIds.length ||
-                !views.every((s: View) => crdIds.includes(s.key))
-            ) {
-                setViews(fetchViews(crdIds));
-            }
+        }
+        if (
+            views.length !== crdIds.length ||
+            !views.every((s: View) => crdIds.includes(s.key))
+        ) {
+            setViews(fetchViews(crdIds));
         }
     }
 
     return (
         <AdminUI
             ready={Loading}
-            dashboard={MyDashboard}
+            dashboard={AppDashboard}
             loginPage={Login}
             layout={MyLayout}
             requireAuth={true}

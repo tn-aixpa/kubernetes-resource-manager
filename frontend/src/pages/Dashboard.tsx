@@ -54,21 +54,22 @@ const Empty = () => {
     );
 };
 
-const MyDashboard = () => {
+const AppDashboard = () => {
     const translate = useTranslate();
     const resources = useResourceDefinitions();
     const navigate = useNavigate();
 
     const cards: any[] = [];
-
+    
     Object.values(resources).forEach((resource: ResourceDefinition) => {
         if (
             resource.name !== 'crd' &&
             resource.name !== 'crs' &&
+            !resource.name.startsWith('k8s_') &&
             resource.hasList
         ) {
             cards.push(
-                <Card>
+                <Card key={resource.name}>
                     <CardContent>
                         <Grid container spacing={3}>
                             <Grid item xs={1}>
@@ -106,7 +107,7 @@ const MyDashboard = () => {
             {cards.length > 0 ? (
                 <Grid container spacing={2}>
                     {cards.map(card => (
-                        <Grid item xs={12} md={3}>
+                        <Grid item xs={12} md={3} key={card.key}>
                             {card}
                         </Grid>
                     ))}
@@ -118,4 +119,4 @@ const MyDashboard = () => {
     );
 };
 
-export default MyDashboard;
+export default AppDashboard;

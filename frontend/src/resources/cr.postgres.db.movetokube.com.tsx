@@ -21,6 +21,7 @@ import {
     useTranslate,
     Button,
     SortPayload,
+    Link,
 } from 'react-admin';
 import { View } from './index';
 import { formatArray, parseArray } from '../utils';
@@ -227,10 +228,7 @@ const PostgresUsers = () => {
                     />
                 </Datagrid>
             )}
-            <Button
-                label={`buttons.createUser`}
-                href={`${window.location.origin}/${CR_POSTGRES_USERS}/create?db=${record.metadata.name}`}
-            ></Button>
+            <Link to={`/${CR_POSTGRES_USERS}/create?db=${record.metadata.name}`}><Button label={`buttons.createUser`}></Button></Link>
         </>
     );
 };
