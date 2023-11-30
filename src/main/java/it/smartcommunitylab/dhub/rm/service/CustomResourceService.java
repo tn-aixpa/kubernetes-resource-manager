@@ -107,6 +107,10 @@ public class CustomResourceService {
 
         //2. get schema as JsonSchema
         ObjectMapper mapper = new ObjectMapper();
+        // workaround for the $schema attribute
+        if (!schema.getSchema().containsKey("$schema")) {
+            schema.getSchema().put("$schema", "https://json-schema.org/draft/2020-12/schema");
+        }
         JsonNode schemaNode = mapper.valueToTree(schema.getSchema());
         JsonSchemaFactory factory = JsonSchemaFactory.getInstance(SpecVersionDetector.detect(schemaNode));
         JsonSchema jsonSchema = factory.getSchema(schemaNode);
