@@ -149,6 +149,15 @@ export const dataProvider = (
                     })
                 )
             ).then(responses => ({ data: responses.map(({ json }) => json) })),
+        // secret-specific
+        decodeSecret: (secret: string, key: string) => {
+            return httpClient(`${apiUrl}/k8s_secret/${secret}/decode/${key}`).then(({ headers, json }) => {
+                if (!json) {
+                    throw new Error('the response is invalid');
+                }
+                return json;
+            });
+        }
     };
 };
 

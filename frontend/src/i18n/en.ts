@@ -100,6 +100,23 @@ const messages = {
                 }
             },
         },
+        k8s_secret: {
+            name: 'Secret |||| Secrets',
+            fields: {
+                metadata: {
+                    creationTimestamp: 'Created',
+                    generation: 'Generation',
+                    name: 'Name',
+                    resourceVersion: 'Resource version',
+                    uid: 'UID',
+                },
+                type: 'Type',
+                data: 'Data',
+                secretname: 'Secret Name',
+                secretnum: 'Number of Secrets'
+            },
+            decode: 'Decode'
+        },
         'postgres.db.movetokube.com': {
             name: 'Postgres DB |||| Postgres DBs',
             fields: {
@@ -200,6 +217,9 @@ const messages = {
     label: {
         name: 'Label Name',
         value: 'Label Value'
+    },
+    clipboard: {
+        copied: 'Value copied to clipboard'
     }
 };
 

@@ -16,18 +16,17 @@ import {
     SchemaShow,
 } from './resources/crs';
 
-import {
-    K8SServiceList,
-    K8SServiceShow,
-} from './resources/k8s_service';
 
 import Login from './pages/Login';
 import { useUpdateCrdIds } from './hooks/useUpdateCrdIds';
 import { i18nProvider } from './providers/i18nProvider';
+
 import SettingsIcon from '@mui/icons-material/Settings';
 import LinkIcon from '@mui/icons-material/Link';
 import AppIcon from '@mui/icons-material/Apps';
 import AlbumIcon from '@mui/icons-material/Album';
+import KeyIcon from '@mui/icons-material/Key';
+
 import MyLayout from './Layout';
 import AppDashboard from './pages/Dashboard';
 import { CrdShow } from './resources/crd';
@@ -42,8 +41,11 @@ import crPostgresUsers from './resources/cr.postgresusers.db.movetokube.com';
 import crNuclioApiGateways from './resources/cr.nuclioapigateways.nuclio.io';
 import crPostgrest from './resources/cr.postgrests.operator.postgrest.org';
 import { httpClientProvider } from './providers/httpClientProvider';
+
 import { K8SDeploymentList, K8SDeploymentShow } from './resources/k8s_deployment';
 import { K8SPvcCreate, K8SPvcList, K8SPvcShow } from './resources/k8s_pvc';
+import { K8SServiceList, K8SServiceShow } from './resources/k8s_service';
+import { K8SSecretCreate, K8SSecretList, K8SSecretShow } from './resources/k8s_secret';
 
 console.log('Config', Config);
 
@@ -168,6 +170,13 @@ function DynamicAdminUI() {
                 list={K8SPvcList}
                 show={K8SPvcShow}
                 icon={AlbumIcon}
+            />
+            <Resource
+                name="k8s_secret"
+                create={K8SSecretCreate}
+                list={K8SSecretList}
+                show={K8SSecretShow}
+                icon={KeyIcon}
             />
         </AdminUI>
     );

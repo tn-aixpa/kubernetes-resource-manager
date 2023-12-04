@@ -203,6 +203,9 @@ const messages = {
     label: {
         name: 'Nome Label',
         value: 'Valore Label'
+    },
+    clipboard: {
+        copied: 'Valore copiato'
     }
 
 };

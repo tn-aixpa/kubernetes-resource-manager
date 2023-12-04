@@ -39,6 +39,10 @@ kubernetes:
   pvc:
     managed-by: ${K8S_PVC_MANAGED_BY:krm}
     storage-classes: ${K8S_PVC_STORAGE_CLASSES:krm}
+  secret:
+    labels: ${K8S_SELECTOR_LABELS:}
+    owners: ${K8S_SELECTOR_OWNERS:}
+    annotations: ${K8S_SELECTOR_ANNOTATIONS:}
 
 # authentication and authorization config
 auth:
