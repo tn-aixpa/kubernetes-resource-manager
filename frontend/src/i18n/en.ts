@@ -177,6 +177,28 @@ const messages = {
                 existingSecret: 'With existing secret'
             },
         },
+        'dremiorestservers.operator.dremiorestserver.com': {
+            name: 'Dremio Data Service |||| Dremio Data Services',
+            shortName: 'Dremio Data Service',
+            fields: {
+                id: 'ID',
+                spec: {
+                    tables: 'Exposed Dremio virtual sets',
+                    javaOptions: 'Extra Java options for container (JAVA_TOOL_OPTIONS)',
+                    connection: {
+                        title: 'Connection',
+                        host: 'Dremio Host',
+                        port: 'Dremio Port',
+                        secretName: 'Secret name',
+                        user: 'Dremio User',
+                        password: 'Dremio Password',
+                        jdbcProperties: 'Extra URL connection parameters'
+                    }
+                },
+                tables: 'Exposed Dremio virtual sets',
+                existingSecret: 'With existing secret'
+            },
+        },
         'nuclioapigateways.nuclio.io': {
             name: 'API Gateway |||| API Gateways',
             fields: {

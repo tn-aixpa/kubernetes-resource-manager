@@ -2,6 +2,7 @@ import crPostgres from '../resources/cr.postgres.db.movetokube.com';
 import crPostgresUsers from '../resources/cr.postgresusers.db.movetokube.com';
 import crNuclioApiGateways from '../resources/cr.nuclioapigateways.nuclio.io';
 import crPostgrest from '../resources/cr.postgrests.operator.postgrest.org';
+import crDremiorest from '../resources/cr.dremiorestservers.operator.dremiorestserver.com';
 
 //read config from ENV
 const CONTEXT_PATH =
@@ -51,6 +52,7 @@ export const Config = {
         'postgresusers.db.movetokube.com': crPostgresUsers,
         'nuclioapigateways.nuclio.io': crNuclioApiGateways,
         'postgrests.operator.postgrest.org': crPostgrest,
+        'dremiorestservers.operator.dremiorestserver.com': crDremiorest
     },
 };
 
