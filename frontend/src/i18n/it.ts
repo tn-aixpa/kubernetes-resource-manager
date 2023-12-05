@@ -136,20 +136,31 @@ const messages = {
             },
         },
         'postgrests.operator.postgrest.org': {
-            name: 'Servizio PostgREST |||| Servizi PostgREST',
+            name: 'Servizio Dati PostgREST |||| Servizi Dati PostgREST',
             shortName: 'PostgREST',
             fields: {
                 id: 'ID',
                 spec: {
                     database: 'Database ID',
-                    schemas: 'Schema DB',
+                    schema: 'Schema DB',
                     anonRole: 'Nome utente DB esisente',
-                    tables: 'Tabelle DB esposte',
                     grants: 'Permessi DB',
-                    },
+                    tables: 'Tabelle DB esposte',
+                    connection: {
+                        title: 'Connessione',
+                        host: 'DB Host',
+                        port: 'DB Port',
+                        database: 'Nome database',
+                        secretName: 'Nome segreto',
+                        user: 'Utente DB',
+                        password: 'Password DB',
+                        extraParams: 'Extra parametri URL di connessione'
+                    }
+                },
                 tables: 'Tabelle DB esposte',
                 grants: 'Permessi DB',
-                existing: 'Con utente DB esistent',
+                existing: 'Con utente DB esistente',
+                existingSecret: 'Con segreto esistente'
             },
         },
         'nuclioapigateways.nuclio.io': {

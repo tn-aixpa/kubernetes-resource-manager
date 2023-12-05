@@ -150,20 +150,31 @@ const messages = {
             },
         },
         'postgrests.operator.postgrest.org': {
-            name: 'PostgREST service |||| PostgREST services',
-            shortName: 'PostgREST',
+            name: 'PostgREST Data Service |||| PostgREST Data Services',
+            shortName: 'PostgREST Data Service',
             fields: {
                 id: 'ID',
                 spec: {
                     database: 'Database ID',
-                    schemas: 'DB Schema',
+                    schema: 'DB Schema',
                     anonRole: 'Existing DB user name',
                     grants: 'DB permissions',
                     tables: 'Exposed DB tables',
+                    connection: {
+                        title: 'Connection',
+                        host: 'DB Host',
+                        port: 'DB Port',
+                        database: 'Database name',
+                        secretName: 'Secret name',
+                        user: 'DB User',
+                        password: 'DB Password',
+                        extraParams: 'Extra connection URL params'
+                    }
                 },
                 tables: 'Exposed DB tables',
                 grants: 'DB permissions',
                 existing: 'With existing DB user',
+                existingSecret: 'With existing secret'
             },
         },
         'nuclioapigateways.nuclio.io': {
