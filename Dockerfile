@@ -12,7 +12,9 @@ RUN --mount=type=cache,target=/root/.m2,source=/.m2,from=ghcr.io/scc-digitalhub/
     mvn package -DskipTests
 
 FROM gcr.io/distroless/java17-debian12:nonroot
+ARG VER
+ENV VER=${VER}
 LABEL org.opencontainers.image.source=https://github.com/scc-digitalhub/custom-resource-manager
-COPY --chown=65532:65532 --from=mvn /tmp/target/resourcemanager-1.0.0-SNAPSHOT.jar /home/nonroot/resourcemanager-1.0.0-SNAPSHOT.jar
+COPY --chown=65532:65532 --from=mvn /tmp/target/resourcemanager-${VER}.jar /home/nonroot/resourcemanager-${VER}.jar
 EXPOSE 8080
-CMD ["/home/nonroot/resourcemanager-1.0.0-SNAPSHOT.jar"]
+CMD ["/home/nonroot/resourcemanager-${VER}.jar"]
