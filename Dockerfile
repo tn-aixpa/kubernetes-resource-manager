@@ -15,6 +15,6 @@ FROM gcr.io/distroless/java17-debian12:nonroot
 ARG VER
 ENV VER=${VER}
 LABEL org.opencontainers.image.source=https://github.com/scc-digitalhub/custom-resource-manager
-COPY --chown=65532:65532 --from=mvn /tmp/target/resourcemanager-${VER}.jar /home/nonroot/resourcemanager-${VER}.jar
+COPY --chown=65532:65532 --from=mvn /tmp/target/resourcemanager-${VER}.jar /home/nonroot/resourcemanager.jar
 EXPOSE 8080
-CMD ["/home/nonroot/resourcemanager-${VER}.jar"]
+CMD ["/home/nonroot/resourcemanager.jar"]
