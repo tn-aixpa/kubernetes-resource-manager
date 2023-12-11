@@ -41,9 +41,12 @@ public class K8SSecretService extends K8SResourceService<Secret> {
     private String ownerFilters;
     @Value("${kubernetes.secret.annotations}")
     private String annotationFilters;
+    @Value("${kubernetes.secret.names}")
+    private String nameFilters;
 
     Map<String, String> annotations = new HashMap<>();
     Set<String> owners = new HashSet<>();
+    Set<String> names = new HashSet<>();
 
     public K8SSecretService(KubernetesClient client, AuthorizationService authService) {
         super(client, authService, 60);
@@ -62,6 +65,9 @@ public class K8SSecretService extends K8SResourceService<Secret> {
             }
             if (StringUtils.hasText(ownerFilters)) {
                 owners.addAll(StringUtils.commaDelimitedListToSet(ownerFilters));
+            }
+            if (StringUtils.hasText(nameFilters)) {
+                names.addAll(StringUtils.commaDelimitedListToSet(nameFilters));
             }
 
     }
@@ -127,8 +133,7 @@ public class K8SSecretService extends K8SResourceService<Secret> {
                 Arrays.asList(labelFilters.split("\\|")).stream()
                 .map(s -> getKubernetesClient().secrets().inNamespace(namespace) .withLabelSelector(s).list().getItems())
                 .flatMap(Collection::stream).forEach(s -> secrets.put(s.getMetadata().getName(), s));
-        //if (StringUtils.hasText(ownerFilters))
-        if (!annotations.isEmpty() || !owners.isEmpty()) {
+        if (!annotations.isEmpty() || !owners.isEmpty() || !names.isEmpty()) {
             List<Secret> all = getKubernetesClient().secrets().inNamespace(namespace).list().getItems();
             all.forEach(s -> {
                 // check owners: apiVersion in the list of owners
@@ -137,6 +142,10 @@ public class K8SSecretService extends K8SResourceService<Secret> {
                 } 
                 // check annotations: should match at least one
                 if (!annotations.isEmpty() && s.getMetadata().getAnnotations() != null && s.getMetadata().getAnnotations().keySet().stream().filter(a -> annotations.containsKey(a) && annotations.get(a).equals(s.getMetadata().getAnnotations().get(a))).findAny().isPresent()) {
+                    secrets.put(s.getMetadata().getName(), s);
+                }
+                // check names: regexp
+                if (names.stream().anyMatch(n -> s.getMetadata().getName().matches(n))) {
                     secrets.put(s.getMetadata().getName(), s);
                 }
             });

@@ -247,7 +247,7 @@ const CrEdit = () => {
 
     const tables = record.spec.tables ? record.spec.tables.map((t: any) => ({id: t, name: t})) : [];
     record.existing = !!record.spec.anonRole;
-    record.existingSecret = !!record.spec.connection.secretName;
+    record.existingSecret = !!record.spec.connection && !!record.spec.connection.secretName;
     record.tables = record.spec.tables;
     record.grants = record.spec.grants ? record.spec.grants.split(',') : [];
 

@@ -43,6 +43,7 @@ kubernetes:
     labels: ${K8S_SELECTOR_LABELS:}
     owners: ${K8S_SELECTOR_OWNERS:}
     annotations: ${K8S_SELECTOR_ANNOTATIONS:}
+    names: ${K8S_SELECTOR_NAMES:}
 
 # authentication and authorization config
 auth:
