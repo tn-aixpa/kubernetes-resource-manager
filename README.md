@@ -40,8 +40,9 @@ KRM allows for accessing a subset of secrets. To define which secrets to access,
 - `kubernetes.secret.labels` (`K8S_SELECTOR_LABELS`) defines the label selectors (separated by `|`) for filtering the K8S Secrets to match.
 - `kubernetes.secret.owners` (`K8S_SELECTOR_OWNERS`) list of comma-separated owner api versions (full form) to match.
 - `kubernetes.secret.annotations` (`K8S_SELECTOR_ANNOTATIONS`) defines the annotation filters (separated by `|`) for filtering the K8S Secrets to match. The filter should have a form `<annotation>=<value>`.
+- `kubernetes.secret.name` (`K8S_SELECTOR_NAMES`) list of comma-separated regular expressionds to match the secret name.
 
-The secrets will be shown only if one of these filters match.
+The secrets will be shown only if at least one of these filters match.
 
 To control the creation of the Persistent Volume Claims, it is possible additional to define the following properties
 
