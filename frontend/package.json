@@ -5,6 +5,7 @@
   "dependencies": {
     "@dslab/ra-ace-editor": "^1.0.0",
     "@dslab/ra-breadcrumb": "^1.0.0",
+    "@dslab/ra-inspect-button": "^1.0.0",
     "@dslab/ra-jsonschema-input": "^1.1.0",
     "@dslab/ra-language-italian": "^1.0.0",
     "@mui/material": "^5.12.3",

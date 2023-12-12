@@ -6,7 +6,6 @@ import {
     SimpleShowLayout,
     TextField,
     ArrayField,
-    ChipField,
     useShowController,
     useTranslate,
     useRecordContext,
@@ -23,7 +22,7 @@ import {
 import { Grid, Typography } from '@mui/material';
 import { Breadcrumb } from '@dslab/ra-breadcrumb';
 import { ContentCopy } from '@mui/icons-material';
-import { CreateTopToolbar } from '../components/toolbars';
+import { CreateTopToolbar, ShowTopToolbar } from '../components/toolbars';
 
 
 
@@ -147,7 +146,7 @@ export const K8SSecretShow = () => {
                     recordRepresentation: record.id,
                 })}
             </Typography>
-            <Show actions={false}>
+            <Show actions={<ShowTopToolbar hasYaml hasEdit={false} hasDelete={false} />}>
                 <SimpleShowLayout>
                     <TextField source="metadata.name" />
                     <TextField source="type" />

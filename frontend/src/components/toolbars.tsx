@@ -11,13 +11,14 @@ import {
 } from 'react-admin';
 import { useUpdateCrdIds } from '../hooks/useUpdateCrdIds';
 import YamlButton from './YamlButton';
+import { InspectButton } from '@dslab/ra-inspect-button';
 
 export const TopToolbar = (props: TopToolbarProps) => {
     const { hasCreate, hasEdit, hasShow, hasList, hasDelete, hasYaml } = props;
 
     return (
         <ReactAdminTopToolbar>
-            {hasYaml && <YamlButton key="yaml-button" />}
+            {hasYaml && <InspectButton key="yaml-button" language="yaml"/>}
             {hasCreate && <CreateButton key="create-button" />}
             {hasEdit && <EditButton key="edit-button" />}
             {hasShow && <ShowButton key="show-button" />}
@@ -52,7 +53,7 @@ export const ListTopToolbar = (props: TopToolbarProps) => {
 };
 
 export const ShowTopToolbar = (props: TopToolbarProps) => {
-    const { hasEdit = true, hasList = true, hasDelete = true } = props;
+    const { hasEdit = true, hasList = true, hasDelete = true, hasYaml = true } = props;
     return (
         <TopToolbar
             {...props}

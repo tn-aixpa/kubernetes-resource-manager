@@ -104,6 +104,9 @@ const CrCreate = () => {
         } else {
             delete data.spec.secretName;
         }
+        if (data.spec.connection && (!data.spec.connection.port || data.spec.connection.port <= 0)) {
+            data.spec.connection.port = 5432;
+        }
         return {
             ...data,
             apiVersion: apiVersion,
@@ -265,6 +268,9 @@ const CrEdit = () => {
             delete data.spec.connection.password;
         } else {
             delete data.spec.secretName;
+        }
+        if (data.spec.connection && (!data.spec.connection.port || data.spec.connection.port <= 0)) {
+            data.spec.connection.port = 5432;
         }
 
         return data;

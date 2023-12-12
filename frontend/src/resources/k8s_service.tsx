@@ -13,6 +13,7 @@ import {
 } from 'react-admin';
 import { Typography } from '@mui/material';
 import { Breadcrumb } from '@dslab/ra-breadcrumb';
+import { ShowTopToolbar } from '../components/toolbars';
 
 // customization to distinguish known types
 const labels2type = (labels: any) => {
@@ -63,7 +64,7 @@ export const K8SServiceShow = () => {
                     recordRepresentation: record.id,
                 })}
             </Typography>
-            <Show actions={false}>
+            <Show actions={<ShowTopToolbar hasYaml hasEdit={false} hasDelete={false} /> }>
                 <SimpleShowLayout>
                     <TextField source="metadata.name" />
                     {type ? (

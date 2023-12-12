@@ -23,6 +23,7 @@ import { Breadcrumb } from '@dslab/ra-breadcrumb';
 import {
     CreateTopToolbar,
     ListTopToolbar,
+    ShowTopToolbar,
 } from '../components/toolbars';
 
 export const K8SPvcCreate = () => {
@@ -156,7 +157,7 @@ export const K8SPvcShow = () => {
                     recordRepresentation: record.id,
                 })}
             </Typography>
-            <Show actions={false}>
+            <Show actions={<ShowTopToolbar hasYaml hasEdit={false} />}>
                 <SimpleShowLayout>
                     <TextField source="metadata.name" />
                     <TextField source="status.phase" />

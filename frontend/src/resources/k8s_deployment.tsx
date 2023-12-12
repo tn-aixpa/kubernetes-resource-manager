@@ -13,10 +13,11 @@ import {
 } from 'react-admin';
 import { Typography } from '@mui/material';
 import { Breadcrumb } from '@dslab/ra-breadcrumb';
+import { ShowTopToolbar } from '../components/toolbars';
 
 const StatusField = (props: any) => {
     const record = useRecordContext(props);
-    const status = record.status.readyReplicas + ' / ' +record.status.replicas;
+    const status = (record.status.readyReplicas || 0) + ' / ' +record.status.replicas;
     return (
          <TextField source="status" record={{
             status: status
@@ -50,7 +51,7 @@ export const K8SDeploymentShow = () => {
                     recordRepresentation: record.id,
                 })}
             </Typography>
-            <Show actions={false}>
+            <Show actions={<ShowTopToolbar hasYaml hasEdit={false} hasDelete={false} />}>
                 <SimpleShowLayout>
                     <TextField source="metadata.name" />
                     <TextField source="metadata.creationTimestamp" />
