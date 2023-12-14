@@ -19,10 +19,10 @@ import {
     SimpleFormIterator,
     useNotify,
 } from 'react-admin';
-import { Grid, Typography } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import { Breadcrumb } from '@dslab/ra-breadcrumb';
 import { ContentCopy } from '@mui/icons-material';
-import { CreateTopToolbar, ShowTopToolbar } from '../components/toolbars';
+import { CreateTopToolbar, ShowTopToolbar } from '../../components/toolbars';
 
 
 
@@ -106,7 +106,9 @@ export const K8SSecretList = () => (
                 <TextField source="metadata.name" />
                 <TextField source="type" />
                 <DataNumField label="resources.k8s_secret.fields.secretnum" />
-                <ShowButton />
+                <Box textAlign={'right'}>
+                    <ShowButton />
+                </Box>
             </Datagrid>
         </List>
     </>

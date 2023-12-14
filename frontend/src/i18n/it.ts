@@ -62,6 +62,20 @@ const messages = {
                 type: 'Tipo'
             },
         },
+        k8s_job: {
+            name: 'Job |||| Job',
+            fields: {
+                metadata: {
+                    creationTimestamp: 'Creazione',
+                    generation: 'Generazione',
+                    name: 'Nome',
+                    resourceVersion: 'Versione risorsa',
+                    uid: 'UID',
+                },
+                completion: 'Completamento',
+                duration: 'Durata'
+            },
+        },
         k8s_deployment: {
             name: 'Deployment |||| Deployment',
             fields: {

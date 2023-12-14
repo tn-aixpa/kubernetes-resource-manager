@@ -19,15 +19,15 @@ import {
     useTranslate,
     SelectInput,
 } from 'react-admin';
-import { View } from './index';
-import { ViewToolbar } from '../components/ViewToolbar';
-import { TopToolbarProps } from '../components/toolbars';
-import { SimplePageTitle } from './cr';
+import { View } from '../index';
+import { ViewToolbar } from '../../components/ViewToolbar';
+import { TopToolbarProps } from '../../components/toolbars';
+import { SimplePageTitle } from '../cr';
 import { CR_POSTGRES_DB } from './cr.postgres.db.movetokube.com';
-import { useCrTransform } from '../hooks/useCrTransform';
+import { useCrTransform } from '../../hooks/useCrTransform';
 import { Breadcrumbs, Grid, Typography } from '@mui/material';
 import { useLocation, Link } from 'react-router-dom';
-import YamlButton from '../components/YamlButton';
+import YamlButton from '../../components/YamlButton';
 
 export const CR_POSTGRES_USERS = 'postgresusers.db.movetokube.com';
 

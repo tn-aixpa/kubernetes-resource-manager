@@ -14,7 +14,7 @@ import {
     useTranslate,
 } from 'react-admin';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import { Breadcrumbs, Typography } from '@mui/material';
+import { Box, Breadcrumbs, Typography } from '@mui/material';
 import { AceEditorField } from '@dslab/ra-ace-editor';
 import { useLocation, Link } from 'react-router-dom';
 import { Breadcrumb } from '@dslab/ra-breadcrumb';
@@ -25,7 +25,9 @@ export const CrdList = () => (
         <List actions={false}>
             <Datagrid bulkActionButtons={false}>
                 <TextField source="spec.names.kind" />
-                <ShowButton />
+                <Box textAlign={'right'}>
+                    <ShowButton />
+                </Box>
             </Datagrid>
         </List>
     </>

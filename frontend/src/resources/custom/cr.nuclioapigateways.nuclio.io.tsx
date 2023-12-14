@@ -24,17 +24,17 @@ import {
     useGetList,
     ReferenceInput,
 } from 'react-admin';
-import { ViewToolbar } from '../components/ViewToolbar';
+import { ViewToolbar } from '../../components/ViewToolbar';
 import {
     CreateTopToolbar,
     EditTopToolbar,
     ListTopToolbar,
     ShowTopToolbar,
-} from '../components/toolbars';
-import { SimplePageTitle } from './cr';
-import { View } from '.';
-import { useCrTransform } from '../hooks/useCrTransform';
-import { Grid, Typography } from '@mui/material';
+} from '../../components/toolbars';
+import { SimplePageTitle } from '../cr';
+import { View } from '..';
+import { useCrTransform } from '../../hooks/useCrTransform';
+import { Box, Grid, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import CableIcon from '@mui/icons-material/Cable';
 import { Breadcrumb } from '@dslab/ra-breadcrumb';
@@ -503,9 +503,11 @@ const CrList = () => {
                     <TextField source="spec.host" />
                     <TextField source="spec.path" />
                     <TextField source="status.state" />
-                    <EditButton />
-                    <ShowButton />
-                    <DeleteWithConfirmButton />
+                    <Box textAlign={'right'}>
+                        <EditButton />
+                        <ShowButton />
+                        <DeleteWithConfirmButton />
+                    </Box>
                 </Datagrid>
             </List>
         </>

@@ -1,6 +1,8 @@
 package it.smartcommunitylab.dhub.rm.api;
 
 import java.util.Collection;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.fabric8.kubernetes.api.model.apps.Deployment;
@@ -46,4 +49,10 @@ public class K8SDeploymentApi {
     public IdAwareResource<Deployment> findById(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String deploymentId) {
         return service.findById(namespace, deploymentId);
     }
+
+    @GetMapping("/{deploymentId}/log")
+    public List<String>  getLog(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String deploymentId) {
+        return service.getLog(namespace, deploymentId);
+    }
+
 }

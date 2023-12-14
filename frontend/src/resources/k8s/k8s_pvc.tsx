@@ -18,13 +18,13 @@ import {
     ReferenceInput,
     NumberInput,
 } from 'react-admin';
-import { Grid, Typography } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 import { Breadcrumb } from '@dslab/ra-breadcrumb';
 import {
     CreateTopToolbar,
     ListTopToolbar,
     ShowTopToolbar,
-} from '../components/toolbars';
+} from '../../components/toolbars';
 
 export const K8SPvcCreate = () => {
     const translate = useTranslate();
@@ -137,8 +137,10 @@ export const K8SPvcList = () => (
                 <TextField source="spec.volumeName" />
                 <TextField source="spec.resources.requests.storage" />
                 <TextField source="spec.storageClassName" />
-                <ShowButton />
-                <DeleteWithConfirmButton />
+                <Box textAlign={'right'}>
+                    <ShowButton />
+                    <DeleteWithConfirmButton />
+                </Box>
             </Datagrid>
         </List>
     </>

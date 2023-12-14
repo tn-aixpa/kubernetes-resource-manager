@@ -27,7 +27,7 @@ import {
     useEditController,
 } from 'react-admin';
 import { useUpdateCrdIds } from '../hooks/useUpdateCrdIds';
-import { Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import { useFormContext } from 'react-hook-form';
 import { useEffect } from 'react';
@@ -172,10 +172,12 @@ export const SchemaList = () => {
                 <Datagrid bulkActionButtons={false}>
                     <TextField source="crdId" />
                     <TextField source="version" />
-                    <CopyButton />
-                    <EditButton />
-                    <ShowButton />
-                    <DeleteWithConfirmButton mutationOptions={{ onSuccess }} />
+                    <Box textAlign={'right'}>
+                        <CopyButton />
+                        <EditButton />
+                        <ShowButton />
+                        <DeleteWithConfirmButton mutationOptions={{ onSuccess }} />
+                    </Box>
                 </Datagrid>
             </List>
         </>

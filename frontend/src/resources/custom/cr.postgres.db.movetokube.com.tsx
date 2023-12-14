@@ -23,19 +23,19 @@ import {
     SortPayload,
     Link,
 } from 'react-admin';
-import { View } from './index';
-import { formatArray, parseArray } from '../utils';
-import { ViewToolbar } from '../components/ViewToolbar';
+import { View } from '../index';
+import { formatArray, parseArray } from '../../utils';
+import { ViewToolbar } from '../../components/ViewToolbar';
 import {
     CreateTopToolbar,
     EditTopToolbar,
     ListTopToolbar,
     ShowTopToolbar,
-} from '../components/toolbars';
-import { SimplePageTitle } from './cr';
-import { Grid, Typography } from '@mui/material';
+} from '../../components/toolbars';
+import { SimplePageTitle } from '../cr';
+import { Box, Grid, Typography } from '@mui/material';
 import { CR_POSTGRES_USERS } from './cr.postgresusers.db.movetokube.com';
-import { useCrTransform } from '../hooks/useCrTransform';
+import { useCrTransform } from '../../hooks/useCrTransform';
 import DatasetIcon from '@mui/icons-material/Dataset';
 import { Breadcrumb } from '@dslab/ra-breadcrumb';
 
@@ -182,9 +182,11 @@ const CrList = () => {
                 <Datagrid>
                     <TextField source="id" />
                     <TextField source="spec.database" />
-                    <EditButton />
-                    <ShowButton />
-                    <DeleteWithConfirmButton />
+                    <Box textAlign={'right'}>
+                        <EditButton />
+                        <ShowButton />
+                        <DeleteWithConfirmButton />
+                    </Box>
                 </Datagrid>
             </List>
         </>
@@ -262,12 +264,13 @@ const PostgresUsers = () => {
                         source="spec.secretName"
                         label={`resources.${CR_POSTGRES_USERS}.fields.spec.secretName`}
                     />
-                    <EditButton resource={CR_POSTGRES_USERS} />
-                    <ShowButton resource={CR_POSTGRES_USERS} />
-                    <DeleteWithConfirmButton
-                        redirect={false}
-                        resource={CR_POSTGRES_USERS}
-                    />
+                    <Box textAlign={'right'}>
+                        <EditButton resource={CR_POSTGRES_USERS} />
+                        <ShowButton resource={CR_POSTGRES_USERS} />
+                        <DeleteWithConfirmButton
+                            redirect={false}
+                            resource={CR_POSTGRES_USERS}/>
+                    </Box>
                 </Datagrid>
             )}
             <Link to={`/${CR_POSTGRES_USERS}/create?db=${record.metadata.name}`}><Button label={`buttons.createUser`}></Button></Link>

@@ -68,11 +68,14 @@ export const dataProvider = (
             if (params?.meta?.yaml) {
                 headers = new Headers({ Accept: 'application/x-yaml' });
             }
-            return httpClient(`${apiUrl}/${resource}/${params.id}`, {
+            return httpClient(`${apiUrl}/${resource}/${params.id}${params?.meta?.log ? '/log' : ''}`, {
                 headers: headers,
             }).then(({ json, body }) => {
                 if (params?.meta?.yaml) {
                     return { data: { id: 'yamltext', yaml: body } };
+                }
+                if (params?.meta?.log) {
+                    return { data: { id: 'log', records: json } };
                 }
                 return {
                     data: json,

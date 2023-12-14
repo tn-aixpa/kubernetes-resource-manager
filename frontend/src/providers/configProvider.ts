@@ -1,8 +1,8 @@
-import crPostgres from '../resources/cr.postgres.db.movetokube.com';
-import crPostgresUsers from '../resources/cr.postgresusers.db.movetokube.com';
-import crNuclioApiGateways from '../resources/cr.nuclioapigateways.nuclio.io';
-import crPostgrest from '../resources/cr.postgrests.operator.postgrest.org';
-import crDremiorest from '../resources/cr.dremiorestservers.operator.dremiorestserver.com';
+import crPostgres from '../resources/custom/cr.postgres.db.movetokube.com';
+import crPostgresUsers from '../resources/custom/cr.postgresusers.db.movetokube.com';
+import crNuclioApiGateways from '../resources/custom/cr.nuclioapigateways.nuclio.io';
+import crPostgrest from '../resources/custom/cr.postgrests.operator.postgrest.org';
+import crDremiorest from '../resources/custom/cr.dremiorestservers.operator.dremiorestserver.com';
 
 //read config from ENV
 const CONTEXT_PATH =

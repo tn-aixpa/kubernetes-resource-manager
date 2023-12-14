@@ -19,7 +19,7 @@ import {
     useShowController,
     useEditController,
 } from 'react-admin';
-import { Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { ViewToolbar } from '../components/ViewToolbar';
 
 import {
@@ -125,9 +125,11 @@ export const CrList = () => {
                         source="kind"
                         label={'resources.cr.fields.kind'}
                     />
-                    <EditButton />
-                    <ShowButton />
-                    <DeleteWithConfirmButton />
+                    <Box textAlign={'right'}>
+                        <EditButton />
+                        <ShowButton />
+                        <DeleteWithConfirmButton />
+                    </Box>
                 </Datagrid>
             </List>
         </>

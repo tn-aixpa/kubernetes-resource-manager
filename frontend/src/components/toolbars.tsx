@@ -10,15 +10,16 @@ import {
     useResourceContext,
 } from 'react-admin';
 import { useUpdateCrdIds } from '../hooks/useUpdateCrdIds';
-import YamlButton from './YamlButton';
 import { InspectButton } from '@dslab/ra-inspect-button';
+import LogButton from './LogButton';
 
 export const TopToolbar = (props: TopToolbarProps) => {
-    const { hasCreate, hasEdit, hasShow, hasList, hasDelete, hasYaml } = props;
+    const { hasCreate, hasEdit, hasShow, hasList, hasDelete, hasYaml, hasLog } = props;
 
     return (
         <ReactAdminTopToolbar>
             {hasYaml && <InspectButton key="yaml-button" language="yaml"/>}
+            {hasLog && <LogButton/>}
             {hasCreate && <CreateButton key="create-button" />}
             {hasEdit && <EditButton key="edit-button" />}
             {hasShow && <ShowButton key="show-button" />}
@@ -35,6 +36,7 @@ export interface TopToolbarProps {
     hasCreate?: boolean;
     hasDelete?: boolean;
     hasYaml?: boolean;
+    hasLog?: boolean;
 }
 
 export const CreateTopToolbar = (props: TopToolbarProps) => {
@@ -53,13 +55,14 @@ export const ListTopToolbar = (props: TopToolbarProps) => {
 };
 
 export const ShowTopToolbar = (props: TopToolbarProps) => {
-    const { hasEdit = true, hasList = true, hasDelete = true, hasYaml = true } = props;
+    const { hasEdit = true, hasList = true, hasDelete = true, hasLog = false } = props;
     return (
         <TopToolbar
             {...props}
             hasEdit={hasEdit}
             hasList={hasList}
             hasDelete={hasDelete}
+            hasLog={hasLog}
         />
     );
 };
