@@ -13,10 +13,12 @@ const MyMenu = (props: MenuProps) => {
     return (
         <Menu {...props}>
             <Menu.DashboardItem />
+            <Divider />
             {Object.values(resources).map(
                 (resource: ResourceDefinition) =>
                     resource.name !== 'crd' &&
                     resource.name !== 'crs' &&
+                    !resource.name.startsWith('k8s') &&
                     resource.hasList && (
                         <Menu.ResourceItem
                             key={resource.name}
@@ -24,6 +26,12 @@ const MyMenu = (props: MenuProps) => {
                         />
                     )
             )}
+            <Divider />
+            <Menu.ResourceItem name={'k8s_service'} />
+            <Menu.ResourceItem name={'k8s_deployment'} />
+            <Menu.ResourceItem name={'k8s_job'} />                    
+            <Menu.ResourceItem name={'k8s_pvc'} />
+            <Menu.ResourceItem name={'k8s_secret'} />
             <div key="settings">
                 <Divider />
                 <Menu.ResourceItem name={'crs'} />
