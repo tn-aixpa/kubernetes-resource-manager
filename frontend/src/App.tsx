@@ -39,7 +39,7 @@ import { Config } from './providers/configProvider';
 import { buildAuthProvider } from './providers/authProvider';
 import crPostgres from './resources/custom/cr.postgres.db.movetokube.com';
 import crPostgresUsers from './resources/custom/cr.postgresusers.db.movetokube.com';
-import crNuclioApiGateways from './resources/custom/cr.nuclioapigateways.nuclio.io';
+import crApiGateways from './resources/custom/cr.apigws.operator.scc-digitalhub.github.io';
 import crPostgrest from './resources/custom/cr.postgrests.operator.postgrest.org';
 import crDremiorest from './resources/custom/cr.dremiorestservers.operator.dremiorestserver.com';
 import { httpClientProvider } from './providers/httpClientProvider';
@@ -63,9 +63,9 @@ const store = localStorageStore();
 const customViews: { [index: string]: View } = {
     'postgres.db.movetokube.com': crPostgres,
     'postgresusers.db.movetokube.com': crPostgresUsers,
-    'nuclioapigateways.nuclio.io': crNuclioApiGateways,
+    'apigws.operator.scc-digitalhub.github.io': crApiGateways,
     'postgrests.operator.postgrest.org': crPostgrest,
-    'dremiorestservers.operator.dremiorestserver.com': crDremiorest
+    'dremiorestservers.operator.dremiorestserver.com': crDremiorest    
 };
 
 //theming

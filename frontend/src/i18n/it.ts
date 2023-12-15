@@ -234,6 +234,29 @@ const messages = {
             authenticationTitle: 'Autenticazione',
             alreadyExists: 'Esiste già'
         },
+        'apigws.operator.scc-digitalhub.github.io': {
+            name: 'API Gateway |||| API Gateway',
+            fields: {
+                id: 'ID',
+                spec: {
+                    auth: {
+                        type: 'Modalità',
+                        basic: {
+                            user: 'Utente',
+                            password: 'Password',
+                        },
+                    },
+                    host: 'Host',
+                    path: 'Percorso',
+                    port: 'Porta',
+                    service: 'Servizio',
+                },
+                status: {
+                    state: 'Stato'
+                }
+            },
+            authenticationTitle: 'Autenticazione'
+        },
     },
     dashboard: {
         title: 'Resource Manager',

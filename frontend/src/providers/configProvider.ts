@@ -1,8 +1,9 @@
 import crPostgres from '../resources/custom/cr.postgres.db.movetokube.com';
 import crPostgresUsers from '../resources/custom/cr.postgresusers.db.movetokube.com';
-import crNuclioApiGateways from '../resources/custom/cr.nuclioapigateways.nuclio.io';
 import crPostgrest from '../resources/custom/cr.postgrests.operator.postgrest.org';
 import crDremiorest from '../resources/custom/cr.dremiorestservers.operator.dremiorestserver.com';
+import crApiGateways from '../resources/custom/cr.apigws.operator.scc-digitalhub.github.io';
+
 
 //read config from ENV
 const CONTEXT_PATH =
@@ -50,9 +51,9 @@ export const Config = {
     views: {
         'postgres.db.movetokube.com': crPostgres,
         'postgresusers.db.movetokube.com': crPostgresUsers,
-        'nuclioapigateways.nuclio.io': crNuclioApiGateways,
         'postgrests.operator.postgrest.org': crPostgrest,
-        'dremiorestservers.operator.dremiorestserver.com': crDremiorest
+        'dremiorestservers.operator.dremiorestserver.com': crDremiorest,
+        'apigws.operator.scc-digitalhub.github.io': crApiGateways
     },
 };
 
