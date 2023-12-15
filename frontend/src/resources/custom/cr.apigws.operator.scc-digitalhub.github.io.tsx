@@ -210,6 +210,7 @@ const CrEdit = () => {
         if (data.spec.auth.type === 'none') {
             delete data.spec.auth.basic;
         }
+        data.status = {state: 'Updating'}
         return {
             ...data,
             apiVersion: apiVersion,
