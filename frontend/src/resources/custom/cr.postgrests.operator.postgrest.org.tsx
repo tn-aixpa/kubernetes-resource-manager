@@ -102,11 +102,15 @@ const CrCreate = () => {
             delete data.spec.connection.user;
             delete data.spec.connection.password;
         } else {
-            delete data.spec.secretName;
+            delete data.spec.connection.secretName;
         }
         if (data.spec.connection && (!data.spec.connection.port || data.spec.connection.port <= 0)) {
             data.spec.connection.port = 5432;
         }
+        if (data.spec.connection && (!data.spec.connection.extraParams || data.spec.connection.extraParams.trim() === '')) {
+            delete data.spec.connection.extraParams;
+        }
+
         return {
             ...data,
             apiVersion: apiVersion,
@@ -213,8 +217,9 @@ const CrCreate = () => {
                     <>
                         {formData.existingSecret && (
                             <Grid container alignItems="center" spacing={2}>
-                                <Grid item xs={4}>
-                                    <TextInput fullWidth source="spec.connection.secretName"  validate={required()}/>
+                                <Grid item xs={8}>
+                                    <TextInput fullWidth source="spec.connection.secretName"  validate={required()} 
+                                     helperText={`resources.${CR_POSTGREST}.fields.spec.connection.secretNameHint`}/>
                                 </Grid>
                             </Grid>
                         )}
@@ -267,10 +272,13 @@ const CrEdit = () => {
             delete data.spec.connection.user;
             delete data.spec.connection.password;
         } else {
-            delete data.spec.secretName;
+            delete data.spec.connection.secretName;
         }
         if (data.spec.connection && (!data.spec.connection.port || data.spec.connection.port <= 0)) {
             data.spec.connection.port = 5432;
+        }
+        if (data.spec.connection && (!data.spec.connection.extraParams || data.spec.connection.extraParams.trim() === '')) {
+            delete data.spec.connection.extraParams;
         }
 
         return data;
@@ -362,8 +370,9 @@ const CrEdit = () => {
                     <>
                         {formData.existingSecret && (
                             <Grid container alignItems="center" spacing={2}>
-                                <Grid item xs={4}>
-                                    <TextInput fullWidth source="spec.connection.secretName"  validate={required()}/>
+                                <Grid item xs={8}>
+                                    <TextInput fullWidth source="spec.connection.secretName"  validate={required()} 
+                                     helperText={`resources.${CR_POSTGREST}.fields.spec.connection.secretNameHint`}/>
                                 </Grid>
                             </Grid>
                         )}
@@ -457,7 +466,6 @@ const CrShow = () => {
                     <TextField source="spec.connection.database" />
                     <TextField source="spec.connection.secretName" />
                     <TextField source="spec.connection.user" />
-                    <TextField source="spec.connection.password" />
                     <TextField source="spec.connection.extraParams" />
 
                 </SimpleShowLayout>

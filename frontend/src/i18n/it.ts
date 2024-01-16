@@ -115,6 +115,23 @@ const messages = {
                 }
             },
         },
+        k8s_secret: {
+            name: 'Segreto |||| Segreti',
+            fields: {
+                metadata: {
+                    creationTimestamp: 'Creazione',
+                    generation: 'Generazione',
+                    name: 'Nome',
+                    resourceVersion: 'Versione risorsa',
+                    uid: 'UID',
+                },
+                type: 'Tipo',
+                data: 'Dati',
+                secretname: 'Nome segreto',
+                secretnum: 'Numero delle chiavi'
+            },
+            decode: 'Decodifica'
+        },
         'postgres.db.movetokube.com': {
             name: 'DB Postgres',
             fields: {
@@ -166,6 +183,7 @@ const messages = {
                         port: 'DB Port',
                         database: 'Nome database',
                         secretName: 'Nome segreto',
+                        secretNameHint: 'Secret deve definire POSTGRES_URL oppure i valori di USER e PASSWORD del database',
                         user: 'Utente DB',
                         password: 'Password DB',
                         extraParams: 'Extra parametri URL di connessione'

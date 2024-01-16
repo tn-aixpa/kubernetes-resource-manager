@@ -180,6 +180,7 @@ const messages = {
                         port: 'DB Port',
                         database: 'Database name',
                         secretName: 'Secret name',
+                        secretNameHint: 'Secret should contain either full POSTGRES_URL or USER and PASSWORD keys',
                         user: 'DB User',
                         password: 'DB Password',
                         extraParams: 'Extra connection URL params'

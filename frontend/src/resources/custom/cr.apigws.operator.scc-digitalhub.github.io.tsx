@@ -91,7 +91,7 @@ const ApiGWForm = () => {
                     <TextInput disabled={!!id} fullWidth source="metadata.name" validate={required()} />
                     </Grid>
                     <Grid item xs={4}>
-                    <ReferenceInput reference='k8s_service' fullWidth source="spec.service" validate={required()}/>
+                    <ReferenceInput reference='k8s_service' perPage={1000} fullWidth source="spec.service" validate={required()}/>
                     </Grid>
                     <Grid item xs={2}>
                     <FormDataConsumer>
