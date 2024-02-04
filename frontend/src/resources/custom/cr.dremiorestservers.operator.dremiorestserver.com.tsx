@@ -77,7 +77,7 @@ const CrCreate = () => {
             delete data.spec.connection.user;
             delete data.spec.connection.password;
         } else {
-            delete data.spec.secretName;
+            delete data.spec.connection.secretName;
         }
         data.spec.tables = data.tables.filter((t: any) => !!t).join(',');
         return {
@@ -194,7 +194,7 @@ const CrEdit = () => {
 
     const tables = record.spec.tables ? record.spec.tables.split(',').map((t: any) => ({id: t, name: t})) : [];
     record.existing = !!record.spec.anonRole;
-    record.existingSecret = !!record.spec.connection.secretName;
+    record.existingSecret = !!record.spec.connection && !!record.spec.connection.secretName;
     record.tables = record.spec.tables ? record.spec.tables.split(',') : [];
 
     const transform = (data: any) => {
