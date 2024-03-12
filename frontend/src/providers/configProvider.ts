@@ -41,12 +41,12 @@ export const Config = {
     authentication: {
         type: AUTH_TYPE,
         basic: {},
-        oauth2: {
-            authority: OAUTH2_AUTHORITY,
-            clientId: OAUTH2_CLIENT_ID,
-            scope: OAUTH2_SCOPE,
-            redirectUri: OAUTH2_REDIRECT_URL,
-        },
+        oauth2: [
+            OAUTH2_AUTHORITY,
+            OAUTH2_CLIENT_ID,
+            OAUTH2_REDIRECT_URL,
+            OAUTH2_SCOPE,
+        ],
     },
     views: {
         'postgres.db.movetokube.com': crPostgres,
