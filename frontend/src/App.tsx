@@ -72,8 +72,11 @@ const customViews: { [index: string]: View } = {
 export const themeOptions = {
     ...defaultTheme,
     palette: {
+        primary: {
+          main: '#AD530F'  
+        },
         secondary: {
-            main: '#204372',
+            main: '#DB6A13',
         },
     },
     sidebar: {
