@@ -48,11 +48,11 @@ kubernetes:
 # authentication and authorization config
 auth:
   basic:
-    username:
-    password:
+    username: ${KRM_AUTH_BASIC_USERNAME:}
+    password: ${KRM_AUTH_BASIC_PASSWORD:}
   oauth2:
-    issuer-uri:
-    audience:
+    issuer-uri: ${KRM_AUTH_OAUTH2_ISSUER:}
+    audience: ${KRM_AUTH_OAUTH2_AUDIENCE:}
 
 security.cors.origins: ${SECURITY_CORS_ORIGINS:http://localhost:3000}
 
