@@ -12,8 +12,7 @@ const CONTEXT_PATH =
 const API_URL: string =
     (globalThis as any).REACT_APP_API_URL ||
     (process.env.REACT_APP_API_URL as string);
-const AUTH_CALLBACK_PATH: string = process.env
-    .REACT_APP_AUTH_CALLBACK_PATH as string;
+const AUTH_CALLBACK_PATH: string = CONTEXT_PATH + (process.env.REACT_APP_AUTH_CALLBACK_PATH as string);
 
 const APPLICATION_URL: string =
     (globalThis as any).REACT_APP_APPLICATION_URL ||
