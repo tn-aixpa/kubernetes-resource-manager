@@ -42,6 +42,10 @@ import crPostgresUsers from './resources/custom/cr.postgresusers.db.movetokube.c
 import crApiGateways from './resources/custom/cr.apigws.operator.scc-digitalhub.github.io';
 import crPostgrest from './resources/custom/cr.postgrests.operator.postgrest.org';
 import crDremiorest from './resources/custom/cr.dremiorestservers.operator.dremiorestserver.com';
+import crMinioBuckets from './resources/custom/cr.buckets.minio.scc-digitalhub.github.io';
+import crMinioUsers from './resources/custom/cr.users.minio.scc-digitalhub.github.io';
+import crMinioPolicies from './resources/custom/cr.policies.minio.scc-digitalhub.github.io';
+
 import { httpClientProvider } from './providers/httpClientProvider';
 
 import { K8SDeploymentList, K8SDeploymentShow } from './resources/k8s/k8s_deployment';
@@ -63,6 +67,9 @@ const store = localStorageStore();
 const customViews: { [index: string]: View } = {
     'postgres.db.movetokube.com': crPostgres,
     'postgresusers.db.movetokube.com': crPostgresUsers,
+    'buckets.minio.scc-digitalhub.github.io': crMinioBuckets,
+    'users.minio.scc-digitalhub.github.io': crMinioUsers,
+    'policies.minio.scc-digitalhub.github.io': crMinioPolicies,
     'apigws.operator.scc-digitalhub.github.io': crApiGateways,
     'postgrests.operator.postgrest.org': crPostgrest,
     'dremiorestservers.operator.dremiorestserver.com': crDremiorest    

@@ -413,6 +413,7 @@ const CrList = () => {
                     <TextField source="spec.anonRole" />
                     <TextField source="spec.grants" />
                     <TextField source="spec.tables" />
+                    <TextField source="status.state" />
                     <Box textAlign={'right'}>
                         <EditButton />
                         <ShowButton />
@@ -440,6 +441,7 @@ const CrShow = () => {
             <Show actions={<ShowTopToolbar hasYaml />}>
                 <SimpleShowLayout>
                 <TextField source="id" />
+                <TextField source="status.state" />
                     <TextField source="spec.schema" />
                     <TextField source="spec.anonRole" />
                     <ArrayField label={`resources.${CR_POSTGREST}.fields.grants`} source="glabels" record={{

@@ -42,6 +42,6 @@
 }
 
 .ace_editor {
-  width: 800px !important;
-  height: 200px !important;
+  width: 100% !important;
+  height: 400px !important;
 }

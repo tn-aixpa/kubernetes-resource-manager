@@ -304,6 +304,7 @@ const CrList = () => {
                 <Datagrid>
                     <TextField source="id" />
                     <TextField source="spec.tables" />
+                    <TextField source="status.state" />
                     <Box textAlign={'right'}>
                         <EditButton />
                         <ShowButton />
@@ -331,6 +332,7 @@ const CrShow = () => {
             <Show actions={<ShowTopToolbar hasYaml />}>
                 <SimpleShowLayout>
                 <TextField source="id" />
+                <TextField source="status.state" />
                 <ArrayField label={`resources.${CR_DREMIOREST}.fields.tables`} source="tlabels" record={{
                          tlabels: record.spec.tables ? record.spec.tables.split(',').map((t: any) => ({name: t})) : []    
                     }}>

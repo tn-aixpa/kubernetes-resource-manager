@@ -166,6 +166,41 @@ const messages = {
                 },
             },
         },
+        'buckets.minio.scc-digitalhub.github.io': {
+            name: 'S3 Bucket |||| S3 Bucket',
+            fields: {
+                id: 'ID',
+                spec: {
+                    name: 'Bucket',
+                    quota: 'Quota (Byte)',
+                    nameHint: 'Nome Bucket',
+                    quotaHint: 'Quota in Byte',
+                },
+            },
+        },
+        'users.minio.scc-digitalhub.github.io': {
+            name: 'Utente S3 |||| Utenti S3',
+            fields: {
+                id: 'ID',
+                spec: {
+                    accessKey: 'Access key',
+                    secretKey: 'Secret key',
+                    policies: 'Policy',
+                    policyHint: 'Elenco delle policy',
+                },
+            },
+        },
+        'policies.minio.scc-digitalhub.github.io': {
+            name: 'S3 Policy |||| S3 Policy',
+            fields: {
+                id: 'ID',
+                spec: {
+                    name: 'Policy',
+                    content: 'Contenuto di policy (JSON)',
+                    nameHint: 'Nome di policy',
+                },
+            },
+        },
         'postgrests.operator.postgrest.org': {
             name: 'Servizio Dati PostgREST |||| Servizi Dati PostgREST',
             shortName: 'PostgREST',
@@ -188,6 +223,9 @@ const messages = {
                         password: 'Password DB',
                         extraParams: 'Extra parametri URL di connessione'
                     }
+                },
+                status: {
+                    state: 'Stato'
                 },
                 tables: 'Tabelle DB esposte',
                 grants: 'Permessi DB',
@@ -212,6 +250,9 @@ const messages = {
                         password: 'Password Dremio',
                         jdbcProperties: 'Extra parametri URL di connessione'
                     }
+                },
+                status: {
+                    state: 'Stato'
                 },
                 tables: 'Virtual set Dremio esposti',
                 existingSecret: 'Con segreto esistente'

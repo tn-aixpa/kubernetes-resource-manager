@@ -4,6 +4,10 @@ import crPostgrest from '../resources/custom/cr.postgrests.operator.postgrest.or
 import crDremiorest from '../resources/custom/cr.dremiorestservers.operator.dremiorestserver.com';
 import crApiGateways from '../resources/custom/cr.apigws.operator.scc-digitalhub.github.io';
 
+import crMinioBuckets from '../resources/custom/cr.buckets.minio.scc-digitalhub.github.io';
+import crMinioUsers from '../resources/custom/cr.users.minio.scc-digitalhub.github.io';
+import crMinioPolicies from '../resources/custom/cr.policies.minio.scc-digitalhub.github.io';
+
 
 //read config from ENV
 const CONTEXT_PATH =
@@ -50,6 +54,9 @@ export const Config = {
     views: {
         'postgres.db.movetokube.com': crPostgres,
         'postgresusers.db.movetokube.com': crPostgresUsers,
+        'buckets.minio.scc-digitalhub.github.io': crMinioBuckets,
+        'users.minio.scc-digitalhub.github.io': crMinioUsers,
+        'policies.minio.scc-digitalhub.github.io': crMinioPolicies,
         'postgrests.operator.postgrest.org': crPostgrest,
         'dremiorestservers.operator.dremiorestserver.com': crDremiorest,
         'apigws.operator.scc-digitalhub.github.io': crApiGateways

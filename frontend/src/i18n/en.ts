@@ -1,3 +1,4 @@
+import { access } from 'fs';
 import englishMessages from 'ra-language-english';
 
 const messages = {
@@ -163,6 +164,41 @@ const messages = {
                 },
             },
         },
+        'buckets.minio.scc-digitalhub.github.io': {
+            name: 'S3 Bucket |||| S3 Buckets',
+            fields: {
+                id: 'ID',
+                spec: {
+                    name: 'Bucket',
+                    quota: 'Quota (Bytes)',
+                    nameHint: 'Bucket name',
+                    quotaHint: 'Quota in Bytes',
+                },
+            },
+        },
+        'users.minio.scc-digitalhub.github.io': {
+            name: 'S3 User |||| S3 Users',
+            fields: {
+                id: 'ID',
+                spec: {
+                    accessKey: 'Access key',
+                    secretKey: 'Secret key',
+                    policies: 'Policies',
+                    policyHint: 'Policies list',
+                },
+            },
+        },
+        'policies.minio.scc-digitalhub.github.io': {
+            name: 'S3 Policy |||| S3 Policies',
+            fields: {
+                id: 'ID',
+                spec: {
+                    name: 'Policy',
+                    content: 'Policy content (JSON)',
+                    nameHint: 'Policy name',
+                },
+            },
+        },
         'postgrests.operator.postgrest.org': {
             name: 'PostgREST Data Service |||| PostgREST Data Services',
             shortName: 'PostgREST Data Service',
@@ -185,6 +221,9 @@ const messages = {
                         password: 'DB Password',
                         extraParams: 'Extra connection URL params'
                     }
+                },
+                status: {
+                    state: 'Status'
                 },
                 tables: 'Exposed DB tables',
                 grants: 'DB permissions',
@@ -209,6 +248,9 @@ const messages = {
                         password: 'Dremio Password',
                         jdbcProperties: 'Extra URL connection parameters'
                     }
+                },
+                status: {
+                    state: 'Status'
                 },
                 tables: 'Exposed Dremio virtual sets',
                 existingSecret: 'With existing secret'
