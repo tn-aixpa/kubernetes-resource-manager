@@ -46,11 +46,24 @@ import { CR_MINIO_POLICIES } from './cr.policies.minio.scc-digitalhub.github.io'
 
 export const CR_MINIO_BUCKETS = 'buckets.minio.scc-digitalhub.github.io';
 
+const validateData = (values: any) => {
+    const errors: any = {};
+
+    if (values.spec.quota && values.spec.quota < 0) {
+        errors['spec.quota'] = `resources.${CR_MINIO_BUCKETS}.errors.quota`;
+    }
+
+    return errors;    
+}
+
 const CrCreate = () => {
     const { apiVersion, kind } = useCrTransform();
     const translate = useTranslate();
 
     const transform = (data: any) => {
+        if (!data.spec.quota) {
+            delete data.spec.quota
+        }
         return {
             ...data,
             apiVersion: apiVersion,
@@ -66,7 +79,7 @@ const CrCreate = () => {
             };
         }
 
-        return {};
+        return validateData(values);
     };
 
     return (
@@ -102,6 +115,13 @@ const CrEdit = () => {
     const { record } = useEditController();
     if (!record) return null;
 
+    const transform = (data: any) => {
+        if (!data.spec.quota) {
+            delete data.spec.quota
+        }
+        return data;
+    };
+
     return (
         <>
             <Breadcrumb />
@@ -110,8 +130,8 @@ const CrEdit = () => {
                 crName={CR_MINIO_BUCKETS}
                 crId={record.spec.database}
             />
-            <Edit actions={<EditTopToolbar hasYaml />}>
-                <SimpleForm toolbar={<ViewToolbar />}>
+            <Edit actions={<EditTopToolbar hasYaml/>} transform={transform}>
+                <SimpleForm toolbar={<ViewToolbar />}  validate={validateData} >
                     <Grid container alignItems="center" spacing={2}>
                         <Grid item xs={4}>
                             <TextInput fullWidth source="metadata.name" disabled validate={required()} />

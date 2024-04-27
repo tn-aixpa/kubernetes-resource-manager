@@ -175,6 +175,9 @@ const messages = {
                     quotaHint: 'Quota in Bytes',
                 },
             },
+            errors: {
+                'quota': 'Quota must be a positive number',
+            }
         },
         'users.minio.scc-digitalhub.github.io': {
             name: 'S3 User |||| S3 Users',

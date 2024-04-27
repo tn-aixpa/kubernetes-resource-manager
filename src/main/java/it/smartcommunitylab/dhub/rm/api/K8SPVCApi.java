@@ -1,8 +1,6 @@
 package it.smartcommunitylab.dhub.rm.api;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

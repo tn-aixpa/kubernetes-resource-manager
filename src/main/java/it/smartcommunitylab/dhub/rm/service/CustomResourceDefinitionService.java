@@ -16,6 +16,7 @@ import it.smartcommunitylab.dhub.rm.exception.ParsingException;
 import it.smartcommunitylab.dhub.rm.model.CustomResourceSchema;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResourceDefinition;
 import it.smartcommunitylab.dhub.rm.repository.CustomResourceSchemaRepository;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -56,6 +57,7 @@ public class CustomResourceDefinitionService {
         .expireAfterWrite(5, TimeUnit.MINUTES)
         .build(
             new CacheLoader<String, List<CustomResourceDefinition>>() {
+                @SuppressWarnings("null")
                 @Override
                 public List<CustomResourceDefinition> load(String key) throws Exception {
                     CustomResourceDefinitionList crdList = client.apiextensions().v1().customResourceDefinitions().list();
