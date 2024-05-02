@@ -229,37 +229,38 @@ const S3Users = () => {
     });
 
     if (isLoading) return <Loading />;
-    if (!data) return null;
+    // if (!data) return null;
 
 
     return (
         <>
             <SimplePageTitle pageType="list" crName={CR_MINIO_USERS} />
-            {data.length > 0 && (
-                <>
-                <TopToolbar>
-                <CreateButton resource={CR_MINIO_USERS}></CreateButton>
-                </TopToolbar>
-                <Datagrid
-                    data={data}
-                    total={total}
-                    isLoading={isLoading}
-                    sort={sort}
-                >
-                    <TextField source="id" />
-                    <TextField source="spec.accessKey" />
-                    <ReferenceArrayField source="spec.policies" perPage={1000} reference='policies.minio.scc-digitalhub.github.io'/>
+            <>
+            <List resource={CR_MINIO_USERS} actions={
+            <TopToolbar>
+            <CreateButton resource={CR_MINIO_USERS}></CreateButton>
+            </TopToolbar>
+            }>
+            <Datagrid
+                data={data}
+                total={total}
+                isLoading={isLoading}
+                sort={sort}
+            >
+                <TextField source="id" />
+                <TextField source="spec.accessKey" />
+                <ReferenceArrayField source="spec.policies" perPage={1000} reference='policies.minio.scc-digitalhub.github.io'/>
 
-                    <Box textAlign={'right'}>
-                        <EditButton resource={CR_MINIO_USERS} />
-                        <ShowButton resource={CR_MINIO_USERS} />
-                        <DeleteWithConfirmButton
-                            redirect={false}
-                            resource={CR_MINIO_USERS}/>
-                    </Box>
-                </Datagrid>
-                </>
-            )}
+                <Box textAlign={'right'}>
+                    <EditButton resource={CR_MINIO_USERS} />
+                    <ShowButton resource={CR_MINIO_USERS} />
+                    <DeleteWithConfirmButton
+                        redirect={false}
+                        resource={CR_MINIO_USERS}/>
+                </Box>
+            </Datagrid>
+            </List>
+            </>
         </>
     );
 };
@@ -272,36 +273,36 @@ const S3Policies = () => {
     });
 
     if (isLoading) return <Loading />;
-    if (!data) return null;
 
 
     return (
         <>
             <SimplePageTitle pageType="list" crName={CR_MINIO_POLICIES} />
-            {data.length > 0 && (
-                <>
-                <TopToolbar>
-                <CreateButton resource={CR_MINIO_POLICIES}></CreateButton>
-                </TopToolbar>
-                <Datagrid
-                    data={data}
-                    total={total}
-                    isLoading={isLoading}
-                    sort={sort}
-                >
-                    <TextField source="id" />
-                    <TextField source="spec.name" />
+            <>
+            <List resource={CR_MINIO_POLICIES} actions={
+            <TopToolbar>
+            <CreateButton resource={CR_MINIO_POLICIES}></CreateButton>
+            </TopToolbar>                
+            }>
+            <Datagrid
+                data={data}
+                total={total}
+                isLoading={isLoading}
+                sort={sort}
+            >
+                <TextField source="id" />
+                <TextField source="spec.name" />
 
-                    <Box textAlign={'right'}>
-                        <EditButton resource={CR_MINIO_POLICIES} />
-                        <ShowButton resource={CR_MINIO_POLICIES} />
-                        <DeleteWithConfirmButton
-                            redirect={false}
-                            resource={CR_MINIO_POLICIES}/>
-                    </Box>
-                </Datagrid>
-                </>
-            )}
+                <Box textAlign={'right'}>
+                    <EditButton resource={CR_MINIO_POLICIES} />
+                    <ShowButton resource={CR_MINIO_POLICIES} />
+                    <DeleteWithConfirmButton
+                        redirect={false}
+                        resource={CR_MINIO_POLICIES}/>
+                </Box>
+            </Datagrid>
+            </List>
+            </>
         </>
     );
 };

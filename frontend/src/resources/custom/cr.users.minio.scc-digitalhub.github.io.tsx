@@ -20,14 +20,10 @@ import {
 } from 'react-admin';
 import { View } from '../index';
 import { ViewToolbar } from '../../components/ViewToolbar';
-import {
-    CreateTopToolbar,
-} from '../../components/toolbars';
 import { SimplePageTitle } from '../cr';
 import { Grid } from '@mui/material';
 import { useCrTransform } from '../../hooks/useCrTransform';
 import FolderDeleteIcon from '@mui/icons-material/FolderDelete';
-import { Breadcrumb } from '@dslab/ra-breadcrumb';
 import { CR_MINIO_BUCKETS } from './cr.buckets.minio.scc-digitalhub.github.io';
 import { InspectButton } from '@dslab/ra-inspect-button';
 
@@ -58,11 +54,14 @@ const CrCreate = () => {
 
     return (
         <>
-            <Breadcrumb />
             <SimplePageTitle pageType="create" crName={CR_MINIO_USERS} />
             <Create
-                redirect="list"
-                actions={<CreateTopToolbar />}
+                redirect="show" 
+                actions={
+                <TopToolbar>
+                    <ListButton resource={CR_MINIO_BUCKETS}/>
+                </TopToolbar>                    
+                }
                 transform={transform}
             >
                 <SimpleForm validate={validate}>
