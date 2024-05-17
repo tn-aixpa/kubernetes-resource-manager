@@ -34,7 +34,7 @@ public class K8SPVCService extends K8SResourceService<PersistentVolumeClaim> {
     @Value("${kubernetes.pvc.storage-classes}")
     private String acceptedStorageClasses;
 
-    public K8SPVCService(KubernetesClient client, AuthorizationService authService) {
+    public K8SPVCService(KubernetesClient client, K8SAuthorizationService authService) {
         super(client, authService, 60);
     }
 

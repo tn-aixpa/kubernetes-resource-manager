@@ -17,6 +17,7 @@ import {
     SelectInput,
     ReferenceInput,
     NumberInput,
+    usePermissions,
 } from 'react-admin';
 import { Box, Grid, Typography } from '@mui/material';
 import { Breadcrumb } from '@dslab/ra-breadcrumb';
@@ -127,28 +128,33 @@ export const K8SPvcCreate = () => {
     );
 };
 
-export const K8SPvcList = () => (
-    <>
+export const K8SPvcList = () => {
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess('k8s_pvc', op)
+
+    return <>
         <Breadcrumb />
-        <List actions={<ListTopToolbar />}>
-            <Datagrid bulkActionButtons={false}>
+        <List actions={<ListTopToolbar hasCreate={hasPermission('write')}/>}>
+            <Datagrid bulkActionButtons={false} >
                 <TextField source="metadata.name" />
                 <TextField source="status.phase" />
                 <TextField source="spec.volumeName" />
                 <TextField source="spec.resources.requests.storage" />
                 <TextField source="spec.storageClassName" />
                 <Box textAlign={'right'}>
-                    <ShowButton />
-                    <DeleteWithConfirmButton />
+                    {hasPermission('read') && <ShowButton />}
+                    {hasPermission('write') && <DeleteWithConfirmButton />}
                 </Box>
             </Datagrid>
         </List>
     </>
-);
+};
 
 export const K8SPvcShow = () => {
     const translate = useTranslate();
     const { record } = useShowController();
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess('k8s_pvc', op)
     if (!record) return null;
     return (
         <>
@@ -159,7 +165,7 @@ export const K8SPvcShow = () => {
                     recordRepresentation: record.id,
                 })}
             </Typography>
-            <Show actions={<ShowTopToolbar hasYaml hasEdit={false} />}>
+            <Show actions={<ShowTopToolbar hasYaml hasEdit={false} hasDelete={hasPermission('write')}/>}>
                 <SimpleShowLayout>
                     <TextField source="metadata.name" />
                     <TextField source="status.phase" />

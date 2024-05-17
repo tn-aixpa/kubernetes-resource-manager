@@ -18,6 +18,7 @@ import {
     useRedirect,
     useTranslate,
     SelectInput,
+    usePermissions,
 } from 'react-admin';
 import { View } from '../index';
 import { ViewToolbar } from '../../components/ViewToolbar';
@@ -202,6 +203,9 @@ const CrList = () => {
 
 const CrShow = () => {
     const { record } = useShowController();
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess(CR_POSTGRES_USERS, op)
+
     if (!record) return null;
 
     return (
@@ -217,9 +221,9 @@ const CrShow = () => {
                     <UserTopToolbar
                         redirect={`${CR_POSTGRES_DB}/${record.spec.database}/show`}
                         buttons={{
-                            hasEdit: true,
+                            hasEdit: hasPermission('write'),
                             hasList: true,
-                            hasDelete: true,
+                            hasDelete: hasPermission('write'),
                             hasYaml: true
                         }}
                     />

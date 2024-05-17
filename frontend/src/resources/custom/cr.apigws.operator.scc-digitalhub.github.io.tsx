@@ -20,6 +20,7 @@ import {
     ReferenceInput,
     NumberInput,
     useGetOne,
+    usePermissions,
 } from 'react-admin';
 import { useFormContext, useWatch } from "react-hook-form";
 import {
@@ -242,6 +243,10 @@ const CrEdit = () => {
 }
 
 const CrList = () => {
+
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess(CR_APIGATEWAYS, op)
+
     return (
         <>
             <Breadcrumb />
@@ -255,8 +260,8 @@ const CrList = () => {
                     <TextField source="spec.path" />
                     <TextField source="status.state" />
                     <Box textAlign={'right'}>
-                        <EditButton />
-                        <ShowButton />
+                        {hasPermission('write') && <EditButton />}
+                        {hasPermission('read') && <ShowButton />}
                         <DeleteWithConfirmButton />
                     </Box>
                 </Datagrid>
@@ -268,13 +273,15 @@ const CrList = () => {
 const CrShow = () => {
     const translate = useTranslate();
     const { record } = useShowController();
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess(CR_APIGATEWAYS, op)
     if (!record) return null;
 
     return (
         <>
             <Breadcrumb />
             <SimplePageTitle pageType="show" crName={CR_APIGATEWAYS} />
-            <Show actions={<ShowTopToolbar hasYaml />}>
+            <Show actions={<ShowTopToolbar hasYaml hasEdit={hasPermission('write')} hasDelete={hasPermission('write')} />}>
                 <SimpleShowLayout>
                     <TextField source="spec.service" />
                     <TextField source="spec.host" />

@@ -17,6 +17,7 @@ import {
     ReferenceArrayField,
     TopToolbar,
     ListButton,
+    usePermissions,
 } from 'react-admin';
 import { View } from '../index';
 import { ViewToolbar } from '../../components/ViewToolbar';
@@ -134,6 +135,9 @@ const CrEdit = () => {
 
 const CrShow = () => {
     const { record } = useShowController();
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess(CR_MINIO_USERS, op)
+
     if (!record) return null;
 
     return (
@@ -146,7 +150,7 @@ const CrShow = () => {
             <Show actions={false}>
                 <TopToolbar>
                     <InspectButton/>
-                    <EditButton/>
+                    {hasPermission('write') && <EditButton/>}
                     <ListButton resource={CR_MINIO_BUCKETS}/>
                 </TopToolbar>
                 <SimpleShowLayout>

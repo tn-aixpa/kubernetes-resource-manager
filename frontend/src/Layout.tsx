@@ -4,12 +4,14 @@ import {
     Menu,
     MenuProps,
     ResourceDefinition,
+    usePermissions,
     useResourceDefinitions,
 } from 'react-admin';
 import { Divider } from '@mui/material';
 
 const MyMenu = (props: MenuProps) => {
     const resources = useResourceDefinitions();
+    const { permissions } = usePermissions();
     return (
         <Menu {...props}>
             <Menu.DashboardItem />
@@ -19,7 +21,8 @@ const MyMenu = (props: MenuProps) => {
                     resource.name !== 'crd' &&
                     resource.name !== 'crs' &&
                     !resource.name.startsWith('k8s') &&
-                    resource.hasList && (
+                    resource.hasList && 
+                    permissions && permissions.canAccess(resource.name, 'list') && (
                         <Menu.ResourceItem
                             key={resource.name}
                             name={resource.name}
@@ -27,11 +30,11 @@ const MyMenu = (props: MenuProps) => {
                     )
             )}
             <Divider />
-            <Menu.ResourceItem name={'k8s_service'} />
-            <Menu.ResourceItem name={'k8s_deployment'} />
-            <Menu.ResourceItem name={'k8s_job'} />                    
-            <Menu.ResourceItem name={'k8s_pvc'} />
-            <Menu.ResourceItem name={'k8s_secret'} />
+            {permissions && permissions.canAccess('k8s_service', 'list') && <Menu.ResourceItem name={'k8s_service'} />}
+            {permissions && permissions.canAccess('k8s_deployment', 'list') && <Menu.ResourceItem name={'k8s_deployment'} />}
+            {permissions && permissions.canAccess('k8s_job', 'list') && <Menu.ResourceItem name={'k8s_job'} />  }                  
+            {permissions && permissions.canAccess('k8s_pvc', 'list') && <Menu.ResourceItem name={'k8s_pvc'} /> }
+            {permissions && permissions.canAccess('k8s_secret', 'list') && <Menu.ResourceItem name={'k8s_secret'} /> }
             <div key="settings">
                 <Divider />
                 <Menu.ResourceItem name={'crs'} />

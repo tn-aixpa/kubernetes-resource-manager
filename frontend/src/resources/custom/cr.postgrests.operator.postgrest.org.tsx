@@ -23,6 +23,7 @@ import {
     SingleFieldList,
     ChipField,
     NumberInput,
+    usePermissions,
 } from 'react-admin';
 import { View } from '../index';
 import { ViewToolbar } from '../../components/ViewToolbar';
@@ -401,11 +402,14 @@ const CrEdit = () => {
 };
 
 const CrList = () => {
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess(CR_POSTGREST, op)
+
     return (
         <>
             <Breadcrumb />
             <SimplePageTitle pageType="list" crName={CR_POSTGREST} />
-            <List actions={<ListTopToolbar />}>
+            <List actions={<ListTopToolbar hasCreate={hasPermission('write')}/>}>
                 <Datagrid>
                     <TextField source="id" />
                     <TextField source="spec.connection.database" />
@@ -415,9 +419,9 @@ const CrList = () => {
                     <TextField source="spec.tables" />
                     <TextField source="status.state" />
                     <Box textAlign={'right'}>
-                        <EditButton />
-                        <ShowButton />
-                        <DeleteWithConfirmButton />
+                        {hasPermission('write') && <EditButton />}
+                        {hasPermission('read') && <ShowButton />}
+                        {hasPermission('write') && <DeleteWithConfirmButton />}
                     </Box>
                 </Datagrid>
             </List>
@@ -428,6 +432,8 @@ const CrList = () => {
 const CrShow = () => {
     const { record } = useShowController();
     const translate = useTranslate();
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess(CR_POSTGREST, op)
     if (!record) return null;
 
     return (
@@ -438,7 +444,7 @@ const CrShow = () => {
                 crName={CR_POSTGREST}
                 crId={record.spec.database}
             />
-            <Show actions={<ShowTopToolbar hasYaml />}>
+            <Show actions={<ShowTopToolbar hasYaml hasEdit={hasPermission('write')} hasDelete={hasPermission('write')}/>}>
                 <SimpleShowLayout>
                 <TextField source="id" />
                 <TextField source="status.state" />

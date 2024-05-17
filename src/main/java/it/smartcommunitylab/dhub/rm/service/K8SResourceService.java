@@ -33,14 +33,14 @@ public abstract class K8SResourceService<T extends HasMetadata> {
     public static final Logger logger = LoggerFactory.getLogger(K8SResourceService.class);
 
     private final KubernetesClient client;
-    private final AuthorizationService authService;
+    private final K8SAuthorizationService authService;
 
     private ConcurrentHashMap<String, java.util.Map<String,IdAwareResource<T>>> resourceMap = new ConcurrentHashMap<>();
     private LoadingCache<String, java.util.Map<String, IdAwareResource<T>>> resourceCache;
 
     public K8SResourceService(
         KubernetesClient client,
-        AuthorizationService authService,
+        K8SAuthorizationService authService,
         int cacheExpirationSec
     ) {
         Assert.notNull(client, "Client required");
@@ -81,7 +81,7 @@ public abstract class K8SResourceService<T extends HasMetadata> {
      * Reference to auth service
      * @return
      */
-    protected AuthorizationService getAuthService() {
+    protected K8SAuthorizationService getAuthService() {
         return authService;
     }
 

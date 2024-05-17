@@ -44,13 +44,13 @@ public class CustomResourceService {
     private final KubernetesClient client;
     private final CustomResourceDefinitionService crdService;
     private final CustomResourceSchemaService schemaService;
-    private final AuthorizationService authService;
+    private final K8SAuthorizationService authService;
 
     public CustomResourceService(
         KubernetesClient client,
         CustomResourceDefinitionService crdService,
         CustomResourceSchemaService schemaService,
-        AuthorizationService authService
+        K8SAuthorizationService authService
     ) {
         Assert.notNull(client, "Client required");
         this.client = client;
