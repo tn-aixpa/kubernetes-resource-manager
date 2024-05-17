@@ -20,7 +20,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 @Service
 public class K8SDeploymentService extends K8SResourceService<Deployment> {
     
-    public K8SDeploymentService(KubernetesClient client, AuthorizationService authService) {
+    public K8SDeploymentService(KubernetesClient client, K8SAuthorizationService authService) {
         super(client, authService, 60);
     }
 

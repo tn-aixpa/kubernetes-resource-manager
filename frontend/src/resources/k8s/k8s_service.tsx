@@ -10,6 +10,7 @@ import {
     useShowController,
     useTranslate,
     useRecordContext,
+    usePermissions,
 } from 'react-admin';
 import { Box, Typography } from '@mui/material';
 import { Breadcrumb } from '@dslab/ra-breadcrumb';
@@ -35,8 +36,11 @@ const TypeField = (props: any) => {
     ) : (<></>)
 };
     
-export const K8SServiceList = () => (
-    <>
+export const K8SServiceList = () => {
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess('k8s_service', op)
+
+    return <>
         <Breadcrumb />
         <List actions={false}>
             <Datagrid bulkActionButtons={false}>
@@ -45,12 +49,12 @@ export const K8SServiceList = () => (
                 <TextField source="spec.ports[0].name" />
                 <TextField source="spec.ports[0].port" />
                 <Box textAlign={'right'}>
-                    <ShowButton />
+                    {hasPermission('read') && <ShowButton />}
                 </Box>
             </Datagrid>
         </List>
     </>
-);
+};
 
 export const K8SServiceShow = () => {
     const translate = useTranslate();

@@ -50,12 +50,12 @@ public class CustomResourceSchemaService {
     private final DTOToSchemaConverter dtoToSchemaConverter;
     private final SchemaToDTOConverter schemaToDTOConverter;
     private final CustomResourceDefinitionService crdService;
-    private final AuthorizationService authService;
+    private final K8SAuthorizationService authService;
     
     public CustomResourceSchemaService(
         CustomResourceSchemaRepository customResourceSchemaRepository,
         CustomResourceDefinitionService crdService,
-        AuthorizationService authService
+        K8SAuthorizationService authService
     ) {
         this.customResourceSchemaRepository = customResourceSchemaRepository;
         this.dtoToSchemaConverter = new DTOToSchemaConverter();

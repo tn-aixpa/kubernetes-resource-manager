@@ -22,6 +22,7 @@ import {
     Button,
     SortPayload,
     Link,
+    usePermissions,
 } from 'react-admin';
 import { View } from '../index';
 import { formatArray, parseArray } from '../../utils';
@@ -174,6 +175,9 @@ const CrEdit = () => {
 };
 
 const CrList = () => {
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess(CR_POSTGRES_DB, op)
+
     return (
         <>
             <Breadcrumb />
@@ -183,9 +187,9 @@ const CrList = () => {
                     <TextField source="id" />
                     <TextField source="spec.database" />
                     <Box textAlign={'right'}>
-                        <EditButton />
-                        <ShowButton />
-                        <DeleteWithConfirmButton />
+                        {hasPermission('write') && <EditButton />}
+                        {hasPermission('read') && <ShowButton />}
+                        {hasPermission('write') && <DeleteWithConfirmButton />}
                     </Box>
                 </Datagrid>
             </List>
@@ -195,6 +199,9 @@ const CrList = () => {
 
 const CrShow = () => {
     const { record } = useShowController();
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess(CR_POSTGRES_DB, op)
+
     if (!record) return null;
 
     return (
@@ -205,7 +212,7 @@ const CrShow = () => {
                 crName={CR_POSTGRES_DB}
                 crId={record.spec.database}
             />
-            <Show actions={<ShowTopToolbar hasYaml />}>
+            <Show actions={<ShowTopToolbar hasYaml hasEdit={hasPermission('write')} hasDelete={hasPermission('write')}  />}>
                 <SimpleShowLayout>
                     <TextField source="spec.database" />
                     <BooleanField source="spec.dropOnDelete" />
@@ -222,6 +229,8 @@ const CrShow = () => {
 const PostgresUsers = () => {
     const translate = useTranslate();
     const { record } = useShowController();
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess(CR_POSTGRES_USERS, op)
 
     const sort : SortPayload = { field: 'id', order: 'ASC' };
     const { data, total, isLoading } = useGetList(CR_POSTGRES_USERS, {
@@ -265,15 +274,15 @@ const PostgresUsers = () => {
                         label={`resources.${CR_POSTGRES_USERS}.fields.spec.secretName`}
                     />
                     <Box textAlign={'right'}>
-                        <EditButton resource={CR_POSTGRES_USERS} />
-                        <ShowButton resource={CR_POSTGRES_USERS} />
-                        <DeleteWithConfirmButton
+                        {hasPermission('write') && <EditButton resource={CR_POSTGRES_USERS} />}
+                        {hasPermission('read') && <ShowButton resource={CR_POSTGRES_USERS} />}
+                        {hasPermission('write') && <DeleteWithConfirmButton
                             redirect={false}
-                            resource={CR_POSTGRES_USERS}/>
+                            resource={CR_POSTGRES_USERS}/>}
                     </Box>
                 </Datagrid>
             )}
-            <Link to={`/${CR_POSTGRES_USERS}/create?db=${record.metadata.name}`}><Button label={`buttons.createUser`}></Button></Link>
+            {hasPermission('write') && <Link to={`/${CR_POSTGRES_USERS}/create?db=${record.metadata.name}`}><Button label={`buttons.createUser`}></Button></Link>}
         </>
     );
 };

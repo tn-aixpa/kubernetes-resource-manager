@@ -5,10 +5,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
- * Resource access authorization service. Defines properties and methods to control the access to K8S resources
+ * K8S Resource access authorization service. Defines properties and methods to control the access to K8S resources
  */
 @Service
-public class AuthorizationService {
+public class K8SAuthorizationService {
 
     @Value("${kubernetes.crd.allowed}")
     private List<String> allowedCrds;

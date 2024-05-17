@@ -23,7 +23,7 @@ import it.smartcommunitylab.dhub.rm.service.K8SDeploymentService;
 import jakarta.validation.constraints.Pattern;
 
 @RestController
-@PreAuthorize("hasAuthority('ROLE_USER')")
+@PreAuthorize("@authz.canAccess('k8s_deployment', 'list')")
 @SecurityRequirement(name = "basicAuth")
 @SecurityRequirement(name = "jwtAuth")
 @RequestMapping(SystemKeys.API_PATH + "/k8s_deployment")
@@ -36,6 +36,7 @@ public class K8SDeploymentApi {
     @Value("${kubernetes.namespace}")
     private String namespace;
 
+    @PreAuthorize("@authz.canAccess('k8s_deployment', 'list')")
     @GetMapping
     public Page<IdAwareResource<Deployment>> findAll(
         @RequestParam(required = false) Collection<String> id,
@@ -44,11 +45,13 @@ public class K8SDeploymentApi {
         return service.findAll(namespace, id, pageable);
     }
 
+    @PreAuthorize("@authz.canAccess('k8s_deployment', 'read')")
     @GetMapping("/{deploymentId}")
     public IdAwareResource<Deployment> findById(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String deploymentId) {
         return service.findById(namespace, deploymentId);
     }
 
+    @PreAuthorize("@authz.canAccess('k8s_deployment', 'read')")
     @GetMapping("/{deploymentId}/log")
     public List<String>  getLog(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String deploymentId) {
         return service.getLog(namespace, deploymentId);

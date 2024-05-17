@@ -29,7 +29,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 
 @RestController
-@PreAuthorize("hasAuthority('ROLE_USER')")
+@PreAuthorize("@authz.canAccess('k8s_pvc', 'list')")
 @SecurityRequirement(name = "basicAuth")
 @SecurityRequirement(name = "jwtAuth")
 @RequestMapping(SystemKeys.API_PATH)
@@ -42,6 +42,7 @@ public class K8SPVCApi {
     @Value("${kubernetes.namespace}")
     private String namespace;
 
+    @PreAuthorize("@authz.canAccess('k8s_pvc', 'list')")
     @GetMapping("/k8s_pvc")
     public Page<IdAwareResource<PersistentVolumeClaim>> findAll(
         @RequestParam(required = false) Collection<String> id,
@@ -50,11 +51,13 @@ public class K8SPVCApi {
         return service.findAll(namespace, id, pageable);
     }
 
+    @PreAuthorize("@authz.canAccess('k8s_pvc', 'read')")
     @GetMapping("/k8s_pvc/{pvcId}")
     public IdAwareResource<PersistentVolumeClaim> findById(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String pvcId) {
         return service.findById(namespace, pvcId);
     }
 
+    @PreAuthorize("@authz.canAccess('k8s_pvc', 'write')")
     @PostMapping("/k8s_pvc")
     public IdAwareResource<PersistentVolumeClaim> add(
         @Valid @RequestBody PersistentVolumeClaimDTO request
@@ -62,6 +65,7 @@ public class K8SPVCApi {
         return service.add(namespace, request);
     }
 
+    @PreAuthorize("@authz.canAccess('k8s_pvc', 'write')")
     @DeleteMapping("/k8s_pvc/{pvcId}")
     public void delete(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String pvcId) {
         service.delete(namespace, pvcId);
@@ -69,6 +73,7 @@ public class K8SPVCApi {
 
     
     @GetMapping("/k8s_storageclass")
+    @PreAuthorize("@authz.canAccess('k8s_pvc', 'list')")
     public Page<IdAwareResource<StorageClass>> getStorageClasses(
         @RequestParam(required = false) Collection<String> id,
         Pageable pageable

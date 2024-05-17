@@ -49,7 +49,7 @@ public class K8SSecretService extends K8SResourceService<Secret> {
     Set<String> owners = new HashSet<>();
     Set<String> names = new HashSet<>();
 
-    public K8SSecretService(KubernetesClient client, AuthorizationService authService) {
+    public K8SSecretService(KubernetesClient client, K8SAuthorizationService authService) {
         super(client, authService, 60);
     }
 

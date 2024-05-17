@@ -22,6 +22,7 @@ import {
     SingleFieldList,
     ChipField,
     NumberInput,
+    usePermissions,
 } from 'react-admin';
 import { View } from '../index';
 import { ViewToolbar } from '../../components/ViewToolbar';
@@ -296,6 +297,9 @@ const CrEdit = () => {
 };
 
 const CrList = () => {
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess(CR_DREMIOREST, op)
+
     return (
         <>
             <Breadcrumb />
@@ -306,9 +310,9 @@ const CrList = () => {
                     <TextField source="spec.tables" />
                     <TextField source="status.state" />
                     <Box textAlign={'right'}>
-                        <EditButton />
-                        <ShowButton />
-                        <DeleteWithConfirmButton />
+                        {hasPermission('write') && <EditButton />}
+                        {hasPermission('read') && <ShowButton />}
+                        {hasPermission('write') && <DeleteWithConfirmButton />}
                     </Box>
                 </Datagrid>
             </List>
@@ -319,6 +323,9 @@ const CrList = () => {
 const CrShow = () => {
     const translate = useTranslate();
     const { record } = useShowController();
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess(CR_DREMIOREST, op)
+
     if (!record) return null;
 
     return (
@@ -329,7 +336,7 @@ const CrShow = () => {
                 crName={CR_DREMIOREST}
                 crId={record.spec.database}
             />
-            <Show actions={<ShowTopToolbar hasYaml />}>
+            <Show actions={<ShowTopToolbar hasYaml hasEdit={hasPermission('write')} hasDelete={hasPermission('write')} />}>
                 <SimpleShowLayout>
                 <TextField source="id" />
                 <TextField source="status.state" />

@@ -19,7 +19,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 @Service
 public class K8SJobService extends K8SResourceService<Job> {
     
-    public K8SJobService(KubernetesClient client, AuthorizationService authService) {
+    public K8SJobService(KubernetesClient client, K8SAuthorizationService authService) {
         super(client, authService, 60);
     }
 

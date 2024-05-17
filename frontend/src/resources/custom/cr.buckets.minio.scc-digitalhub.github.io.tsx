@@ -23,6 +23,7 @@ import {
     ReferenceArrayField,
     CreateButton,
     TopToolbar,
+    usePermissions,
 } from 'react-admin';
 import { View } from '../index';
 import { ViewToolbar } from '../../components/ViewToolbar';
@@ -155,6 +156,9 @@ const CrEdit = () => {
 const CrList = () => {
     const translate = useTranslate();
 
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess(CR_MINIO_BUCKETS, op)
+
     const [value, setValue] = useState(0);
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
@@ -170,15 +174,15 @@ const CrList = () => {
             </Tabs>
             <S3TabPanel value={value} index={0}>
                 <SimplePageTitle pageType="list" crName={CR_MINIO_BUCKETS} />
-                <List actions={<ListTopToolbar />}>
+                <List actions={<ListTopToolbar hasCreate={hasPermission('write')}/>}>
                     <Datagrid>
                         <TextField source="id" />
                         <TextField source="spec.name" />
                         <NumberField source="spec.quota" />
                         <Box textAlign={'right'}>
-                            <EditButton />
-                            <ShowButton />
-                            <DeleteWithConfirmButton />
+                            {hasPermission('write') && <EditButton />}
+                            {hasPermission('read') && <ShowButton />}
+                            {hasPermission('write') && <DeleteWithConfirmButton />}
                         </Box>
                     </Datagrid>
                 </List>
@@ -228,6 +232,9 @@ const S3Users = () => {
         sort: sort,
     });
 
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess(CR_MINIO_USERS, op)
+
     if (isLoading) return <Loading />;
     // if (!data) return null;
 
@@ -238,7 +245,7 @@ const S3Users = () => {
             <>
             <List resource={CR_MINIO_USERS} actions={
             <TopToolbar>
-            <CreateButton resource={CR_MINIO_USERS}></CreateButton>
+            {hasPermission('write') && <CreateButton resource={CR_MINIO_USERS}></CreateButton>}
             </TopToolbar>
             }>
             <Datagrid
@@ -252,11 +259,11 @@ const S3Users = () => {
                 <ReferenceArrayField source="spec.policies" perPage={1000} reference='policies.minio.scc-digitalhub.github.io'/>
 
                 <Box textAlign={'right'}>
-                    <EditButton resource={CR_MINIO_USERS} />
-                    <ShowButton resource={CR_MINIO_USERS} />
-                    <DeleteWithConfirmButton
+                    {hasPermission('write') && <EditButton resource={CR_MINIO_USERS} />}
+                    {hasPermission('read') && <ShowButton resource={CR_MINIO_USERS} />}
+                    {hasPermission('write') && <DeleteWithConfirmButton
                         redirect={false}
-                        resource={CR_MINIO_USERS}/>
+                        resource={CR_MINIO_USERS}/>}
                 </Box>
             </Datagrid>
             </List>
@@ -272,6 +279,9 @@ const S3Policies = () => {
         sort: sort,
     });
 
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess(CR_MINIO_POLICIES, op)
+
     if (isLoading) return <Loading />;
 
 
@@ -281,7 +291,7 @@ const S3Policies = () => {
             <>
             <List resource={CR_MINIO_POLICIES} actions={
             <TopToolbar>
-            <CreateButton resource={CR_MINIO_POLICIES}></CreateButton>
+            {hasPermission('write') && <CreateButton resource={CR_MINIO_POLICIES}></CreateButton>}
             </TopToolbar>                
             }>
             <Datagrid
@@ -294,11 +304,11 @@ const S3Policies = () => {
                 <TextField source="spec.name" />
 
                 <Box textAlign={'right'}>
-                    <EditButton resource={CR_MINIO_POLICIES} />
-                    <ShowButton resource={CR_MINIO_POLICIES} />
-                    <DeleteWithConfirmButton
+                    {hasPermission('write') && <EditButton resource={CR_MINIO_POLICIES} />}
+                    {hasPermission('read') && <ShowButton resource={CR_MINIO_POLICIES} />}
+                    {hasPermission('write') && <DeleteWithConfirmButton
                         redirect={false}
-                        resource={CR_MINIO_POLICIES}/>
+                        resource={CR_MINIO_POLICIES}/>}
                 </Box>
             </Datagrid>
             </List>
@@ -309,6 +319,9 @@ const S3Policies = () => {
 
 const CrShow = () => {
     const { record } = useShowController();
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess(CR_MINIO_BUCKETS, op)
+
     if (!record) return null;
 
     return (
@@ -319,7 +332,7 @@ const CrShow = () => {
                 crName={CR_MINIO_BUCKETS}
                 crId={record.spec.name}
             />
-            <Show actions={<ShowTopToolbar hasYaml />}>
+            <Show actions={<ShowTopToolbar hasYaml hasEdit={hasPermission('write')} hasDelete={hasPermission('write')} />}>
                 <SimpleShowLayout>
                     <TextField source="spec.name" />
                     <TextField source="spec.quota" />

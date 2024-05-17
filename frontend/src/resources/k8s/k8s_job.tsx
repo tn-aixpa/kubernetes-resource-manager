@@ -10,6 +10,7 @@ import {
     useTranslate,
     useRecordContext,
     DeleteButton,
+    usePermissions,
 } from 'react-admin';
 import { Box, Typography } from '@mui/material';
 import { Breadcrumb } from '@dslab/ra-breadcrumb';
@@ -55,8 +56,11 @@ const CompletionField = (props: any) => {
     )
 };
     
-export const K8SJobList = () => (
-    <>
+export const K8SJobList = () => {
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess('k8s_job', op)
+
+    return <>
         <Breadcrumb />
         <List actions={false}>
             <Datagrid bulkActionButtons={false}>
@@ -64,17 +68,20 @@ export const K8SJobList = () => (
                 <CompletionField label="resources.k8s_job.fields.completion"/>
                 <DurationField label="resources.k8s_job.fields.duration"/>
                 <Box textAlign={'right'}>
-                    <ShowButton />
-                    <DeleteButton />
+                    {hasPermission('read') && <ShowButton />}
+                    {hasPermission('write') && <DeleteButton />}
                 </Box>
             </Datagrid>
         </List>
     </>
-);
+};
 
 export const K8SJobShow = () => {
     const translate = useTranslate();
     const { record } = useShowController();
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess('k8s_job', op)
+
     if (!record) return null;
     return (
         <>
@@ -85,7 +92,7 @@ export const K8SJobShow = () => {
                     recordRepresentation: record.id,
                 })}
             </Typography>
-            <Show actions={<ShowTopToolbar hasYaml hasEdit={false} hasDelete hasLog/> }>
+            <Show actions={<ShowTopToolbar hasYaml hasEdit={false} hasDelete={hasPermission('write')} hasLog/> }>
                 <SimpleShowLayout>
                     <TextField source="metadata.name" />
                     <CompletionField label="resources.k8s_job.fields.completion"/>

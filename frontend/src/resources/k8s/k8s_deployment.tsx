@@ -10,6 +10,7 @@ import {
     useShowController,
     useTranslate,
     useRecordContext,
+    usePermissions,
 } from 'react-admin';
 import { Box, Typography } from '@mui/material';
 import { Breadcrumb } from '@dslab/ra-breadcrumb';
@@ -25,20 +26,23 @@ const StatusField = (props: any) => {
     )
 };
 
-export const K8SDeploymentList = () => (
-    <>
+export const K8SDeploymentList = () => {
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess('k8s_deployment', op)
+
+    return <>
         <Breadcrumb />
         <List actions={false}>
             <Datagrid bulkActionButtons={false}>
                 <TextField source="metadata.name" />
                 <StatusField  label="resources.k8s_deployment.fields.status"/>
                 <Box textAlign={'right'}>
-                    <ShowButton />
+                    {hasPermission('read') && <ShowButton />}
                 </Box>
             </Datagrid>
         </List>
     </>
-);
+};
 
 export const K8SDeploymentShow = () => {
     const translate = useTranslate();

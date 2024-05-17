@@ -48,7 +48,7 @@ public class CustomResourceDefinitionService {
     private static final Logger logger = LoggerFactory.getLogger(CustomResourceDefinitionService.class);
 
     private final KubernetesClient client;
-    private final AuthorizationService authService;
+    private final K8SAuthorizationService authService;
     private final CustomResourceSchemaRepository customResourceSchemaRepository;
     private ConcurrentHashMap<String, CustomResourceDefinition> crdMap = new ConcurrentHashMap<>();
 
@@ -74,7 +74,7 @@ public class CustomResourceDefinitionService {
 
     public CustomResourceDefinitionService(
         KubernetesClient client,
-        AuthorizationService authService,
+        K8SAuthorizationService authService,
         CustomResourceSchemaRepository customResourceSchemaRepository
     ) {
         this.client = client;

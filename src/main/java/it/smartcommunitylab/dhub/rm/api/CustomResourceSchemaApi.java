@@ -48,6 +48,7 @@ public class CustomResourceSchemaApi {
         return service.findById(id);
     }
 
+    @PreAuthorize("@authz.canAccess('crs', 'write')")
     @PostMapping
     public CustomResourceSchemaDTO add(
         @RequestParam(required = false) String id,
@@ -56,6 +57,7 @@ public class CustomResourceSchemaApi {
         return service.add(id, request);
     }
 
+    @PreAuthorize("@authz.canAccess('crs', 'write')")
     @PutMapping("/{id}")
     public CustomResourceSchemaDTO update(
         @PathVariable @Pattern(regexp = SystemKeys.REGEX_SCHEMA_ID) String id,
@@ -64,6 +66,7 @@ public class CustomResourceSchemaApi {
         return service.update(id, request);
     }
 
+    @PreAuthorize("@authz.canAccess('crs', 'write')")
     @DeleteMapping("/{id}")
     public void delete(@PathVariable @Pattern(regexp = SystemKeys.REGEX_SCHEMA_ID) String id) {
         service.delete(id);

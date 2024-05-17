@@ -18,6 +18,7 @@ import {
     useTranslate,
     useShowController,
     useEditController,
+    usePermissions,
 } from 'react-admin';
 import { Box, Typography } from '@mui/material';
 import { ViewToolbar } from '../components/ViewToolbar';
@@ -110,11 +111,16 @@ export const CrEdit = () => {
 };
 
 export const CrList = () => {
+    const crdId = useResourceContext();
+
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess(crdId, op)
+
     return (
         <>
             <Breadcrumb />
             <PageTitle pageType="list" />
-            <List actions={<ListTopToolbar />}>
+            <List actions={<ListTopToolbar hasCreate={hasPermission('write')} />}>
                 <Datagrid>
                     <TextField source="id" label={'resources.cr.fields.id'} />
                     <TextField
@@ -126,9 +132,9 @@ export const CrList = () => {
                         label={'resources.cr.fields.kind'}
                     />
                     <Box textAlign={'right'}>
-                        <EditButton />
-                        <ShowButton />
-                        <DeleteWithConfirmButton />
+                        {hasPermission('write') && <EditButton />}
+                        {hasPermission('read') && <ShowButton />}
+                        {hasPermission('write') && <DeleteWithConfirmButton />}
                     </Box>
                 </Datagrid>
             </List>
@@ -139,13 +145,18 @@ export const CrList = () => {
 export const CrShow = () => {
     const { jsonSchema } = useGetCrdJsonSchema();
     const { record } = useShowController();
+    const crdId = useResourceContext();
+
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess(crdId, op)
+
     if (!record) return null;
 
     return (
         <>
             <Breadcrumb />
             <PageTitle pageType="show" crId={record.id} />
-            <Show actions={<ShowTopToolbar hasYaml />}>
+            <Show actions={<ShowTopToolbar hasYaml hasDelete={hasPermission('write')} hasEdit={hasPermission('write')} />}>
                 <SimpleShowLayout>
                     <TextField source="id" label={'resources.cr.fields.id'} />
                     <TextField
