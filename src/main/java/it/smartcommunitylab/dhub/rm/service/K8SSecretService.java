@@ -22,6 +22,7 @@ import org.springframework.util.StringUtils;
 import io.fabric8.kubernetes.api.model.Secret;
 import io.fabric8.kubernetes.api.model.SecretBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import it.smartcommunitylab.dhub.rm.SystemKeys;
 import it.smartcommunitylab.dhub.rm.model.IdAwareResource;
 import it.smartcommunitylab.dhub.rm.model.dto.SecretDTO;
 import jakarta.annotation.PostConstruct;
@@ -84,7 +85,7 @@ public class K8SSecretService extends K8SResourceService<Secret> {
      * @param key
      * @return
      */
-    public String decode(String namespace, @Pattern(regexp = "[a-z0-9-]+") String secretId, String key) {
+    public String decode(String namespace, @Pattern(regexp = SystemKeys.REGEX_CR_ID) String secretId, String key) {
         List<Secret> secrets = fetch(namespace);
         
         Optional<Secret> secret = secrets.stream().filter(s -> s.getMetadata().getName().equals(secretId)).findAny();

@@ -157,7 +157,7 @@ public abstract class K8SResourceService<T extends HasMetadata> {
      * @param resourceId
      * @return
      */
-    public  IdAwareResource<T> findById(String namespace, @Pattern(regexp = "[a-z0-9-]+") String resourceId) {
+    public  IdAwareResource<T> findById(String namespace, @Pattern(regexp = SystemKeys.REGEX_CR_ID) String resourceId) {
          IdAwareResource<T> resource = readResource(resourceId, namespace);
         if (resource == null) {
             throw new NoSuchElementException(SystemKeys.ERROR_NO_RESOURCE);

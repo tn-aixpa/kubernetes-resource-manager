@@ -137,7 +137,7 @@ const CrEdit = () => {
                             <TextInput fullWidth source="metadata.name" disabled validate={required()} />
                         </Grid>
                         <Grid item xs={4}>
-                            <TextInput fullWidth source="spec.name" validate={required()} 
+                            <TextInput fullWidth source="spec.name" disabled validate={required()} 
                                 helperText={`resources.${CR_MINIO_BUCKETS}.fields.spec.nameHint`}/>
                         </Grid>
                         <Grid item xs={4}>
