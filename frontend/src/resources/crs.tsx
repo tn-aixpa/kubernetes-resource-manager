@@ -111,6 +111,7 @@ export const SchemaCreate = () => {
                         mode="json"
                         source="schema"
                         theme="monokai"
+                        fullWidth={true}
                     />
                 </SimpleForm>
             </Create>
@@ -132,7 +133,7 @@ export const SchemaEdit = () => {
                     recordRepresentation: record.id,
                 })}
             </Typography>
-            <Edit actions={<EditTopToolbar />}>
+            <Edit actions={<EditTopToolbar />} mutationMode='pessimistic'>
                 <SimpleForm toolbar={<ViewToolbar />}>
                     <TextInput source="id" disabled sx={{ width: '22em' }} />
                     <TextInput source="crdId" disabled sx={{ width: '22em' }} />
@@ -141,6 +142,7 @@ export const SchemaEdit = () => {
                         mode="json"
                         source="schema"
                         theme="monokai"
+                        fullWidth={true}
                     />
                 </SimpleForm>
             </Edit>

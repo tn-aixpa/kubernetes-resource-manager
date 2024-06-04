@@ -94,7 +94,7 @@ export const CrEdit = () => {
         <>
             <Breadcrumb />
             <PageTitle pageType="edit" crId={record.id} />
-            <Edit actions={<EditTopToolbar hasYaml />}>
+            <Edit actions={<EditTopToolbar hasYaml />} mutationMode='pessimistic'>
                 <SimpleForm toolbar={<ViewToolbar />}>
                     {jsonSchema ? (
                         <JsonSchemaInput

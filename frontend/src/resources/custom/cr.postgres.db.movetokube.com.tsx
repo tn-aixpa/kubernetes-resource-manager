@@ -131,7 +131,7 @@ const CrEdit = () => {
                 crName={CR_POSTGRES_DB}
                 crId={record.spec.database}
             />
-            <Edit actions={<EditTopToolbar hasYaml />}>
+            <Edit actions={<EditTopToolbar hasYaml />} mutationMode='pessimistic'>
                 <SimpleForm toolbar={<ViewToolbar />}>
                     <Grid container alignItems="center" spacing={2}>
                         <Grid item xs={4}>

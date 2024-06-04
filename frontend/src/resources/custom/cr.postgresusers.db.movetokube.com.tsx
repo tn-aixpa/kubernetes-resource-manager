@@ -138,6 +138,7 @@ const CrEdit = () => {
             />
             <Edit
                 mutationOptions={{ onSuccess }}
+                mutationMode='pessimistic'
                 actions={
                     <UserTopToolbar
                         redirect={`${CR_POSTGRES_DB}/${record.spec.database}/show`}

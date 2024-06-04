@@ -386,7 +386,7 @@ const CrEdit = () => {
         <>
             <Breadcrumb />
             <SimplePageTitle pageType="edit" crName={CR_NUCLIO_APIGATEWAYS} />
-            <Edit actions={<EditTopToolbar hasYaml />} transform={transform}>
+            <Edit actions={<EditTopToolbar hasYaml />} transform={transform} mutationMode='pessimistic'>
                 <SimpleForm toolbar={<ViewToolbar />} validate={validate}>
                     <Grid container  spacing={2}>
                         <Grid item xs={2}>

@@ -232,7 +232,7 @@ const CrEdit = () => {
         <>
             <Breadcrumb />
             <SimplePageTitle pageType="create" crName={CR_APIGATEWAYS} />
-            <Edit redirect="list" actions={<EditTopToolbar />} transform={transform} >
+            <Edit redirect="list" actions={<EditTopToolbar />} transform={transform} mutationMode='pessimistic'>
                 <SimpleForm validate={validate} >
                     <ApiGWForm/>
                 </SimpleForm>

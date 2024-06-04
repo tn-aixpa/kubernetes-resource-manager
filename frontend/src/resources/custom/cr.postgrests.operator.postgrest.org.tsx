@@ -292,7 +292,7 @@ const CrEdit = () => {
                 crName={CR_POSTGREST}
                 crId={record.spec.database}
             />
-            <Edit actions={<EditTopToolbar hasYaml />} transform={transform}>
+            <Edit actions={<EditTopToolbar hasYaml />} transform={transform} mutationMode='pessimistic'>
                 <SimpleForm toolbar={<ViewToolbar />} validate={validateData}>
                 <Grid container alignItems="center" spacing={2}>
                         <Grid item xs={4}>

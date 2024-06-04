@@ -101,7 +101,7 @@ const CrEdit = () => {
                 crName={CR_MINIO_USERS}
                 crId={record.spec.database}
             />
-            <Edit actions={false}>
+            <Edit actions={false} mutationMode='pessimistic'>
                 <TopToolbar>
                     <ShowButton/>
                     <InspectButton/>
