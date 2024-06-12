@@ -54,7 +54,7 @@ auth:
     issuer-uri: ${KRM_AUTH_OAUTH2_ISSUER:}
     audience: ${KRM_AUTH_OAUTH2_AUDIENCE:}
 
-security.cors.origins: ${SECURITY_CORS_ORIGINS:http://localhost:3000}
+security.cors.origins: ${SECURITY_CORS_ORIGINS:}
 
 management:
   server:
