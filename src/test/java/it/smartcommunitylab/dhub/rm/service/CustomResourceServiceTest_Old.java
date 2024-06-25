@@ -1,3 +1,4 @@
+/*
 package it.smartcommunitylab.dhub.rm.service;
 
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
@@ -21,7 +22,7 @@ import java.util.Map;
 
 
 @SpringBootTest
-public class CustomResourceDefinitionServiceTest {
+public class public class CustomResourceServiceTest {
 
     @Autowired
     private CustomResourceDefinitionService customResourceDefinitionService;
@@ -51,21 +52,21 @@ public class CustomResourceDefinitionServiceTest {
 
         createdCrd = new CustomResourceDefinitionBuilder()
                 .withNewMetadata()
-                    .withName(crdName)
+                .withName(crdName)
                 .endMetadata()
                 .withNewSpec()
-                    .withGroup(crdGroup)
-                    .addNewVersion()
-                        .withName("v1")
-                        .withServed(true)
-                        .withStorage(true)
-                    .endVersion()
-                    .withScope("Namespaced")
-                    .withNewNames()
-                        .withPlural("tests")
-                        .withSingular("test")
-                        .withKind("Test")
-                    .endNames()
+                .withGroup(crdGroup)
+                .addNewVersion()
+                .withName("v1")
+                .withServed(true)
+                .withStorage(true)
+                .endVersion()
+                .withScope("Namespaced")
+                .withNewNames()
+                .withPlural("tests")
+                .withSingular("test")
+                .withKind("Test")
+                .endNames()
                 .endSpec()
                 .build();
 
@@ -111,13 +112,15 @@ public class CustomResourceDefinitionServiceTest {
     }
 
     //Map<String, Serializable> getCrdSchema(CustomResourceDefinition crd)
-  /*  @Test
+  */
+/*  @Test
     public void getCrdSchemaCustomResource() {
 
        Map<String, Serializable> crdSchema = customResourceDefinitionService.getCrdSchema(createdCrd);
         Assertions.assertNotNull(crdSchema);
 
-    }*/
+    }*//*
+
 
     //boolean crdExists(String crdId, String version)
     @Test
@@ -149,3 +152,5 @@ public class CustomResourceDefinitionServiceTest {
 
 
 }
+
+*/
