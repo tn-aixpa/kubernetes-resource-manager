@@ -1,40 +1,53 @@
 package it.smartcommunitylab.dhub.rm.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
-@TestPropertySource(properties = {
-        "kubernetes.crd.allowed=crd1,crd2",
-        "kubernetes.crd.denied=crd3,crd4",
-        "kubernetes.selector.service=serviceSelector",
-        "kubernetes.selector.deployment=deploymentSelector",
-        "kubernetes.selector.job=jobSelector",
-        "kubernetes.selector.pvc=pvcSelector"
-})
+@ExtendWith(MockitoExtension.class)
 public class AuthorizationServiceTest {
 
-    @Autowired
+    @InjectMocks
     private AuthorizationService authorizationService;
 
+    @BeforeEach
+    public void setUp() throws Exception {
+        MockitoAnnotations.openMocks(this);
+
+        // Use reflection to set the private fields
+        setPrivateField(authorizationService, "allowedCrds", Arrays.asList("crd1", "crd2"));
+        setPrivateField(authorizationService, "deniedCrds", Arrays.asList("crd3", "crd4"));
+        setPrivateField(authorizationService, "serviceSelector", "serviceSelector");
+        setPrivateField(authorizationService, "deploymentSelector", "deploymentSelector");
+        setPrivateField(authorizationService, "jobSelector", "jobSelector");
+        setPrivateField(authorizationService, "pvcSelector", "pvcSelector");
+    }
+
+    private void setPrivateField(Object target, String fieldName, Object value) throws Exception {
+        var field = target.getClass().getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.set(target, value);
+    }
 
     @Test
-    public void test() {
-
+    public void testIsCrdAllowed() {
         assertTrue(authorizationService.isCrdAllowed("crd1"));
         assertFalse(authorizationService.isCrdAllowed("crd3"));
         assertFalse(authorizationService.isCrdAllowed("crd5"));
+    }
 
+    @Test
+    public void testSelectors() {
         assertEquals("serviceSelector", authorizationService.getServiceSelector());
-
         assertEquals("deploymentSelector", authorizationService.getDeploymentSelector());
-
         assertEquals("jobSelector", authorizationService.getJobSelector());
-
         assertEquals("pvcSelector", authorizationService.getPVCSelector());
     }
 }
