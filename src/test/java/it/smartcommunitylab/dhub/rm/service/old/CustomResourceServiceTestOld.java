@@ -22,7 +22,7 @@ import java.util.Map;
 
 
 @SpringBootTest
-public class public class CustomResourceServiceTest {
+public class CustomResourceServiceTestOld {
 
     @Autowired
     private CustomResourceDefinitionService customResourceDefinitionService;
@@ -112,14 +112,13 @@ public class public class CustomResourceServiceTest {
     }
 
     //Map<String, Serializable> getCrdSchema(CustomResourceDefinition crd)
-  */
-/*  @Test
+  @Test
     public void getCrdSchemaCustomResource() {
 
        Map<String, Serializable> crdSchema = customResourceDefinitionService.getCrdSchema(createdCrd);
         Assertions.assertNotNull(crdSchema);
 
-    }*//*
+    }
 
 
     //boolean crdExists(String crdId, String version)
