@@ -46,7 +46,6 @@ public class CustomResourceDefinitionServiceTest {
 
     @BeforeEach
     public void setup() {
-        // Create a Custom Resource Definition with schema
         CustomResourceValidation validation = new CustomResourceValidation();
         validation.setOpenAPIV3Schema(new JSONSchemaProps());
 

@@ -21,7 +21,6 @@ public class AuthorizationServiceTest {
     public void setUp() throws Exception {
         MockitoAnnotations.openMocks(this);
 
-        // Use reflection to set the private fields
         setPrivateField(authorizationService, "allowedCrds", Arrays.asList("crd1", "crd2"));
         setPrivateField(authorizationService, "deniedCrds", Arrays.asList("crd3", "crd4"));
         setPrivateField(authorizationService, "serviceSelector", "serviceSelector");
