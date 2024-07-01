@@ -9,6 +9,7 @@ import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import it.smartcommunitylab.dhub.rm.model.CustomResourceSchema;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResource;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,6 +49,20 @@ public class CustomResourceServiceTest {
 
     }
 
+    private static @NotNull List<GenericKubernetesResource> getGenericKubernetesResources() {
+        GenericKubernetesResource resource1 = new GenericKubernetesResource();
+        ObjectMeta metadata1 = new ObjectMeta();
+        metadata1.setName("resource1");
+        resource1.setMetadata(metadata1);
+
+        GenericKubernetesResource resource2 = new GenericKubernetesResource();
+        ObjectMeta metadata2 = new ObjectMeta();
+        metadata2.setName("resource2");
+        resource2.setMetadata(metadata2);
+
+        return List.of(resource1, resource2);
+    }
+
     @Test
     public void testFindAll() {
         String crdId = "example.crd";
@@ -65,17 +80,7 @@ public class CustomResourceServiceTest {
         MixedOperation<GenericKubernetesResource, GenericKubernetesResourceList, Resource<GenericKubernetesResource>> mixedOperation = mock(MixedOperation.class);
         GenericKubernetesResourceList resourceList = mock(GenericKubernetesResourceList.class);
 
-        GenericKubernetesResource resource1 = new GenericKubernetesResource();
-        ObjectMeta metadata1 = new ObjectMeta();
-        metadata1.setName("resource1");
-        resource1.setMetadata(metadata1);
-
-        GenericKubernetesResource resource2 = new GenericKubernetesResource();
-        ObjectMeta metadata2 = new ObjectMeta();
-        metadata2.setName("resource2");
-        resource2.setMetadata(metadata2);
-
-        List<GenericKubernetesResource> mockResources = List.of(resource1, resource2);
+        List<GenericKubernetesResource> mockResources = getGenericKubernetesResources();
 
         when(client.genericKubernetesResources(any())).thenReturn(mixedOperation);
         when(mixedOperation.inNamespace(namespace)).thenReturn(mixedOperation);
@@ -84,8 +89,8 @@ public class CustomResourceServiceTest {
 
         Page<IdAwareCustomResource> result = service.findAll(crdId, namespace, null, pageable);
 
-        assertEquals(2, result.getTotalElements()); // Verify the total number of items returned
-        assertEquals(2, result.getContent().size()); // Verify the content size
+        assertEquals(2, result.getTotalElements());
+        assertEquals(2, result.getContent().size());
 
         verify(authService).isCrdAllowed(crdId);
         verify(crdService).fetchStoredVersionName(crdId);
@@ -94,6 +99,8 @@ public class CustomResourceServiceTest {
         verify(mixedOperation).inNamespace(namespace);
         verify(mixedOperation).list();
     }
+
+
 
 
     //public IdAwareCustomResource findById(String crdId, String id, String namespace)

@@ -1,0 +1,34 @@
+package it.smartcommunitylab.dhub.rm.model;
+
+import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
+import io.fabric8.kubernetes.api.model.ObjectMeta;
+import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinition;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+
+public class IdAwareCustomResourceTest {
+
+    @Mock
+    GenericKubernetesResource cr;
+
+    @InjectMocks
+    IdAwareCustomResource idAwareCr;
+
+    @Test
+    public void testConstructor() {
+        ObjectMeta metadata = new ObjectMeta();
+        metadata.setName("test-crd");
+
+        cr = new GenericKubernetesResource();
+        cr.setMetadata(metadata);
+
+        idAwareCr = new IdAwareCustomResource(cr);
+
+        Assertions.assertEquals("test-crd", idAwareCr.getId());
+        Assertions.assertEquals(cr, idAwareCr.getCr());
+    }
+
+}
