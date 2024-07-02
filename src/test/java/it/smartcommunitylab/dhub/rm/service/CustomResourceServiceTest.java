@@ -5,7 +5,6 @@ import io.fabric8.kubernetes.api.model.GenericKubernetesResourceList;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
-import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import it.smartcommunitylab.dhub.rm.model.CustomResourceSchema;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResource;
@@ -20,12 +19,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+//WARNING!!!
+//Test still not done!
 @ExtendWith(MockitoExtension.class)
 public class CustomResourceServiceTest {
 
@@ -44,8 +44,14 @@ public class CustomResourceServiceTest {
     @InjectMocks
     CustomResourceService service;
 
+    private final String crdId = "example.crd";
+    private final String namespace = "exampleNamespace";
+    private final String storedVersion = "v1";
+
     @BeforeEach
     public void setup() {
+
+
 
     }
 
@@ -65,13 +71,10 @@ public class CustomResourceServiceTest {
 
     @Test
     public void testFindAll() {
-        String crdId = "example.crd";
-        String namespace = "exampleNamespace";
         Pageable pageable = PageRequest.of(0, 10);
 
         when(authService.isCrdAllowed(crdId)).thenReturn(true);
 
-        String storedVersion = "v1";
         when(crdService.fetchStoredVersionName(crdId)).thenReturn(storedVersion);
 
         CustomResourceSchema mockSchema = mock(CustomResourceSchema.class);
@@ -106,6 +109,19 @@ public class CustomResourceServiceTest {
     //public IdAwareCustomResource findById(String crdId, String id, String namespace)
     @Test
     public void testFindById() {
+        //DA FINIRE
+        lenient().when(authService.isCrdAllowed(crdId)).thenReturn(true);
+        lenient().when(crdService.fetchStoredVersionName(crdId)).thenReturn(storedVersion);
+
+        CustomResourceSchema mockSchema = mock(CustomResourceSchema.class);
+        lenient().when(schemaService.findCRDByCrdIdAndVersion(crdId, storedVersion)).thenReturn(mockSchema);
+
+       /*
+        NamespaceableResource<GenericKubernetesResource> cr = fetchCustomResource(context, id, namespace);*/
+
+        /*verify(authService).isCrdAllowed(crdId);
+        verify(crdService).fetchStoredVersionName(crdId);
+        verify(schemaService).findCRDByCrdIdAndVersion(crdId, storedVersion);*/
 
     }
 
