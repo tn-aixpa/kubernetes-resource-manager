@@ -47,10 +47,6 @@ public class K8SJobServiceTest {
     @InjectMocks
     K8SJobService k8sJobService;
 
-    private final String namespace = "test-namespace";
-    private final String deploymentName = "test-deployment";
-    private final String expectedLog = "Log line 1\nLog line 2";
-
     @BeforeEach
     public void setup() {
         k8sJobService = new K8SJobService(client, service);
@@ -60,6 +56,10 @@ public class K8SJobServiceTest {
 
     @Test
     public void testGetLog() {
+
+        String namespace = "test-namespace";
+        String deploymentName = "test-deployment";
+        String expectedLog = "Log line 1\nLog line 2";
 
         Mockito.when(mixedOperation.inNamespace(namespace)).thenReturn(mixedOperation);
         Mockito.when(mixedOperation.withName(deploymentName)).thenReturn(scalableResource);
@@ -71,18 +71,6 @@ public class K8SJobServiceTest {
         List<String> result = k8sJobService.getLog(namespace, deploymentName);
 
         Assertions.assertEquals(Arrays.asList("Log line 1", "Log line 2"), result);
-
-        /*
-         when(mockDeploymentOperation.inNamespace(namespace)).thenReturn(mockDeploymentOperation);
-        when(mockDeploymentOperation.withName(deploymentName)).thenReturn(mockRollableScalableResource);
-        when(mockRollableScalableResource.getLog()).thenReturn(expectedLog);
-
-        lenient().when(k8sDeploymentService.getKubernetesClient().apps()).thenReturn(mockAppsAPIGroupDSL);
-
-        List<String> result = k8sDeploymentService.getLog(namespace, deploymentName);
-
-        Assertions.assertEquals(Arrays.asList("Log line 1", "Log line 2"), result);
-         */
 
     }
 

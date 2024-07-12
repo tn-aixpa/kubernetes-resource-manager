@@ -25,10 +25,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class K8SDeploymentServiceTest {
 
     @Mock
-    private KubernetesClient mockKubernetesClient;
+    private KubernetesClient kubernetesClient;
 
     @Mock
-    private AuthorizationService service;
+    private AuthorizationService authorizationService;
 
     @Mock
     private AppsAPIGroupDSL mockAppsAPIGroupDSL;
@@ -42,23 +42,23 @@ public class K8SDeploymentServiceTest {
     @InjectMocks
     private K8SDeploymentService k8sDeploymentService;
 
-    private final String namespace = "test-namespace";
-    private final String deploymentName = "test-deployment";
-    private final String expectedLog = "Log line 1\nLog line 2";
-
     @BeforeEach
     public void setup() {
-        k8sDeploymentService = new K8SDeploymentService(mockKubernetesClient, service);
+        k8sDeploymentService = new K8SDeploymentService(kubernetesClient, authorizationService);
         MockitoAnnotations.openMocks(this);
         when(mockAppsAPIGroupDSL.deployments()).thenReturn(mockDeploymentOperation);
     }
 
     @Test
     public void testGetLog() {
+
+        String namespace = "test-namespace";
+        String deploymentName = "test-deployment";
+        String expectedLog = "Log line 1\nLog line 2";
+
         when(mockDeploymentOperation.inNamespace(namespace)).thenReturn(mockDeploymentOperation);
         when(mockDeploymentOperation.withName(deploymentName)).thenReturn(mockRollableScalableResource);
         when(mockRollableScalableResource.getLog()).thenReturn(expectedLog);
-
         lenient().when(k8sDeploymentService.getKubernetesClient().apps()).thenReturn(mockAppsAPIGroupDSL);
 
         List<String> result = k8sDeploymentService.getLog(namespace, deploymentName);

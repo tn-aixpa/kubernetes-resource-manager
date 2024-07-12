@@ -10,16 +10,14 @@ import org.mockito.Mockito;
 public class IdAwareResourceTest {
 
     private HasMetadata mockHasMetadata;
-    private ObjectMeta mockObjectMeta;
 
     private final String name = "test-crd";
-    private final String newName = "new-crd";
 
     @BeforeEach
     public void setUp() {
 
         mockHasMetadata = Mockito.mock(HasMetadata.class);
-        mockObjectMeta = Mockito.mock(ObjectMeta.class);
+        ObjectMeta mockObjectMeta = Mockito.mock(ObjectMeta.class);
 
         Mockito.when(mockHasMetadata.getMetadata()).thenReturn(mockObjectMeta);
         Mockito.when(mockObjectMeta.getName()).thenReturn(name);
@@ -36,13 +34,12 @@ public class IdAwareResourceTest {
 
     @Test
     public void testSetIdAndSetResource() {
-        //Set Id
         IdAwareResource<HasMetadata> idAwareResource = new IdAwareResource<>(mockHasMetadata);
+        String newName = "new-crd";
         idAwareResource.setId(newName);
 
         Assertions.assertEquals(newName, idAwareResource.getId());
 
-        //Set Resource
         HasMetadata newMockHasMetadata = Mockito.mock(HasMetadata.class);
         ObjectMeta newMockObjectMeta = Mockito.mock(ObjectMeta.class);
         Mockito.when(newMockHasMetadata.getMetadata()).thenReturn(newMockObjectMeta);

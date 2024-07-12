@@ -14,7 +14,6 @@ import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
-
 import io.fabric8.kubernetes.client.dsl.internal.BaseOperation;
 import it.smartcommunitylab.dhub.rm.model.IdAwareResource;
 import it.smartcommunitylab.dhub.rm.model.dto.PersistentVolumeClaimDTO;
@@ -57,6 +56,8 @@ public class K8SPVCServiceTest {
 
     @BeforeEach
     void setup() {
+        k8sPVCService = new K8SPVCService(kubernetesClient, authorizationService);
+
         when(kubernetesClient.persistentVolumeClaims()).thenReturn(persistentVolumeClaimOperation);
         when(persistentVolumeClaimOperation.inNamespace(anyString())).thenReturn(namespaceOperation);
         lenient().when(namespaceOperation.resource(any(PersistentVolumeClaim.class))).thenReturn(resourceOperation);
@@ -68,7 +69,6 @@ public class K8SPVCServiceTest {
 
     @Test
     public void testAdd() {
-        // Prepare test data
         String namespace = "test-namespace";
         PersistentVolumeClaimDTO dto = new PersistentVolumeClaimDTO();
         dto.setName("test-pvc");
@@ -78,7 +78,6 @@ public class K8SPVCServiceTest {
         dto.setAccessModes(Arrays.asList(PersistentVolumeClaimDTO.PVC_ACCESS_MODE.ReadWriteOnce));
         dto.setResourceAmount(10);
 
-        // Prepare expected PersistentVolumeClaim
         PersistentVolumeClaim expectedPvc = new PersistentVolumeClaimBuilder()
                 .withNewMetadata()
                 .withName(dto.getName())
@@ -95,15 +94,12 @@ public class K8SPVCServiceTest {
                 .endSpec()
                 .build();
 
-        // Mock findById method
         IdAwareResource<PersistentVolumeClaim> idAwareResource = new IdAwareResource<>(expectedPvc);
         K8SPVCService spyService = spy(k8sPVCService);
         doReturn(idAwareResource).when(spyService).findById(namespace, dto.getName());
 
-        // Call the method
         IdAwareResource<PersistentVolumeClaim> result = spyService.add(namespace, dto);
 
-        // Verify interactions and assert the result
         verify(resourceOperation, times(1)).item();
         verify(resourceOperation, times(1)).serverSideApply();
         Assertions.assertEquals(expectedPvc, result.getResource());
@@ -111,18 +107,14 @@ public class K8SPVCServiceTest {
 
     @Test
     public void testDelete() {
-        // Prepare test data
         String namespace = "test-namespace";
         String pvcId = "test-pvc";
 
-        // Mock getResourceCache to return the mocked resourceCache
         K8SPVCService spyService = spy(k8sPVCService);
         doReturn(resourceCache).when(spyService).getResourceCache();
 
-        // Call the method
         spyService.delete(namespace, pvcId);
 
-        // Verify interactions
         verify(resourceCache, times(1)).invalidate(namespace);
         verify(resourceOperation, times(1)).delete();
     }

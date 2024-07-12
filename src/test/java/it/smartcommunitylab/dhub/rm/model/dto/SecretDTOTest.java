@@ -6,10 +6,10 @@ import static org.mockito.Mockito.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import it.smartcommunitylab.dhub.rm.model.dto.SecretDTO;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
@@ -17,9 +17,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class SecretDTOTest {
 
     @Mock
-    private Map<String, String> mockData;
+    Map<String, String> mockData;
 
-    private SecretDTO secretDTO;
+    @InjectMocks
+    SecretDTO secretDTO;
 
     @Before
     public void setUp() {

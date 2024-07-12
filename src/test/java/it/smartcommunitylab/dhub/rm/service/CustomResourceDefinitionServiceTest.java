@@ -29,10 +29,10 @@ import static org.mockito.Mockito.*;
 public class CustomResourceDefinitionServiceTest {
 
     @Mock
-    private KubernetesClient client;
+    private KubernetesClient kubernetesClient;
 
     @Mock
-    private AuthorizationService authService;
+    private AuthorizationService authorizationService;
 
     @Mock
     private CustomResourceSchemaRepository customResourceSchemaRepository;
@@ -42,13 +42,13 @@ public class CustomResourceDefinitionServiceTest {
 
     private CustomResourceDefinition createdCrd;
     private final String crdName = "test-crd";
-    private final String crdGroup = "example.com";
 
     @BeforeEach
     public void setup() {
         CustomResourceValidation validation = new CustomResourceValidation();
         validation.setOpenAPIV3Schema(new JSONSchemaProps());
 
+        String crdGroup = "example.com";
         createdCrd = new CustomResourceDefinitionBuilder()
                 .withNewMetadata()
                 .withName(crdName)
@@ -70,12 +70,11 @@ public class CustomResourceDefinitionServiceTest {
                 .endSpec()
                 .build();
 
-        // Mocking KubernetesClient response
         ApiextensionsAPIGroupDSL apiextensions = mock(ApiextensionsAPIGroupDSL.class);
         V1ApiextensionAPIGroupDSL v1Apiextensions = mock(V1ApiextensionAPIGroupDSL.class);
         NonNamespaceOperation<CustomResourceDefinition, CustomResourceDefinitionList, Resource<CustomResourceDefinition>> crdOperation = mock(NonNamespaceOperation.class);
 
-        lenient().when(client.apiextensions()).thenReturn(apiextensions);
+        lenient().when(kubernetesClient.apiextensions()).thenReturn(apiextensions);
         lenient().when(apiextensions.v1()).thenReturn(v1Apiextensions);
         lenient().when(v1Apiextensions.customResourceDefinitions()).thenReturn(crdOperation);
 
@@ -83,11 +82,7 @@ public class CustomResourceDefinitionServiceTest {
         crdList.setItems(Collections.singletonList(createdCrd));
 
         lenient().when(crdOperation.list()).thenReturn(crdList);
-
-        // Mocking AuthorizationService responses
-        lenient().when(authService.isCrdAllowed(anyString())).thenReturn(true);
-
-        // Mocking CustomResourceSchemaRepository responses
+        lenient().when(authorizationService.isCrdAllowed(anyString())).thenReturn(true);
         lenient().when(customResourceSchemaRepository.findByCrdIdAndVersion(anyString(), anyString()))
                 .thenReturn(Optional.empty());
     }

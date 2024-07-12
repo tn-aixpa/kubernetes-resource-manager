@@ -42,7 +42,6 @@ public class CustomResourceSchemaTest {
         testSchema.put("key2", 123);
 
         schema.setSchema(testSchema);
-
         Map<String, Serializable> retrievedSchema = schema.getSchema();
 
         Assertions.assertEquals(testSchema, retrievedSchema);
@@ -50,7 +49,6 @@ public class CustomResourceSchemaTest {
 
     @Test
     public void testConstraints() {
-
         schema.setId("123");
         Assertions.assertThrows(PersistenceException.class, () -> {
             doThrow(PersistenceException.class).when(entityManager).persist(schema);

@@ -6,7 +6,6 @@ import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.NamespaceableResource;
-import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
 import it.smartcommunitylab.dhub.rm.model.CustomResourceSchema;
@@ -28,13 +27,14 @@ import java.util.function.UnaryOperator;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-//WARNING!!!
-//Test still not done!
 @ExtendWith(MockitoExtension.class)
 public class CustomResourceServiceTest {
 
     @Mock
-    private KubernetesClient client;
+    private KubernetesClient kubernetesClient;
+
+    @Mock
+    private AuthorizationService authorizationService;
 
     @Mock
     private CustomResourceDefinitionService crdService;
@@ -54,15 +54,8 @@ public class CustomResourceServiceTest {
     @Mock
     private GenericKubernetesResource genericKubeResource;
 
-    //
-
     @Mock
     IdAwareCustomResource request;
-
-    //
-
-    @Mock
-    private AuthorizationService authService;
 
     @Mock
     MixedOperation<GenericKubernetesResource, GenericKubernetesResourceList, Resource<GenericKubernetesResource>> mixedOperation;
@@ -87,12 +80,12 @@ public class CustomResourceServiceTest {
         context = new CustomResourceDefinitionContext.Builder()
                 .withScope("Namespaced")
                 .withGroup("com")
-                .withName("example.com")
+                .withName(crdId)
                 .withPlural("example")
                 .withVersion(version)
                 .build();
 
-        lenient().when(authService.isCrdAllowed(crdId)).thenReturn(true);
+        lenient().when(authorizationService.isCrdAllowed(crdId)).thenReturn(true);
 
         genericKubeResource = new GenericKubernetesResource();
         genericKubeResource.setMetadata(new ObjectMeta());
@@ -100,32 +93,26 @@ public class CustomResourceServiceTest {
         genericKubeResource.setApiVersion(storedVersion);
         genericKubeResource.setKind("GenericKubernetesResource");
 
-
-        // Initialize the request and schema objects
         request = new IdAwareCustomResource(genericKubeResource);
-
-
 
         schema = new CustomResourceSchema();
         schema.setSchema(Collections.singletonMap("$schema", "https://json-schema.org/draft/2020-12/schema"));
 
         genericKubernetesResourceList = new GenericKubernetesResourceList();
         genericKubernetesResourceList.setItems(Collections.singletonList(genericKubeResource));
-
-
     }
 
     @Test
     public void testFindAll() {
+
         Pageable pageable = PageRequest.of(0, 10);
 
         when(crdService.fetchStoredVersionName(crdId)).thenReturn(storedVersion);
-
         when(schemaService.findCRDByCrdIdAndVersion(crdId, storedVersion)).thenReturn(schema);
 
         List<GenericKubernetesResource> mockResources = List.of(genericKubeResource);
 
-        when(client.genericKubernetesResources(any())).thenReturn(mixedOperation);
+        when(kubernetesClient.genericKubernetesResources(any())).thenReturn(mixedOperation);
         when(mixedOperation.inNamespace(namespace)).thenReturn(mixedOperation);
         when(mixedOperation.list()).thenReturn(resourceList);
         when(resourceList.getItems()).thenReturn(mockResources);
@@ -135,10 +122,10 @@ public class CustomResourceServiceTest {
         assertEquals(1, result.getTotalElements());
         assertEquals(1, result.getContent().size());
 
-        verify(authService).isCrdAllowed(crdId);
+        verify(authorizationService).isCrdAllowed(crdId);
         verify(crdService).fetchStoredVersionName(crdId);
         verify(schemaService).findCRDByCrdIdAndVersion(crdId, storedVersion);
-        verify(client).genericKubernetesResources(any());
+        verify(kubernetesClient).genericKubernetesResources(any());
         verify(mixedOperation).inNamespace(namespace);
         verify(mixedOperation).list();
     }
@@ -146,36 +133,35 @@ public class CustomResourceServiceTest {
 
     @Test
     public void testFindById() {
-        lenient().when(crdService.fetchStoredVersionName(crdId)).thenReturn(storedVersion);
 
+        lenient().when(crdService.fetchStoredVersionName(crdId)).thenReturn(storedVersion);
         lenient().when(schemaService.findCRDByCrdIdAndVersion(crdId, storedVersion)).thenReturn(schema);
 
         List<GenericKubernetesResource> mockResources = List.of(genericKubeResource);
 
-        when(client.genericKubernetesResources(any())).thenReturn(mixedOperation);
+        when(kubernetesClient.genericKubernetesResources(any())).thenReturn(mixedOperation);
         when(mixedOperation.inNamespace(namespace)).thenReturn(mixedOperation);
         when(mixedOperation.list()).thenReturn(resourceList);
-        lenient().when(client.genericKubernetesResources(context).inNamespace(namespace).list()).thenReturn(resourceList);
+        lenient().when(kubernetesClient.genericKubernetesResources(context).inNamespace(namespace).list()).thenReturn(resourceList);
         lenient().when(resourceList.getItems()).thenReturn(mockResources);
-        when(client.resource(genericKubeResource)).thenReturn(namespaceableResource);
+        when(kubernetesClient.resource(genericKubeResource)).thenReturn(namespaceableResource);
         when(namespaceableResource.get()).thenReturn(genericKubeResource);
 
-       IdAwareCustomResource result = customResourceService.findById(crdId, id, namespace);
+        IdAwareCustomResource result = customResourceService.findById(crdId, id, namespace);
 
         assertNotNull(result);
         assertEquals(id, result.getId());
 
     }
 
-
-    //public IdAwareCustomResource add(String crdId, IdAwareCustomResource request, String namespace)
     @Test
     public void testAdd(){
-        when(authService.isCrdAllowed(crdId)).thenReturn(true);
+
+        when(authorizationService.isCrdAllowed(crdId)).thenReturn(true);
         when(crdService.fetchStoredVersionName(crdId)).thenReturn(version);
         when(schemaService.findCRDByCrdIdAndVersion(crdId, version)).thenReturn(schema);
 
-        when(client.resource(any(GenericKubernetesResource.class))).thenReturn(namespaceableResource);
+        when(kubernetesClient.resource(any(GenericKubernetesResource.class))).thenReturn(namespaceableResource);
         when(namespaceableResource.inNamespace(namespace)).thenReturn(namespaceableResource);
         when(namespaceableResource.create()).thenReturn(request.getCr());
 
@@ -186,53 +172,44 @@ public class CustomResourceServiceTest {
 
     }
 
-    //public IdAwareCustomResource update(String crdId, String id, IdAwareCustomResource request, String namespace)
     @Test
     public void testUpdate() {
-        // Setup mocks
-        when(authService.isCrdAllowed(crdId)).thenReturn(true);
+
+        when(authorizationService.isCrdAllowed(crdId)).thenReturn(true);
         when(crdService.fetchStoredVersionName(crdId)).thenReturn(version);
         when(schemaService.findCRDByCrdIdAndVersion(crdId, version)).thenReturn(schema);
 
-        when(client.genericKubernetesResources(any())).thenReturn(mixedOperation);
+        when(kubernetesClient.genericKubernetesResources(any())).thenReturn(mixedOperation);
         when(mixedOperation.inNamespace(namespace)).thenReturn(mixedOperation);
         when(mixedOperation.list()).thenReturn(resourceList);
         when(resourceList.getItems()).thenReturn(Collections.singletonList(genericKubeResource));
-        lenient().when(client.resource(genericKubeResource)).thenReturn(namespaceableResource);
+        lenient().when(kubernetesClient.resource(genericKubeResource)).thenReturn(namespaceableResource);
         when(namespaceableResource.get()).thenReturn(genericKubeResource);
 
-        // Validation should pass with no errors
-        when(client.resource(any(GenericKubernetesResource.class))).thenReturn(namespaceableResource);
+        when(kubernetesClient.resource(any(GenericKubernetesResource.class))).thenReturn(namespaceableResource);
         when(namespaceableResource.edit((UnaryOperator<GenericKubernetesResource>) any())).thenReturn(genericKubeResource);
         lenient().when(namespaceableResource.inNamespace(namespace)).thenReturn(namespaceableResource);
 
-        // Perform the update
         IdAwareCustomResource updatedResource = customResourceService.update(crdId, id, request, namespace);
 
         assertNotNull(updatedResource);
         assertEquals(request.getCr(), updatedResource.getCr());
     }
 
-
-
-    //public void delete(String crdId, String id, String namespace)
     @Test
     public void testDelete() {
-        // Setup mocks
-        when(authService.isCrdAllowed(crdId)).thenReturn(true);
+
+        when(authorizationService.isCrdAllowed(crdId)).thenReturn(true);
         when(crdService.fetchStoredVersionName(crdId)).thenReturn(version);
         lenient().when(schemaService.findCRDByCrdIdAndVersion(crdId, version)).thenReturn(schema);
 
-        when(client.genericKubernetesResources(any())).thenReturn(mixedOperation);
+        when(kubernetesClient.genericKubernetesResources(any())).thenReturn(mixedOperation);
         when(mixedOperation.inNamespace(namespace)).thenReturn(mixedOperation);
         when(mixedOperation.list()).thenReturn(resourceList);
         when(resourceList.getItems()).thenReturn(Collections.singletonList(genericKubeResource));
-        when(client.resource(genericKubeResource)).thenReturn(namespaceableResource);
+        when(kubernetesClient.resource(genericKubeResource)).thenReturn(namespaceableResource);
 
-        // Perform the delete operation
         customResourceService.delete(crdId, id, namespace);
-
-        // Verify the interactions and assertions
 
         verify(namespaceableResource).delete();
     }

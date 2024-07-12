@@ -8,11 +8,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.util.StringUtils;
 
+@ExtendWith(MockitoExtension.class)
 public class CustomResourceSchemaDTOTest {
 
     @Mock
@@ -26,7 +29,6 @@ public class CustomResourceSchemaDTOTest {
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
         customResourceSchemaDTO = new CustomResourceSchemaDTO();
         objectMapper = new ObjectMapper();
     }
@@ -58,8 +60,6 @@ public class CustomResourceSchemaDTOTest {
     @Test
     public void testGetSchemaAsString() throws JsonProcessingException {
         customResourceSchemaDTO.setSchema(mockJsonNode);
-        String jsonNodeToString = objectMapper.writeValueAsString(mockJsonNode);
-        when(mockJsonNode.toString()).thenReturn(jsonNodeToString);
         assertEquals(objectMapper.writeValueAsString(mockJsonNode), customResourceSchemaDTO.getSchemaAsString());
     }
 

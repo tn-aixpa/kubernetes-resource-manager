@@ -2,7 +2,6 @@ package it.smartcommunitylab.dhub.rm.service;
 
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinition;
-import it.smartcommunitylab.dhub.rm.converter.DTOToSchemaConverter;
 import it.smartcommunitylab.dhub.rm.converter.SchemaToDTOConverter;
 import it.smartcommunitylab.dhub.rm.model.CustomResourceSchema;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResourceDefinition;
@@ -29,9 +28,6 @@ public class CustomResourceSchemaServiceTest {
 
     @Mock
     CustomResourceSchemaRepository customResourceSchemaRepository;
-
-    @Mock
-    DTOToSchemaConverter dtoToSchemaConverter;
 
     @Mock
     SchemaToDTOConverter schemaToDTOConverter;
@@ -61,18 +57,13 @@ public class CustomResourceSchemaServiceTest {
         customResourceSchemaDTO.setCrdId(crdName);
         customResourceSchemaDTO.setVersion(crdVersion);
 
-/*
-        Mockito.when(customResourceSchemaRepository.findById(crdName)).thenReturn(Optional.of(customResourceSchema));
-*/
-
     }
 
-    //public Page<CustomResourceSchemaDTO> findAll(Collection<String> ids, boolean all, Pageable pageable)
     @Test
     public void testFindAll() {
+
         Pageable pageable = PageRequest.of(0, 10);
 
-        // Case 1: ids is null and all is true
         IdAwareCustomResourceDefinition crd = Mockito.mock(IdAwareCustomResourceDefinition.class);
         CustomResourceDefinition crdDefinition = Mockito.mock(CustomResourceDefinition.class);
 
@@ -94,7 +85,8 @@ public class CustomResourceSchemaServiceTest {
         Assertions.assertEquals(1, result1.getTotalElements());
         Assertions.assertEquals(crdName, result1.getContent().get(0).getCrdId());
 
-        // Case 2: ids is null and all is false
+        //
+
         Mockito.when(customResourceSchemaRepository.findAll(pageable)).thenReturn(schemaPage);
 
         Page<CustomResourceSchemaDTO> result2 = customResourceSchemaService.findAll(null, false, pageable);
@@ -103,7 +95,8 @@ public class CustomResourceSchemaServiceTest {
         Assertions.assertEquals(1, result2.getTotalElements());
         Assertions.assertEquals(crdName, result2.getContent().get(0).getCrdId());
 
-        // Case 3: ids is not null
+        //
+
         List<String> ids = Collections.singletonList(crdName);
         Mockito.when(customResourceSchemaRepository.findByIdIn(ids, pageable)).thenReturn(schemaPage);
 
@@ -114,10 +107,9 @@ public class CustomResourceSchemaServiceTest {
         Assertions.assertEquals(crdName, result3.getContent().get(0).getCrdId());
     }
 
-
-    //public CustomResourceSchemaDTO findById(String id)
     @Test
     public void testFindById(){
+
         Mockito.when(customResourceSchemaRepository.findById(crdName))
                 .thenReturn(Optional.of(customResourceSchema));
         Mockito.lenient().when(schemaToDTOConverter.convert(customResourceSchema))
@@ -136,7 +128,6 @@ public class CustomResourceSchemaServiceTest {
         });
     }
 
-    //public CustomResourceSchemaDTO findByCrdIdAndVersion(String crdId, String version)
     @Test
     public void testFindByCrdIdAndVersion() {
 
@@ -173,11 +164,9 @@ public class CustomResourceSchemaServiceTest {
     }
 
 
-    //public CustomResourceSchema findCRDByCrdIdAndVersion(String crdId, String version)
     @Test
     public void testFindCRDByCrdIdAndVersion() {
 
-        // Case 1: Schema is present in the database
         Mockito.when(customResourceSchemaRepository.findByCrdIdAndVersion(crdName, crdVersion)).thenReturn(Optional.of(customResourceSchema));
 
         CustomResourceSchema CRDResult = customResourceSchemaService.findCRDByCrdIdAndVersion(crdName, crdVersion);
@@ -186,7 +175,8 @@ public class CustomResourceSchemaServiceTest {
         Assertions.assertEquals(crdName, CRDResult.getCrdId());
         Assertions.assertEquals(crdVersion, CRDResult.getVersion());
 
-        // Case 2: Schema is not present in the database
+        //
+
         Mockito.when(customResourceSchemaRepository.findByCrdIdAndVersion(crdName, crdVersion))
                 .thenReturn(Optional.empty());
 
@@ -201,7 +191,8 @@ public class CustomResourceSchemaServiceTest {
         Assertions.assertEquals(crdVersion, result2.getVersion());
         Assertions.assertEquals(schemaMap, result2.getSchema());
 
-        // Case 3: Schema is not present in the database and no schema in CRD service
+        //
+
         Mockito.when(crdService.getCrdSchema(crdName, crdVersion))
                 .thenReturn(null);
 
@@ -210,10 +201,9 @@ public class CustomResourceSchemaServiceTest {
         });
     }
 
-
-    //public Page<CustomResourceSchemaDTO> findByCrdId(String crdId, Pageable pageable)
     @Test
     public void testFindByCrdId(){
+
         Pageable pageable = PageRequest.of(0, 10);
         List<CustomResourceSchema> schemas = Collections.singletonList(customResourceSchema);
         Page<CustomResourceSchema> schemaPage = new PageImpl<>(schemas, pageable, schemas.size());
@@ -222,7 +212,6 @@ public class CustomResourceSchemaServiceTest {
         Mockito.lenient().when(schemaToDTOConverter.convert(customResourceSchema)).thenReturn(customResourceSchemaDTO);
 
         Page<CustomResourceSchemaDTO> result = customResourceSchemaService.findByCrdId(crdName, pageable);
-
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1, result.getTotalElements());
 
@@ -231,15 +220,15 @@ public class CustomResourceSchemaServiceTest {
         Assertions.assertEquals(customResourceSchemaDTO.getVersion(), actualDTO.getVersion());
     }
 
-    //public CustomResourceSchemaDTO add(@Nullable String id, CustomResourceSchemaDTO request)
     @Test
     public void testAdd() {
+
         CustomResourceSchemaDTO dtoToAdd = new CustomResourceSchemaDTO();
         dtoToAdd.setCrdId("test-crd");
         dtoToAdd.setVersion("v1");
 
-        Mockito.when(authService.isCrdAllowed(Mockito.anyString())).thenReturn(true); // Simulate authorization check passing
-        Mockito.when(crdService.crdExists("test-crd", "v1")).thenReturn(true); // Simulate CRD exists
+        Mockito.when(authService.isCrdAllowed(Mockito.anyString())).thenReturn(true);
+        Mockito.when(crdService.crdExists("test-crd", "v1")).thenReturn(true);
         Mockito.when(customResourceSchemaRepository.save(Mockito.any())).thenAnswer(invocation -> {
             CustomResourceSchema savedSchema = invocation.getArgument(0);
             savedSchema.setId("01");
@@ -248,43 +237,32 @@ public class CustomResourceSchemaServiceTest {
 
         CustomResourceSchemaDTO addedDTO = customResourceSchemaService.add(null, dtoToAdd);
 
-        Assertions.assertNotNull(addedDTO); // Ensure something was returned
-        Assertions.assertEquals("test-crd", addedDTO.getCrdId()); // Verify the crdId is correct
-        Assertions.assertEquals("v1", addedDTO.getVersion()); // Verify the version is correct
+        Assertions.assertNotNull(addedDTO);
+        Assertions.assertEquals("test-crd", addedDTO.getCrdId());
+        Assertions.assertEquals("v1", addedDTO.getVersion());
     }
 
-    //public CustomResourceSchemaDTO update(String id, CustomResourceSchemaDTO request)
     @Test
     public void testUpdate() {
 
         Mockito.when(customResourceSchemaRepository.findById(crdName)).thenReturn(Optional.of(customResourceSchema));
-
         Mockito.when(crdService.crdExists(crdName, crdVersion)).thenReturn(true);
-
         Mockito.when(customResourceSchemaRepository.save(customResourceSchema)).thenReturn(customResourceSchema);
 
         CustomResourceSchemaDTO updatedSchemaDTO = customResourceSchemaService.update(crdName, customResourceSchemaDTO);
 
         Assertions.assertNotNull(updatedSchemaDTO);
-
         Assertions.assertEquals(crdName, updatedSchemaDTO.getCrdId());
         Assertions.assertEquals(crdVersion, updatedSchemaDTO.getVersion());
-
     }
 
-
-    //public void delete(String id)
     @Test
     public void testDelete(){
 
         Mockito.when(customResourceSchemaRepository.findById(crdName)).thenReturn(Optional.of(customResourceSchema));
-
         customResourceSchemaService.delete(crdName);
 
         Mockito.verify(customResourceSchemaRepository).deleteById(crdName);
     }
-
-
-
 
 }
