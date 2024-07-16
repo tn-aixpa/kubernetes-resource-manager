@@ -129,26 +129,23 @@ public class CustomResourceApiTest {
 
     @Test
     public void testUpdate() throws Exception {
-
-        String newName = "updated-resource";
-
         ObjectMeta meta = new ObjectMeta();
-        meta.setName(newName);
+        meta.setName(name);
         GenericKubernetesResource genericResource = new GenericKubernetesResource();
         genericResource.setMetadata(meta);
-        IdAwareCustomResource updatedResource = new IdAwareCustomResource(genericResource);
-        updatedResource.setId(id);
+        IdAwareCustomResource resource = new IdAwareCustomResource(genericResource);
+        resource.setId(id);
 
 
         when(customResourceService.update(ArgumentMatchers.eq(crdId), ArgumentMatchers.eq(id), any(IdAwareCustomResource.class), ArgumentMatchers.eq(namespace)))
-                .thenReturn(updatedResource);
+                .thenReturn(resource);
 
         mockMvc.perform(put("/api/" + crdId + "/" + id)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"id\":\"" + id + "\", \"metadata\":{\"name\":\"" + newName +"\"}}"))
+                        .content("{\"id\":\"" + id + "\", \"metadata\":{\"name\":\"" + name +"\"}}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id))
-                .andExpect(jsonPath("$.metadata.name").value(newName));
+                .andExpect(jsonPath("$.metadata.name").value(name));
 
     }
 
