@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.smartcommunitylab.dhub.rm.model.dto.CustomResourceSchemaDTO;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
 import it.smartcommunitylab.dhub.rm.service.K8SPVCService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,17 +45,22 @@ public class CustomResourceSchemaApiTest {
     @MockBean
     private K8SPVCService k8SPVCService;
 
-
-    //@Pattern(regexp = SystemKeys.REGEX_SCHEMA_ID)
     private final String crdId = "test";
     private final String version = "v1";
 
-    @Test
-    public void testFindAll() throws Exception {
+    CustomResourceSchemaDTO customResourceSchemaDTO;
 
-        CustomResourceSchemaDTO customResourceSchemaDTO = new CustomResourceSchemaDTO();
+    @BeforeEach
+    public void setup() {
+
+        customResourceSchemaDTO = new CustomResourceSchemaDTO();
         customResourceSchemaDTO.setCrdId(crdId);
         customResourceSchemaDTO.setVersion(version);
+
+    }
+
+    @Test
+    public void testFindAll() throws Exception {
 
         Page<CustomResourceSchemaDTO> page = new PageImpl<>(
                 Arrays.asList(customResourceSchemaDTO),
@@ -74,9 +80,6 @@ public class CustomResourceSchemaApiTest {
 
     @Test
     public void testFindById() throws Exception {
-        CustomResourceSchemaDTO customResourceSchemaDTO = new CustomResourceSchemaDTO();
-        customResourceSchemaDTO.setCrdId(crdId);
-        customResourceSchemaDTO.setVersion(version);
 
         when(service.findById(ArgumentMatchers.eq(crdId))).thenReturn(customResourceSchemaDTO);
 
@@ -88,9 +91,6 @@ public class CustomResourceSchemaApiTest {
 
     @Test
     public void testAdd() throws Exception {
-        CustomResourceSchemaDTO customResourceSchemaDTO = new CustomResourceSchemaDTO();
-        customResourceSchemaDTO.setCrdId(crdId);
-        customResourceSchemaDTO.setVersion(version);
 
         when(service.add(eq(null), any(CustomResourceSchemaDTO.class))).thenReturn(customResourceSchemaDTO);
 
@@ -105,9 +105,6 @@ public class CustomResourceSchemaApiTest {
 
     @Test
     public void testUpdate() throws Exception {
-        CustomResourceSchemaDTO customResourceSchemaDTO = new CustomResourceSchemaDTO();
-        customResourceSchemaDTO.setCrdId(crdId);
-        customResourceSchemaDTO.setVersion(version);
 
         when(service.update(eq(crdId), any(CustomResourceSchemaDTO.class))).thenReturn(customResourceSchemaDTO);
 

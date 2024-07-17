@@ -11,6 +11,7 @@ import it.smartcommunitylab.dhub.rm.model.dto.PersistentVolumeClaimDTO;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceService;
 import it.smartcommunitylab.dhub.rm.service.K8SPVCService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,14 +60,20 @@ public class K8SPVCApiTest {
     private final String name = "pvc";
     private final String namespace = "namespace";
 
-    @Test
-    public void testFindAll() throws Exception {
+    PersistentVolumeClaim pvc;
+    IdAwareResource<PersistentVolumeClaim> idAwareResource;
 
-        PersistentVolumeClaim pvc = new PersistentVolumeClaimBuilder()
+    @BeforeEach
+    public void setup() {
+        pvc = new PersistentVolumeClaimBuilder()
                 .withNewMetadata().withName(name).withNamespace(namespace).endMetadata()
                 .build();
 
-        IdAwareResource<PersistentVolumeClaim> idAwareResource = new IdAwareResource<>(pvc);
+        idAwareResource = new IdAwareResource<>(pvc);
+    }
+
+    @Test
+    public void testFindAll() throws Exception {
 
         Page<IdAwareResource<PersistentVolumeClaim>> page = new PageImpl<>(
                 Arrays.asList(idAwareResource),
@@ -88,12 +95,6 @@ public class K8SPVCApiTest {
     @Test
     public void testFindById() throws Exception {
 
-        PersistentVolumeClaim pvc = new PersistentVolumeClaimBuilder()
-                .withNewMetadata().withName(name).withNamespace(namespace).endMetadata()
-                .build();
-
-        IdAwareResource<PersistentVolumeClaim> idAwareResource = new IdAwareResource<>(pvc);
-
         when(service.findById(anyString(), anyString())).thenReturn(idAwareResource);
 
         mockMvc.perform(get("/api/k8s_pvc/" + name)
@@ -107,12 +108,6 @@ public class K8SPVCApiTest {
     public void testAdd() throws Exception {
         PersistentVolumeClaimDTO pvcDTO = new PersistentVolumeClaimDTO();
         pvcDTO.setName(name);
-
-        PersistentVolumeClaim pvc = new PersistentVolumeClaimBuilder()
-                .withNewMetadata().withName(name).withNamespace(namespace).endMetadata()
-                .build();
-
-        IdAwareResource<PersistentVolumeClaim> idAwareResource = new IdAwareResource<>(pvc);
 
         when(service.add(anyString(), any(PersistentVolumeClaimDTO.class))).thenReturn(idAwareResource);
 

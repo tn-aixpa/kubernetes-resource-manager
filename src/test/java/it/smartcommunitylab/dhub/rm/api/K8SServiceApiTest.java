@@ -1,13 +1,13 @@
 package it.smartcommunitylab.dhub.rm.api;
 
 import io.fabric8.kubernetes.api.model.ObjectMeta;
-import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
 import io.fabric8.kubernetes.api.model.Service;
 import it.smartcommunitylab.dhub.rm.model.IdAwareResource;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceService;
 import it.smartcommunitylab.dhub.rm.service.K8SPVCService;
 import it.smartcommunitylab.dhub.rm.service.K8SSvcService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -58,17 +58,25 @@ public class K8SServiceApiTest {
     private final String name = "pvc";
     private final String namespace = "namespace";
 
-    @Test
-    public void testFindAll() throws Exception {
+    ObjectMeta meta;
+    Service service1;
+    IdAwareResource<Service> idAwareResource;
 
-        ObjectMeta meta = new ObjectMeta();
+    @BeforeEach
+    public void setup() {
+        meta = new ObjectMeta();
         meta.setNamespace(namespace);
         meta.setName(name);
 
-        Service service1 = new Service();
+        service1 = new Service();
         service1.setMetadata(meta);
 
-        IdAwareResource<Service> idAwareResource = new IdAwareResource<>(service1);
+        idAwareResource = new IdAwareResource<>(service1);
+
+    }
+
+    @Test
+    public void testFindAll() throws Exception {
 
         Page<IdAwareResource<Service>> page = new PageImpl<>(
                 Arrays.asList(idAwareResource),
@@ -90,15 +98,6 @@ public class K8SServiceApiTest {
     @Test
     public void testFindById() throws Exception {
 
-        ObjectMeta meta = new ObjectMeta();
-        meta.setNamespace(namespace);
-        meta.setName(name);
-
-        Service service1 = new Service();
-        service1.setMetadata(meta);
-
-        IdAwareResource<Service> idAwareResource = new IdAwareResource<>(service1);
-
         when(service.findById(anyString(), anyString())).thenReturn(idAwareResource);
 
         mockMvc.perform(get("/api/k8s_service/" + name)
@@ -107,7 +106,5 @@ public class K8SServiceApiTest {
                 .andExpect(jsonPath("$.metadata.name").value(name));
 
     }
-
-
 
 }

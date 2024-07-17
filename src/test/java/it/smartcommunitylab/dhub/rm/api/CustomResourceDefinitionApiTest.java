@@ -8,6 +8,7 @@ import it.smartcommunitylab.dhub.rm.service.CustomResourceDefinitionService;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceService;
 import it.smartcommunitylab.dhub.rm.service.K8SPVCService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,18 +52,32 @@ public class CustomResourceDefinitionApiTest {
     private K8SPVCService k8SPVCService;
 
     private final String name = "example.com";
-
     private final String crdId = "crs-dto.test";
     private final String version = "v1";
 
-    @Test
-    public void testFindAll() throws Exception {
-        ObjectMeta meta = new ObjectMeta();
+    ObjectMeta meta;
+    CustomResourceDefinition customResource;
+    IdAwareCustomResourceDefinition resource;
+    CustomResourceSchemaDTO customResourceSchemaDTO;
+
+    @BeforeEach
+    public void setup() {
+        meta = new ObjectMeta();
         meta.setName(name);
-        CustomResourceDefinition customResource = new CustomResourceDefinition();
+        customResource = new CustomResourceDefinition();
         customResource.setMetadata(meta);
 
-        IdAwareCustomResourceDefinition resource = new IdAwareCustomResourceDefinition(customResource);
+        resource = new IdAwareCustomResourceDefinition(customResource);
+
+        customResourceSchemaDTO = new CustomResourceSchemaDTO();
+        customResourceSchemaDTO.setCrdId(crdId);
+        customResourceSchemaDTO.setVersion(version);
+
+    }
+
+
+    @Test
+    public void testFindAll() throws Exception {
 
         Page<IdAwareCustomResourceDefinition> page = new PageImpl<>(
                 Arrays.asList(resource),
@@ -83,12 +98,6 @@ public class CustomResourceDefinitionApiTest {
 
     @Test
     public void testFindById() throws Exception {
-        ObjectMeta meta = new ObjectMeta();
-        meta.setName(name);
-        CustomResourceDefinition customResource = new CustomResourceDefinition();
-        customResource.setMetadata(meta);
-
-        IdAwareCustomResourceDefinition resource = new IdAwareCustomResourceDefinition(customResource);
 
         when(customResourceDefinitionService.findById(name)).thenReturn(resource);
 
@@ -104,10 +113,6 @@ public class CustomResourceDefinitionApiTest {
     @Test
     public void testFindSchemaForId() throws Exception {
 
-        CustomResourceSchemaDTO customResourceSchemaDTO = new CustomResourceSchemaDTO();
-        customResourceSchemaDTO.setCrdId(crdId);
-        customResourceSchemaDTO.setVersion(version);
-
         when(customResourceDefinitionService.fetchStoredVersionName(crdId)).thenReturn(version);
         when(schemaService.findByCrdIdAndVersion(crdId, customResourceDefinitionService.fetchStoredVersionName(crdId))).thenReturn(customResourceSchemaDTO);
 
@@ -121,10 +126,6 @@ public class CustomResourceDefinitionApiTest {
 
     @Test
     public void testFindSchemasForId() throws Exception {
-
-        CustomResourceSchemaDTO customResourceSchemaDTO = new CustomResourceSchemaDTO();
-        customResourceSchemaDTO.setCrdId(crdId);
-        customResourceSchemaDTO.setVersion(version);
 
         Page<CustomResourceSchemaDTO> page = new PageImpl<>(
                 Arrays.asList(customResourceSchemaDTO),

@@ -6,6 +6,7 @@ import it.smartcommunitylab.dhub.rm.model.IdAwareResource;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
 import it.smartcommunitylab.dhub.rm.service.K8SDeploymentService;
 import it.smartcommunitylab.dhub.rm.service.K8SPVCService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -57,14 +58,22 @@ public class K8SDeploymentApiTest {
     private final String name = "deployment";
     private final String namespace = "namespace";
 
-    @Test
-    public void testFindAll() throws Exception {
+    Deployment deployment;
+    IdAwareResource<Deployment> idAwareResource;
 
-        Deployment deployment = new DeploymentBuilder()
+    @BeforeEach
+    public void setup() {
+
+        deployment = new DeploymentBuilder()
                 .withNewMetadata().withName(name).withNamespace(namespace).endMetadata()
                 .build();
 
-        IdAwareResource<Deployment> idAwareResource = new IdAwareResource<>(deployment);
+        idAwareResource = new IdAwareResource<>(deployment);
+
+    }
+
+    @Test
+    public void testFindAll() throws Exception {
 
         Page<IdAwareResource<Deployment>> page = new PageImpl<>(
                 Arrays.asList(idAwareResource),
@@ -81,17 +90,10 @@ public class K8SDeploymentApiTest {
                 .andExpect(jsonPath("$.content[0].metadata.name").value(name))
                 .andExpect(jsonPath("$.content[0].metadata.namespace").value(namespace));
 
-
     }
 
     @Test
     public void testFindById() throws Exception {
-
-        Deployment deployment = new DeploymentBuilder()
-                .withNewMetadata().withName(name).withNamespace(namespace).endMetadata()
-                .build();
-
-        IdAwareResource<Deployment> idAwareResource = new IdAwareResource<>(deployment);
 
         when(service.findById(anyString(), anyString())).thenReturn(idAwareResource);
 

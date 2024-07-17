@@ -7,6 +7,7 @@ import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceService;
 import it.smartcommunitylab.dhub.rm.service.K8SJobService;
 import it.smartcommunitylab.dhub.rm.service.K8SPVCService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,17 +63,24 @@ public class K8SJobApiTest {
     private final String name = "job";
     private final String namespace = "namespace";
 
-    @Test
-    public void testFindAll() throws Exception {
+    ObjectMeta meta;
+    Job job;
+    IdAwareResource<Job> idAwareResource;
 
-        ObjectMeta meta = new ObjectMeta();
+    @BeforeEach
+    public void setup() {
+        meta = new ObjectMeta();
         meta.setName(name);
         meta.setNamespace(namespace);
 
-        Job job = new Job();
+        job = new Job();
         job.setMetadata(meta);
 
-        IdAwareResource<Job> idAwareResource = new IdAwareResource<>(job);
+        idAwareResource = new IdAwareResource<>(job);
+    }
+
+    @Test
+    public void testFindAll() throws Exception {
 
         Page<IdAwareResource<Job>> page = new PageImpl<>(
                 Arrays.asList(idAwareResource),
@@ -93,13 +101,6 @@ public class K8SJobApiTest {
 
     @Test
     public void testFindById() throws Exception {
-
-        ObjectMeta meta = new ObjectMeta();
-        meta.setName(name);
-        meta.setNamespace(namespace);
-        Job job = new Job();
-        job.setMetadata(meta);
-        IdAwareResource<Job> idAwareResource = new IdAwareResource<>(job);
 
         when(service.findById(anyString(), anyString())).thenReturn(idAwareResource);
 

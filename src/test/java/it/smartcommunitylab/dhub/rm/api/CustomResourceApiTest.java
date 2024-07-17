@@ -2,7 +2,6 @@ package it.smartcommunitylab.dhub.rm.api;
 
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
-import io.fabric8.kubernetes.client.KubernetesClient;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResource;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceService;
@@ -10,7 +9,6 @@ import it.smartcommunitylab.dhub.rm.service.K8SPVCService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -53,21 +51,25 @@ public class CustomResourceApiTest {
     private final String name = "resource1";
     private final String id = "1";
 
+    ObjectMeta meta;
+    GenericKubernetesResource genericResource;
+    IdAwareCustomResource resource;
+
     @BeforeEach
     public void setup() {
+
+        meta = new ObjectMeta();
+        meta.setName(name);
+        genericResource = new GenericKubernetesResource();
+        genericResource.setMetadata(meta);
+
+        resource = new IdAwareCustomResource(genericResource);
+        resource.setId(id);
 
     }
 
     @Test
     public void testFindAll() throws Exception {
-
-        ObjectMeta meta = new ObjectMeta();
-        meta.setName(name);
-        GenericKubernetesResource genericResource1 = new GenericKubernetesResource();
-        genericResource1.setMetadata(meta);
-
-        IdAwareCustomResource resource = new IdAwareCustomResource(genericResource1);
-        resource.setId(id);
 
         Page<IdAwareCustomResource> page = new PageImpl<>(
                 Arrays.asList(resource),
@@ -89,13 +91,6 @@ public class CustomResourceApiTest {
     @Test
     public void testFindById() throws Exception {
 
-        ObjectMeta meta = new ObjectMeta();
-        meta.setName(name);
-        GenericKubernetesResource genericResource = new GenericKubernetesResource();
-        genericResource.setMetadata(meta);
-        IdAwareCustomResource resource = new IdAwareCustomResource(genericResource);
-        resource.setId(id);
-
         when(customResourceService.findById(crdId, id, namespace)).thenReturn(resource);
 
         mockMvc.perform(get("/api/" + crdId + "/" + id)
@@ -108,12 +103,6 @@ public class CustomResourceApiTest {
 
     @Test
     public void testAdd() throws Exception {
-        ObjectMeta meta = new ObjectMeta();
-        meta.setName(name);
-        GenericKubernetesResource genericResource = new GenericKubernetesResource();
-        genericResource.setMetadata(meta);
-        IdAwareCustomResource resource = new IdAwareCustomResource(genericResource);
-        resource.setId(id);
 
         when(customResourceService.add(ArgumentMatchers.eq(crdId), any(IdAwareCustomResource.class), ArgumentMatchers.eq(namespace)))
                 .thenReturn(resource);
@@ -129,13 +118,6 @@ public class CustomResourceApiTest {
 
     @Test
     public void testUpdate() throws Exception {
-        ObjectMeta meta = new ObjectMeta();
-        meta.setName(name);
-        GenericKubernetesResource genericResource = new GenericKubernetesResource();
-        genericResource.setMetadata(meta);
-        IdAwareCustomResource resource = new IdAwareCustomResource(genericResource);
-        resource.setId(id);
-
 
         when(customResourceService.update(ArgumentMatchers.eq(crdId), ArgumentMatchers.eq(id), any(IdAwareCustomResource.class), ArgumentMatchers.eq(namespace)))
                 .thenReturn(resource);

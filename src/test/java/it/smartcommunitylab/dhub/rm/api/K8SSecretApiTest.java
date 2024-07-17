@@ -1,13 +1,13 @@
 package it.smartcommunitylab.dhub.rm.api;
 
 import io.fabric8.kubernetes.api.model.ObjectMeta;
-import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
 import io.fabric8.kubernetes.api.model.Secret;
 import it.smartcommunitylab.dhub.rm.model.IdAwareResource;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceService;
 import it.smartcommunitylab.dhub.rm.service.K8SPVCService;
 import it.smartcommunitylab.dhub.rm.service.K8SSecretService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -58,17 +58,25 @@ public class K8SSecretApiTest {
     private final String name = "secret";
     private final String namespace = "namespace";
 
-    @Test
-    public void testFindAll() throws Exception {
+    ObjectMeta meta;
+    Secret secret;
+    IdAwareResource<Secret> idAwareResource;
 
-        ObjectMeta meta = new ObjectMeta();
+    @BeforeEach
+    public void setup() {
+        meta = new ObjectMeta();
         meta.setName(name);
         meta.setNamespace(namespace);
 
-        Secret secret = new Secret();
+        secret = new Secret();
         secret.setMetadata(meta);
 
-        IdAwareResource<Secret> idAwareResource = new IdAwareResource<>(secret);
+        idAwareResource = new IdAwareResource<>(secret);
+
+    }
+
+    @Test
+    public void testFindAll() throws Exception {
 
         Page<IdAwareResource<Secret>> page = new PageImpl<>(
                 Arrays.asList(idAwareResource),
@@ -90,21 +98,13 @@ public class K8SSecretApiTest {
     @Test
     public void testFindById() throws Exception {
 
-        ObjectMeta meta = new ObjectMeta();
-        meta.setName(name);
-        meta.setNamespace(namespace);
-
-        Secret secret = new Secret();
-        secret.setMetadata(meta);
-
-        IdAwareResource<Secret> idAwareResource = new IdAwareResource<>(secret);
-
         when(service.findById(anyString(), anyString())).thenReturn(idAwareResource);
 
         mockMvc.perform(get("/api/k8s_secret/" + name)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.metadata.name").value(name));
+
     }
 
     @Test
