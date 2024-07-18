@@ -216,8 +216,10 @@ const messages = {
                     connection: {
                         title: 'Connection',
                         host: 'DB Host',
+                        hostHint: 'Required if secret has no POSTGREST_URL',
                         port: 'DB Port',
                         database: 'Database name',
+                        databaseHint: 'Required if secret has no POSTGREST_URL',
                         secretName: 'Secret name',
                         secretNameHint: 'Secret should contain either full POSTGRES_URL or USER and PASSWORD keys',
                         user: 'DB User',
@@ -226,7 +228,8 @@ const messages = {
                     }
                 },
                 status: {
-                    state: 'Status'
+                    state: 'Status',
+                    message: 'Status message'
                 },
                 tables: 'Exposed DB tables',
                 grants: 'DB permissions',

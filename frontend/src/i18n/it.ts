@@ -213,23 +213,26 @@ const messages = {
                 spec: {
                     database: 'Database ID',
                     schema: 'Schema DB',
-                    anonRole: 'Nome utente DB esisente',
+                    anonRole: 'Nome utente DB esistente',
                     grants: 'Permessi DB',
                     tables: 'Tabelle DB esposte',
                     connection: {
                         title: 'Connessione',
                         host: 'DB Host',
+                        hostHint: 'Obbligatorio se secret non ha POSTGREST_URL',
                         port: 'DB Port',
                         database: 'Nome database',
+                        databaseHint: 'Obbligatorio se secret non ha POSTGREST_URL',
                         secretName: 'Nome segreto',
                         secretNameHint: 'Secret deve definire POSTGRES_URL oppure i valori di USER e PASSWORD del database',
                         user: 'Utente DB',
                         password: 'Password DB',
-                        extraParams: 'Extra parametri URL di connessione'
+                        extraParams: 'Ulteriori parametri di connessione'
                     }
                 },
                 status: {
-                    state: 'Stato'
+                    state: 'Stato',
+                    message: 'Messaggio relativo allo stato'
                 },
                 tables: 'Tabelle DB esposte',
                 grants: 'Permessi DB',
@@ -244,7 +247,7 @@ const messages = {
                 id: 'ID',
                 spec: {
                     tables: 'Virtual set Dremio esposti',
-                    javaOptions: 'Opzioni Java Extra per il container (JAVA_TOOL_OPTIONS)',
+                    javaOptions: 'Ulteriori opzioni Java per il container (JAVA_TOOL_OPTIONS)',
                     connection: {
                         title: 'Connessione',
                         host: 'Dremio Host',
@@ -252,7 +255,7 @@ const messages = {
                         secretName: 'Nome segreto',
                         user: 'Utente Dremio',
                         password: 'Password Dremio',
-                        jdbcProperties: 'Extra parametri URL di connessione'
+                        jdbcProperties: 'Ulteriori parametri di connessione'
                     }
                 },
                 status: {
