@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.NoSuchElementException;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -139,6 +140,19 @@ public class CustomResourceApiTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
+    }
+
+    //Test Exceptions
+    @Test
+    public void testFindByIdNotFound() throws Exception {
+        when(customResourceService.findById(crdId, id, namespace)).thenThrow(new NoSuchElementException("Resource not found"));
+
+        mockMvc.perform(get("/api/" + crdId + "/" + id)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.error").value("Not Found"))
+                .andExpect(jsonPath("$.message").value("Resource not found"));
     }
 
 }

@@ -18,13 +18,15 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 public class K8SSecretServiceTest {
@@ -81,44 +83,74 @@ public class K8SSecretServiceTest {
         ReflectionTestUtils.setField(k8sSecretService, "nameFilters", secretId);
         k8sSecretService.initFilters();
 
+        when(client.secrets()).thenReturn(secretOperation);
+        when(secretOperation.inNamespace(namespace)).thenReturn(secretOperation);
+    }
+
+    @Test
+    public void testGetItems() {
+        when(secretOperation.list()).thenReturn(secretList);
+        List<Secret> items = k8sSecretService.getItems(namespace);
+        Assertions.assertEquals(1, items.size());
+        Assertions.assertEquals("*************", items.get(0).getData().get(key));
     }
 
     @Test
     public void testDecode() {
-
-        Mockito.when(client.secrets()).thenReturn(secretOperation);
-        Mockito.when(secretOperation.inNamespace(namespace)).thenReturn(secretOperation);
-        Mockito.when(secretOperation.list()).thenReturn(secretList);
-
+        when(secretOperation.list()).thenReturn(secretList);
         String decodedValue = k8sSecretService.decode(namespace, secretId, key);
-
         Assertions.assertEquals("admin", decodedValue);
     }
 
     @Test
-    public void testAdd(){
+    public void testDecodeSecretNotFound() {
+        when(secretOperation.list()).thenReturn(new SecretList());
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            k8sSecretService.decode(namespace, secretId, key);
+        });
+    }
 
-        Mockito.when(client.secrets()).thenReturn(secretOperation);
-        Mockito.when(secretOperation.inNamespace(namespace)).thenReturn(secretOperation);
-        Mockito.when(secretOperation.resource(Mockito.any(Secret.class))).thenReturn(secretResource);
-        Mockito.when(secretOperation.list()).thenReturn(secretList);
-        Mockito.when(secretResource.create()).thenReturn(secret);
+    @Test
+    public void testDecodeKeyNotFound() {
+        when(secretOperation.list()).thenReturn(secretList);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            k8sSecretService.decode(namespace, secretId, "invalidKey");
+        });
+    }
+
+    @Test
+    public void testAdd() {
+        when(secretOperation.resource(any(Secret.class))).thenReturn(secretResource);
+        when(secretResource.create()).thenReturn(secret);
+        when(secretOperation.list()).thenReturn(secretList);
 
         IdAwareResource<Secret> result = k8sSecretService.add(namespace, secretDTO);
 
         Assertions.assertEquals(secretId, result.getId());
         Assertions.assertEquals(secret, result.getResource());
-
     }
 
     @Test
-    public void testDelete(){
+    public void testAddWithData() {
+        Map<String, String> data = new HashMap<>();
+        data.put(key, "testData");
+        secretDTO.setData(data);
+
+        when(secretOperation.resource(any(Secret.class))).thenReturn(secretResource);
+        when(secretResource.create()).thenReturn(secret);
+        when(secretOperation.list()).thenReturn(secretList);
+
+        IdAwareResource<Secret> result = k8sSecretService.add(namespace, secretDTO);
+
+        Assertions.assertEquals(secretId, result.getId());
+        Assertions.assertNotNull(result.getResource().getData().get(key));
+    }
+
+    @Test
+    public void testDelete() {
         lenient().when(resourceOperation.item()).thenReturn(null);
         lenient().when(resourceOperation.serverSideApply()).thenReturn(null);
         lenient().when(secretOperation.withName(anyString())).thenReturn(resourceOperation);
-
-        Mockito.when(client.secrets()).thenReturn(secretOperation);
-        Mockito.when(secretOperation.inNamespace(namespace)).thenReturn(secretOperation);
 
         K8SSecretService spyService = spy(k8sSecretService);
         doReturn(resourceCache).when(spyService).getResourceCache();
@@ -127,7 +159,5 @@ public class K8SSecretServiceTest {
 
         verify(resourceCache, times(1)).invalidate(namespace);
         verify(resourceOperation, times(1)).delete();
-
     }
-
 }
