@@ -84,6 +84,44 @@ const validateData = (values: any) => {
     return errors;
 }
 
+const transformData = (data: any) => {
+    if (data.existing) {
+        delete data.spec.tables;
+        delete data.spec.grants;
+    } else {
+        delete data.spec.anonRole;
+        data.spec.grants = data.grants.join(',');
+        data.spec.tables = data.tables.filter((t: any) => !!t);
+    }
+    if (data.existingSecret) {
+        delete data.spec.connection.user;
+        delete data.spec.connection.password;
+    } else {
+        delete data.spec.connection.secretName;
+    }
+    if (data.spec.connection) {
+        if (!data.spec.connection.port || data.spec.connection.port <= 0) {
+            data.spec.connection.port = 5432;
+        }
+
+        if (!data.spec.connection.host || data.spec.connection.host.trim() === '') {
+            delete data.spec.connection.host;
+        }
+
+        if (!data.spec.connection.database || data.spec.connection.database.trim() === '') {
+            delete data.spec.connection.database;
+        }
+
+        if (!data.spec.connection.extraParams || data.spec.connection.extraParams.trim() === '') {
+            delete data.spec.connection.extraParams;
+        }
+    }
+
+    return {
+        ...data
+    };
+}
+
 const CrCreate = () => {
     const { apiVersion, kind } = useCrTransform();
     const translate = useTranslate();
@@ -91,33 +129,11 @@ const CrCreate = () => {
     const tables: any[] = [];
    
     const transform = (data: any) => {
-        if (data.existing) {
-            delete data.spec.tables;
-            delete data.spec.grants;
-        } else {
-            delete data.spec.anonRole;
-            data.spec.grants = data.grants.join(',');
-            data.spec.tables = data.tables.filter((t: any) => !!t);
-        }
-        if (data.existingSecret) {
-            delete data.spec.connection.user;
-            delete data.spec.connection.password;
-        } else {
-            delete data.spec.connection.secretName;
-        }
-        if (data.spec.connection && (!data.spec.connection.port || data.spec.connection.port <= 0)) {
-            data.spec.connection.port = 5432;
-        }
-        if (data.spec.connection && (!data.spec.connection.extraParams || data.spec.connection.extraParams.trim() === '')) {
-            delete data.spec.connection.extraParams;
-        }
-
         return {
-            ...data,
+            ...transformData(data),
             apiVersion: apiVersion,
             kind: kind,
         };
-
     };
 
     const validate = (values: any) => {
@@ -277,32 +293,7 @@ const CrEdit = () => {
     record.existingSecret = !!record.spec.connection && !!record.spec.connection.secretName;
     record.tables = record.spec.tables;
     record.grants = record.spec.grants ? record.spec.grants.split(',') : [];
-
-    const transform = (data: any) => {
-        if (data.existing) {
-            delete data.spec.tables;
-            delete data.spec.grants;
-        } else {
-            delete data.spec.anonRole;
-            data.spec.grants = data.grants.join(',');
-            data.spec.tables = data.tables.filter((t: any) => !!t);
-        }
-        if (data.existingSecret) {
-            delete data.spec.connection.user;
-            delete data.spec.connection.password;
-        } else {
-            delete data.spec.connection.secretName;
-        }
-        if (data.spec.connection && (!data.spec.connection.port || data.spec.connection.port <= 0)) {
-            data.spec.connection.port = 5432;
-        }
-        if (data.spec.connection && (!data.spec.connection.extraParams || data.spec.connection.extraParams.trim() === '')) {
-            delete data.spec.connection.extraParams;
-        }
-
-        return data;
-
-    };
+    
     return (
         <>
             <Breadcrumb />
@@ -311,7 +302,7 @@ const CrEdit = () => {
                 crName={CR_POSTGREST}
                 crId={record.spec.database}
             />
-            <Edit actions={<EditTopToolbar hasYaml />} transform={transform} mutationMode='pessimistic'>
+            <Edit actions={<EditTopToolbar hasYaml />} transform={transformData} mutationMode='pessimistic'>
                 <SimpleForm toolbar={<ViewToolbar />} validate={validateData}>
                 <Grid container alignItems="center" spacing={2}>
                         <Grid item xs={4}>
@@ -377,7 +368,7 @@ const CrEdit = () => {
                             <>
                                 <Grid container alignItems="center" spacing={2}>
                                     <Grid item xs={4}>
-                                        <TextInput fullWidth source="spec.connection.host" helperText={`resources.${CR_POSTGREST}.fields.spec.connection.databaseHint`}/>
+                                        <TextInput fullWidth source="spec.connection.host" helperText={`resources.${CR_POSTGREST}.fields.spec.connection.hostHint`}/>
                                     </Grid>
                                     <Grid item xs={2}>
                                         <NumberInput fullWidth source="spec.connection.port"/>
