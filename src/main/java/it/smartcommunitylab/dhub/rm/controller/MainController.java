@@ -74,6 +74,8 @@ public class MainController {
             }
         }
 
+        config.put("REACT_APP_CORE_NAME", applicationProperties.getCoreName());
+
         model.addAttribute("config", config);
         return "console.html";
     }
