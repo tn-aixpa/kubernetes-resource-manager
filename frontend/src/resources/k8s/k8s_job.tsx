@@ -11,10 +11,13 @@ import {
     useRecordContext,
     DeleteButton,
     usePermissions,
+    ChipField,
+    SingleFieldList,
 } from 'react-admin';
 import { Box, Typography } from '@mui/material';
 import { Breadcrumb } from '@dslab/ra-breadcrumb';
 import { ShowTopToolbar } from '../../components/toolbars';
+import { labels2types } from '../../utils';
 
 
 const DurationField = (props: any) => {
@@ -40,7 +43,17 @@ const DurationField = (props: any) => {
         </>    
     )
 };
-
+const TypeField = (props: any) => {
+    const record = useRecordContext(props);
+    const types = labels2types(record.metadata.labels);
+    return types ? (
+        <ArrayField source="types" record={{ types: types }} >
+            <SingleFieldList linkType={false}>
+                <ChipField source="name" size="small" />
+            </SingleFieldList>
+        </ArrayField>
+    ) : (<></>)
+};
 const CompletionField = (props: any) => {
     const record = useRecordContext(props);
     const completed = record.status ? (record.status.succeeded || 0) : 0;
@@ -65,6 +78,7 @@ export const K8SJobList = () => {
         <List actions={false}>
             <Datagrid bulkActionButtons={false}>
                 <TextField source="metadata.name" />
+                <TypeField label="resources.k8s_service.fields.types"/>
                 <CompletionField label="resources.k8s_job.fields.completion"/>
                 <DurationField label="resources.k8s_job.fields.duration"/>
                 <Box textAlign={'right'}>
@@ -83,6 +97,7 @@ export const K8SJobShow = () => {
     const hasPermission = (op: string) => permissions && permissions.canAccess('k8s_job', op)
 
     if (!record) return null;
+    const types = labels2types(record.metadata.labels);
     return (
         <>
             <Breadcrumb />
@@ -95,6 +110,13 @@ export const K8SJobShow = () => {
             <Show actions={<ShowTopToolbar hasYaml hasEdit={false} hasDelete={hasPermission('write')} hasLog/> }>
                 <SimpleShowLayout>
                     <TextField source="metadata.name" />
+                    {types ? (
+                        <ArrayField source="types" record={{ types: types }} >
+                            <SingleFieldList linkType={false}>
+                                <ChipField source="name" size="small" />
+                            </SingleFieldList>
+                        </ArrayField>
+                   ) : (<></>)}
                     <CompletionField label="resources.k8s_job.fields.completion"/>
                     <DurationField label="resources.k8s_job.fields.duration"/>
                     <TextField source="metadata.creationTimestamp" />

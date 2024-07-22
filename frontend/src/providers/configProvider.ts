@@ -33,6 +33,8 @@ const OAUTH2_CLIENT_ID =
 const OAUTH2_SCOPE =
     (globalThis as any).REACT_APP_SCOPE || process.env.REACT_APP_SCOPE;
 
+
+const CORE_NAME = (globalThis as any).REACT_APP_CORE_NAME || process.env.REACT_APP_CORE_NAME;
 //build full config
 
 export const Config = {
@@ -40,6 +42,7 @@ export const Config = {
         contextPath: CONTEXT_PATH,
         applicationUrl: APPLICATION_URL,
         apiUrl: API_URL,
+        coreName: CORE_NAME,
     },
     authentication: {
         type: AUTH_TYPE,

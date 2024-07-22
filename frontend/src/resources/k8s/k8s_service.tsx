@@ -11,28 +11,22 @@ import {
     useTranslate,
     useRecordContext,
     usePermissions,
+    SingleFieldList,
 } from 'react-admin';
 import { Box, Typography } from '@mui/material';
 import { Breadcrumb } from '@dslab/ra-breadcrumb';
 import { ShowTopToolbar } from '../../components/toolbars';
-
-// customization to distinguish known types
-const labels2type = (labels: any) => {
-    if (!labels) return '';
-    if (labels['com.coder.resource']) return labels['app.kubernetes.io/name'];
-    if (labels['nuclio.io/class']) return 'nuclio';
-    return '';
-}
+import { labels2types } from '../../utils';
 
 const TypeField = (props: any) => {
     const record = useRecordContext(props);
-    const type = labels2type(record.metadata.labels);
-    return type ? (
-        <>
-         <ChipField source="type" record={{
-            type: type
-        }} />
-        </>    
+    const types = labels2types(record.metadata.labels);
+    return types ? (
+        <ArrayField source="types" record={{ types: types }} >
+            <SingleFieldList linkType={false}>
+                <ChipField source="name" size="small" />
+            </SingleFieldList>
+        </ArrayField>
     ) : (<></>)
 };
     
@@ -45,7 +39,7 @@ export const K8SServiceList = () => {
         <List actions={false}>
             <Datagrid bulkActionButtons={false}>
                 <TextField source="metadata.name" />
-                <TypeField label="resources.k8s_service.fields.type"/>
+                <TypeField label="resources.k8s_service.fields.types"/>
                 <TextField source="spec.ports[0].name" />
                 <TextField source="spec.ports[0].port" />
                 <Box textAlign={'right'}>
@@ -60,7 +54,7 @@ export const K8SServiceShow = () => {
     const translate = useTranslate();
     const { record } = useShowController();
     if (!record) return null;
-    const type = labels2type(record.metadata.labels);
+    const types = labels2types(record.metadata.labels);
     return (
         <>
             <Breadcrumb />
@@ -73,11 +67,13 @@ export const K8SServiceShow = () => {
             <Show actions={<ShowTopToolbar hasYaml hasEdit={false} hasDelete={false} /> }>
                 <SimpleShowLayout>
                     <TextField source="metadata.name" />
-                    {type ? (
-                        <ChipField label="resources.k8s_service.fields.type" source="type" record={{
-                            type: type
-                        }}/>
-                    ) : (<></>)}
+                    {types ? (
+                        <ArrayField source="types" record={{ types: types }} >
+                            <SingleFieldList linkType={false}>
+                                <ChipField source="name" size="small" />
+                            </SingleFieldList>
+                        </ArrayField>
+                   ) : (<></>)}
                     <TextField source="metadata.creationTimestamp" />
                     <TextField source="metadata.resourceVersion" />
                     <TextField source="spec.ports[0].name" />
@@ -99,4 +95,3 @@ export const K8SServiceShow = () => {
         </>
     );
 };
-

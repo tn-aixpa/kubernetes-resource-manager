@@ -59,7 +59,8 @@ const messages = {
                     'ports[0].port': 'Port',
                     'ports[0].name': 'Port name' 
                 },
-                type: 'Type'
+                type: 'Type',
+                types: 'Types'
             },
         },
         k8s_job: {
@@ -73,7 +74,8 @@ const messages = {
                     uid: 'UID',
                 },
                 completion: 'Completion',
-                duration: 'Duration'
+                duration: 'Duration',
+                types: 'Types'
             },
         },
         k8s_deployment: {
@@ -86,7 +88,8 @@ const messages = {
                     resourceVersion: 'Resource version',
                     uid: 'UID',
                 },
-                status: 'Ready'
+                status: 'Ready',
+                types: 'Types'
             },
         },
         k8s_pvc: {
