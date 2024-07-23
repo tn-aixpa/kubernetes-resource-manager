@@ -1,9 +1,7 @@
 package it.smartcommunitylab.dhub.rm.service;
 
 import com.google.common.cache.LoadingCache;
-import io.fabric8.kubernetes.api.model.Secret;
-import io.fabric8.kubernetes.api.model.SecretBuilder;
-import io.fabric8.kubernetes.api.model.SecretList;
+import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
@@ -20,11 +18,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Method;
+import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -82,36 +80,79 @@ public class K8SSecretServiceTest {
         ReflectionTestUtils.setField(k8sSecretService, "ownerFilters", "");
         ReflectionTestUtils.setField(k8sSecretService, "nameFilters", secretId);
         k8sSecretService.initFilters();
-
-        when(client.secrets()).thenReturn(secretOperation);
-        when(secretOperation.inNamespace(namespace)).thenReturn(secretOperation);
     }
 
     @Test
+    public void testInitFilters() {
+
+        ReflectionTestUtils.setField(k8sSecretService, "annotationFilters", "key1=value1|key2=value2");
+        ReflectionTestUtils.setField(k8sSecretService, "ownerFilters", "owner1,owner2");
+        ReflectionTestUtils.setField(k8sSecretService, "nameFilters", "name1,name2");
+
+        // Call the method
+        k8sSecretService.initFilters();
+
+        // Verify the annotations
+        Map<String, String> annotations = k8sSecretService.annotations;
+        assertEquals(2, annotations.size());
+        assertEquals("value1", annotations.get("key1"));
+        assertEquals("value2", annotations.get("key2"));
+
+        // Verify the owners
+        Set<String> owners = k8sSecretService.owners;
+        assertEquals(2, owners.size());
+        assertTrue(owners.contains("owner1"));
+        assertTrue(owners.contains("owner2"));
+
+        // Verify the names
+        Set<String> names = k8sSecretService.names;
+        assertEquals(3, names.size());
+        assertTrue(names.contains("name1"));
+        assertTrue(names.contains("name2"));
+
+    }
+
+
+    @Test
     public void testGetItems() {
+        when(client.secrets()).thenReturn(secretOperation);
+        when(secretOperation.inNamespace(namespace)).thenReturn(secretOperation);
+
         when(secretOperation.list()).thenReturn(secretList);
         List<Secret> items = k8sSecretService.getItems(namespace);
-        Assertions.assertEquals(1, items.size());
-        Assertions.assertEquals("*************", items.get(0).getData().get(key));
+        assertEquals(1, items.size());
+        assertEquals("*************", items.get(0).getData().get(key));
     }
 
     @Test
     public void testDecode() {
+        when(client.secrets()).thenReturn(secretOperation);
+        when(secretOperation.inNamespace(namespace)).thenReturn(secretOperation);
+
         when(secretOperation.list()).thenReturn(secretList);
         String decodedValue = k8sSecretService.decode(namespace, secretId, key);
-        Assertions.assertEquals("admin", decodedValue);
+        assertEquals("admin", decodedValue);
     }
 
     @Test
     public void testDecodeSecretNotFound() {
+        when(client.secrets()).thenReturn(secretOperation);
+        when(secretOperation.inNamespace(namespace)).thenReturn(secretOperation);
+
         when(secretOperation.list()).thenReturn(new SecretList());
-        Assertions.assertThrows(IllegalArgumentException.class, () -> {
+
+        IllegalArgumentException result = Assertions.assertThrows(IllegalArgumentException.class, () -> {
             k8sSecretService.decode(namespace, secretId, key);
         });
+
+        assertEquals("No matching secret found", result.getMessage());
     }
 
     @Test
     public void testDecodeKeyNotFound() {
+        when(client.secrets()).thenReturn(secretOperation);
+        when(secretOperation.inNamespace(namespace)).thenReturn(secretOperation);
+
         when(secretOperation.list()).thenReturn(secretList);
         Assertions.assertThrows(IllegalArgumentException.class, () -> {
             k8sSecretService.decode(namespace, secretId, "invalidKey");
@@ -120,18 +161,24 @@ public class K8SSecretServiceTest {
 
     @Test
     public void testAdd() {
+        when(client.secrets()).thenReturn(secretOperation);
+        when(secretOperation.inNamespace(namespace)).thenReturn(secretOperation);
+
         when(secretOperation.resource(any(Secret.class))).thenReturn(secretResource);
         when(secretResource.create()).thenReturn(secret);
         when(secretOperation.list()).thenReturn(secretList);
 
         IdAwareResource<Secret> result = k8sSecretService.add(namespace, secretDTO);
 
-        Assertions.assertEquals(secretId, result.getId());
-        Assertions.assertEquals(secret, result.getResource());
+        assertEquals(secretId, result.getId());
+        assertEquals(secret, result.getResource());
     }
 
     @Test
     public void testAddWithData() {
+        when(client.secrets()).thenReturn(secretOperation);
+        when(secretOperation.inNamespace(namespace)).thenReturn(secretOperation);
+
         Map<String, String> data = new HashMap<>();
         data.put(key, "testData");
         secretDTO.setData(data);
@@ -142,12 +189,15 @@ public class K8SSecretServiceTest {
 
         IdAwareResource<Secret> result = k8sSecretService.add(namespace, secretDTO);
 
-        Assertions.assertEquals(secretId, result.getId());
+        assertEquals(secretId, result.getId());
         Assertions.assertNotNull(result.getResource().getData().get(key));
     }
 
     @Test
     public void testDelete() {
+        when(client.secrets()).thenReturn(secretOperation);
+        when(secretOperation.inNamespace(namespace)).thenReturn(secretOperation);
+
         lenient().when(resourceOperation.item()).thenReturn(null);
         lenient().when(resourceOperation.serverSideApply()).thenReturn(null);
         lenient().when(secretOperation.withName(anyString())).thenReturn(resourceOperation);
@@ -159,5 +209,70 @@ public class K8SSecretServiceTest {
 
         verify(resourceCache, times(1)).invalidate(namespace);
         verify(resourceOperation, times(1)).delete();
+    }
+
+
+    @Test
+    public void testFetchWithOwners() throws Exception {
+        ReflectionTestUtils.setField(k8sSecretService, "ownerFilters", "v1");
+        k8sSecretService.initFilters();
+
+        OwnerReference ownerReference = new OwnerReferenceBuilder()
+                .withApiVersion("v1")
+                .withKind("Deployment")
+                .withName("ownerName")
+                .withUid(UUID.randomUUID().toString())
+                .build();
+
+        Secret secretWithOwner = new SecretBuilder()
+                .withNewMetadata().withName(secretId).withNamespace(namespace)
+                .withOwnerReferences(ownerReference).endMetadata()
+                .addToData(key, encodedValue)
+                .build();
+
+        secretList.setItems(List.of(secretWithOwner));
+
+        when(client.secrets()).thenReturn(secretOperation);
+        when(secretOperation.inNamespace(namespace)).thenReturn(secretOperation);
+        when(secretOperation.list()).thenReturn(secretList);
+
+        Method fetchMethod = K8SSecretService.class.getDeclaredMethod("fetch", String.class);
+        fetchMethod.setAccessible(true);
+
+        @SuppressWarnings("unchecked")
+        List<Secret> secrets = (List<Secret>) fetchMethod.invoke(k8sSecretService, namespace);
+
+        assertEquals(1, secrets.size());
+        assertEquals(secretId, secrets.get(0).getMetadata().getName());
+    }
+
+    @Test
+    public void testFetchWithAnnotations() throws Exception {
+        ReflectionTestUtils.setField(k8sSecretService, "annotationFilters", "key1=value1");
+        k8sSecretService.initFilters();
+
+        Map<String, String> annotations = new HashMap<>();
+        annotations.put("key1", "value1");
+
+        Secret secretWithAnnotations = new SecretBuilder()
+                .withNewMetadata().withName(secretId).withNamespace(namespace)
+                .withAnnotations(annotations).endMetadata()
+                .addToData(key, encodedValue)
+                .build();
+
+        secretList.setItems(List.of(secretWithAnnotations));
+
+        when(client.secrets()).thenReturn(secretOperation);
+        when(secretOperation.inNamespace(namespace)).thenReturn(secretOperation);
+        when(secretOperation.list()).thenReturn(secretList);
+
+        Method fetchMethod = K8SSecretService.class.getDeclaredMethod("fetch", String.class);
+        fetchMethod.setAccessible(true);
+
+        @SuppressWarnings("unchecked")
+        List<Secret> secrets = (List<Secret>) fetchMethod.invoke(k8sSecretService, namespace);
+
+        assertEquals(1, secrets.size());
+        assertEquals(secretId, secrets.get(0).getMetadata().getName());
     }
 }

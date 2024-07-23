@@ -1,7 +1,9 @@
 package it.smartcommunitylab.dhub.rm.api;
 
+import com.networknt.schema.ValidationMessage;
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
+import io.fabric8.kubernetes.api.model.Status;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResource;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceService;
@@ -19,10 +21,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.dao.DataIntegrityViolationException;
+import it.smartcommunitylab.dhub.rm.exception.ValidationException;
+import io.fabric8.kubernetes.client.KubernetesClientException;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.NoSuchElementException;
+
+import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -154,5 +159,74 @@ public class CustomResourceApiTest {
                 .andExpect(jsonPath("$.error").value("Not Found"))
                 .andExpect(jsonPath("$.message").value("Resource not found"));
     }
+
+    @Test
+    public void testAccessDeniedException() throws Exception {
+        // Simulate AccessDeniedException
+        when(customResourceService.findById(crdId, id, namespace))
+                .thenThrow(new AccessDeniedException("Access is denied"));
+
+        mockMvc.perform(get("/api/" + crdId + "/" + id)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.status").value(403))
+                .andExpect(jsonPath("$.error").value("Forbidden"))
+                .andExpect(jsonPath("$.message").value("Access is denied"));
+    }
+
+    @Test
+    public void testDataIntegrityViolationException() throws Exception {
+        // Simulate DataIntegrityViolationException
+        when(customResourceService.findById(crdId, id, namespace))
+                .thenThrow(new DataIntegrityViolationException("Data integrity violation"));
+
+        mockMvc.perform(get("/api/" + crdId + "/" + id)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value("Data integrity violation"));
+    }
+
+    @Test
+    public void testValidationException() throws Exception {
+        ValidationMessage validationMessage = new ValidationMessage.Builder()
+                .build();
+
+        Set<ValidationMessage> set =  new HashSet<>();
+        set.add(validationMessage);
+
+        // Simulate ValidationException
+        when(customResourceService.findById(crdId, id, namespace))
+                .thenThrow(new ValidationException(set));
+
+        mockMvc.perform(get("/api/" + crdId + "/" + id)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Bad Request"));
+    }
+
+    @Test
+    public void testKubernetesClientException() throws Exception {
+        Status status = new Status();
+        status.setMessage("Error occurred in Kubernetes client");
+        status.setCode(400);
+
+        // Create a KubernetesClientException instance with the status
+        KubernetesClientException kubernetesClientException = new KubernetesClientException(status);
+
+        when(customResourceService.findById(crdId, id, namespace))
+                .thenThrow(kubernetesClientException);
+
+        mockMvc.perform(get("/api/" + crdId + "/" + id)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value("Error occurred in Kubernetes client"));
+    }
+
+
 
 }

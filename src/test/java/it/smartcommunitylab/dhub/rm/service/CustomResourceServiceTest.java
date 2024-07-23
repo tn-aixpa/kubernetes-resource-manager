@@ -1,5 +1,6 @@
 package it.smartcommunitylab.dhub.rm.service;
 
+import com.networknt.schema.ValidationMessage;
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.GenericKubernetesResourceList;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
@@ -8,6 +9,8 @@ import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.NamespaceableResource;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
+import it.smartcommunitylab.dhub.rm.SystemKeys;
+import it.smartcommunitylab.dhub.rm.exception.ValidationException;
 import it.smartcommunitylab.dhub.rm.model.CustomResourceSchema;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResource;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,9 +22,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.function.UnaryOperator;
 
 import static org.mockito.Mockito.*;
@@ -194,6 +200,58 @@ public class CustomResourceServiceTest {
 
         assertNotNull(updatedResource);
         assertEquals(request.getCr(), updatedResource.getCr());
+
+        //
+
+        CustomResourceDefinitionContext contextNotAllowed = new CustomResourceDefinitionContext.Builder()
+                .withScope("Namespaced")
+                .withGroup("com")
+                .withName("crd-not-allowed")
+                .withPlural("example")
+                .withVersion(version)
+                .build();
+
+        when(authorizationService.isCrdAllowed("crd-not-allowed")).thenReturn(false);
+
+
+        AccessDeniedException exception = assertThrows(
+                AccessDeniedException.class,
+                () -> customResourceService.update("crd-not-allowed", id, request, namespace)
+        );
+
+        assertEquals(SystemKeys.ERROR_CRD_NOT_ALLOWED, exception.getMessage());
+    }
+
+    @Test
+    public void testUpdateVersionMismatch() {
+        when(authorizationService.isCrdAllowed(crdId)).thenReturn(true);
+        when(crdService.fetchStoredVersionName(crdId)).thenReturn("different-version");
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> customResourceService.update(crdId, id, request, namespace)
+        );
+
+        assertEquals("Version 1 is not stored", exception.getMessage());
+    }
+
+    @Test
+    public void testUpdateCustomResourceNotFound() {
+        when(authorizationService.isCrdAllowed(crdId)).thenReturn(true);
+        when(crdService.fetchStoredVersionName(crdId)).thenReturn(version);
+        when(schemaService.findCRDByCrdIdAndVersion(crdId, version)).thenReturn(schema);
+
+        when(kubernetesClient.genericKubernetesResources(any())).thenReturn(mixedOperation);
+        when(mixedOperation.inNamespace(namespace)).thenReturn(mixedOperation);
+        when(mixedOperation.list()).thenReturn(resourceList);
+        when(resourceList.getItems()).thenReturn(Collections.emptyList());
+
+        NoSuchElementException exception = assertThrows(
+                NoSuchElementException.class,
+                () -> customResourceService.update(crdId, id, request, namespace)
+        );
+
+        assertEquals(SystemKeys.ERROR_NO_CR_WITH_VERSION, exception.getMessage());
     }
 
     @Test
@@ -212,6 +270,28 @@ public class CustomResourceServiceTest {
         customResourceService.delete(crdId, id, namespace);
 
         verify(namespaceableResource).delete();
+
+        //
+
+        CustomResourceDefinitionContext contextNotAllowed = new CustomResourceDefinitionContext.Builder()
+                .withScope("Namespaced")
+                .withGroup("com")
+                .withName("crd-not-allowed")
+                .withPlural("example")
+                .withVersion(version)
+                .build();
+
+        when(authorizationService.isCrdAllowed("crd-not-allowed")).thenReturn(false);
+
+
+        AccessDeniedException exception = assertThrows(
+                AccessDeniedException.class,
+                () -> customResourceService.delete("crd-not-allowed", id, namespace)
+        );
+
+        assertEquals(SystemKeys.ERROR_CRD_NOT_ALLOWED, exception.getMessage());
+
+
     }
 
 

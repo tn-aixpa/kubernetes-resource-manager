@@ -6,8 +6,10 @@ import io.fabric8.kubernetes.client.dsl.ApiextensionsAPIGroupDSL;
 import io.fabric8.kubernetes.client.V1ApiextensionAPIGroupDSL;
 import io.fabric8.kubernetes.client.dsl.NonNamespaceOperation;
 import io.fabric8.kubernetes.client.dsl.Resource;
+import it.smartcommunitylab.dhub.rm.SystemKeys;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResourceDefinition;
 import it.smartcommunitylab.dhub.rm.repository.CustomResourceSchemaRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.io.Serializable;
 import java.util.*;
@@ -70,6 +73,8 @@ public class CustomResourceDefinitionServiceTest {
                 .endSpec()
                 .build();
 
+        authorizationService.isCrdAllowed(crdName);
+
         ApiextensionsAPIGroupDSL apiextensions = mock(ApiextensionsAPIGroupDSL.class);
         V1ApiextensionAPIGroupDSL v1Apiextensions = mock(V1ApiextensionAPIGroupDSL.class);
         NonNamespaceOperation<CustomResourceDefinition, CustomResourceDefinitionList, Resource<CustomResourceDefinition>> crdOperation = mock(NonNamespaceOperation.class);
@@ -106,6 +111,12 @@ public class CustomResourceDefinitionServiceTest {
     }
 
     @Test
+    public void testGetCrdSchemaWithCrd() {
+        Map<String, Serializable> crdSchema = customResourceDefinitionService.getCrdSchema(createdCrd);
+        assertNotNull(crdSchema);
+    }
+
+    @Test
     public void testCrdExists() {
         assertTrue(customResourceDefinitionService.crdExists(crdName, "v1"));
     }
@@ -123,9 +134,54 @@ public class CustomResourceDefinitionServiceTest {
     }
 
     @Test
+    public void testFindAllIdsNull() {
+        when(customResourceSchemaRepository.findByCrdIdAndVersion(anyString(), anyString()))
+                .thenReturn(Optional.empty());
+
+        boolean onlyWithoutSchema = true;
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<IdAwareCustomResourceDefinition> result = customResourceDefinitionService.findAll(null, onlyWithoutSchema, pageable);
+        Assertions.assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        assertEquals("test-crd", result.getContent().get(0).getId());
+
+
+    }
+
+    @Test
     public void testFindById() {
         IdAwareCustomResourceDefinition result = customResourceDefinitionService.findById(crdName);
         assertNotNull(result);
         assertEquals(crdName, result.getId());
     }
+
+    @Test
+    public void testFindByIdThrowsAccessDeniedException() {
+        String crdId = "test-crd";
+
+        when(authorizationService.isCrdAllowed(crdId)).thenReturn(false);
+
+        AccessDeniedException exception = assertThrows(
+                AccessDeniedException.class,
+                () -> customResourceDefinitionService.findById(crdId)
+        );
+
+        assertEquals(SystemKeys.ERROR_CRD_NOT_ALLOWED, exception.getMessage());
+    }
+
+    @Test
+    public void testFindByIdThrowsNoSuchElementException() {
+
+        String crdId = "non-existent-crd";
+
+        when(authorizationService.isCrdAllowed(crdId)).thenReturn(true);
+
+        NoSuchElementException exception = assertThrows(
+                NoSuchElementException.class,
+                () -> customResourceDefinitionService.findById(crdId)
+        );
+
+        assertEquals(SystemKeys.ERROR_NO_CRD, exception.getMessage());
+    }
+
 }
