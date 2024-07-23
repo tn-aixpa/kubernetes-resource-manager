@@ -176,11 +176,6 @@ const CrCreate = () => {
                             <TextInput fullWidth source="spec.connection.jdbcProperties"/>
                         </Grid>
                     </Grid>
-                    <Grid container alignItems="center" spacing={2}>
-                        <Grid item xs={8}>
-                            <TextInput fullWidth source="spec.javaOptions"/>
-                        </Grid>
-                    </Grid>
 
                 </SimpleForm>
             </Create>
@@ -285,11 +280,6 @@ const CrEdit = () => {
                             <TextInput fullWidth source="spec.connection.jdbcProperties"/>
                         </Grid>
                     </Grid>
-                    <Grid container alignItems="center" spacing={2}>
-                        <Grid item xs={8}>
-                            <TextInput fullWidth source="spec.javaOptions"/>
-                        </Grid>
-                    </Grid>
                 </SimpleForm>
             </Edit>
         </>
@@ -358,7 +348,6 @@ const CrShow = () => {
                     <TextField source="spec.connection.user" />
                     <TextField source="spec.connection.password" />
                     <TextField source="spec.connection.jdbcProperties" />
-                    <TextField source="spec.javaOptions" />
                 </SimpleShowLayout>
             </Show>
         </>

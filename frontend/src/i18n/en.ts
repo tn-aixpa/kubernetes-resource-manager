@@ -247,7 +247,6 @@ const messages = {
                 id: 'ID',
                 spec: {
                     tables: 'Exposed Dremio virtual sets',
-                    javaOptions: 'Extra Java options for container (JAVA_TOOL_OPTIONS)',
                     connection: {
                         title: 'Connection',
                         host: 'Dremio Host',
