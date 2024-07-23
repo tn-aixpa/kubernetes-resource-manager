@@ -67,6 +67,25 @@ const validateData = (values: any) => {
     return errors;
 }
 
+const transformData = (data: any) => {
+    data.spec.tables = data.tables.filter((t: any) => !!t).join(',');
+
+    if (data.existingSecret) {
+        delete data.spec.connection.user;
+        delete data.spec.connection.password;
+    } else {
+        delete data.spec.connection.secretName;
+    }
+
+    if (data.spec.connection && (!data.spec.connection.port || data.spec.connection.port <= 0)) {
+        data.spec.connection.port = 32010;
+    }
+
+    return {
+        ...data
+    };
+}
+
 const CrCreate = () => {
     const { apiVersion, kind } = useCrTransform();
     const translate = useTranslate();
@@ -74,15 +93,8 @@ const CrCreate = () => {
     const tables: any[] = [];
    
     const transform = (data: any) => {
-        if (data.existingSecret) {
-            delete data.spec.connection.user;
-            delete data.spec.connection.password;
-        } else {
-            delete data.spec.connection.secretName;
-        }
-        data.spec.tables = data.tables.filter((t: any) => !!t).join(',');
         return {
-            ...data,
+            ...transformData(data),
             apiVersion: apiVersion,
             kind: kind,
         };
@@ -193,18 +205,6 @@ const CrEdit = () => {
     record.existingSecret = !!record.spec.connection && !!record.spec.connection.secretName;
     record.tables = record.spec.tables ? record.spec.tables.split(',') : [];
 
-    const transform = (data: any) => {
-        data.spec.tables = data.tables.filter((t: any) => !!t).join(',');
-        if (data.existingSecret) {
-            delete data.spec.connection.user;
-            delete data.spec.connection.password;
-        } else {
-            delete data.spec.secretName;
-        }
-
-        return data;
-
-    };
     return (
         <>
             <Breadcrumb />
@@ -213,7 +213,7 @@ const CrEdit = () => {
                 crName={CR_DREMIOREST}
                 crId={record.spec.database}
             />
-            <Edit actions={<EditTopToolbar hasYaml />} transform={transform} mutationMode='pessimistic'>
+            <Edit actions={<EditTopToolbar hasYaml />} transform={transformData} mutationMode='pessimistic'>
                 <SimpleForm toolbar={<ViewToolbar />} validate={validateData}>
                 <Grid container alignItems="center" spacing={2}>
                         <Grid item xs={4}>
