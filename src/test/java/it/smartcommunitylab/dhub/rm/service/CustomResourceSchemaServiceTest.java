@@ -3,7 +3,6 @@ package it.smartcommunitylab.dhub.rm.service;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinition;
 import it.smartcommunitylab.dhub.rm.SystemKeys;
-import it.smartcommunitylab.dhub.rm.converter.DTOToSchemaConverter;
 import it.smartcommunitylab.dhub.rm.converter.SchemaToDTOConverter;
 import it.smartcommunitylab.dhub.rm.model.CustomResourceSchema;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResourceDefinition;
@@ -23,8 +22,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 
-import javax.swing.text.html.Option;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.*;

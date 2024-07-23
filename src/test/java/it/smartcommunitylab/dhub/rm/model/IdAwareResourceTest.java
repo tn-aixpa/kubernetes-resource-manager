@@ -2,10 +2,13 @@ package it.smartcommunitylab.dhub.rm.model;
 
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class IdAwareResourceTest {
 
@@ -16,20 +19,20 @@ public class IdAwareResourceTest {
     @BeforeEach
     public void setUp() {
 
-        mockHasMetadata = Mockito.mock(HasMetadata.class);
-        ObjectMeta mockObjectMeta = Mockito.mock(ObjectMeta.class);
+        mockHasMetadata = mock(HasMetadata.class);
+        ObjectMeta mockObjectMeta = mock(ObjectMeta.class);
 
-        Mockito.when(mockHasMetadata.getMetadata()).thenReturn(mockObjectMeta);
-        Mockito.when(mockObjectMeta.getName()).thenReturn(name);
+        when(mockHasMetadata.getMetadata()).thenReturn(mockObjectMeta);
+        when(mockObjectMeta.getName()).thenReturn(name);
     }
 
     @Test
     public void testConstructor() {
         IdAwareResource<HasMetadata> idAwareResource = new IdAwareResource<>(mockHasMetadata);
 
-        Assertions.assertNotNull(idAwareResource);
-        Assertions.assertEquals(name, idAwareResource.getId());
-        Assertions.assertEquals(mockHasMetadata, idAwareResource.getResource());
+        assertNotNull(idAwareResource);
+        assertEquals(name, idAwareResource.getId());
+        assertEquals(mockHasMetadata, idAwareResource.getResource());
     }
 
     @Test
@@ -38,17 +41,17 @@ public class IdAwareResourceTest {
         String newName = "new-crd";
         idAwareResource.setId(newName);
 
-        Assertions.assertEquals(newName, idAwareResource.getId());
+        assertEquals(newName, idAwareResource.getId());
 
-        HasMetadata newMockHasMetadata = Mockito.mock(HasMetadata.class);
-        ObjectMeta newMockObjectMeta = Mockito.mock(ObjectMeta.class);
-        Mockito.when(newMockHasMetadata.getMetadata()).thenReturn(newMockObjectMeta);
-        Mockito.when(newMockObjectMeta.getName()).thenReturn(newName);
+        HasMetadata newMockHasMetadata = mock(HasMetadata.class);
+        ObjectMeta newMockObjectMeta = mock(ObjectMeta.class);
+        when(newMockHasMetadata.getMetadata()).thenReturn(newMockObjectMeta);
+        when(newMockObjectMeta.getName()).thenReturn(newName);
 
         idAwareResource.setResource(newMockHasMetadata);
 
-        Assertions.assertEquals(newMockHasMetadata, idAwareResource.getResource());
-        Assertions.assertEquals(newName, idAwareResource.getId());
+        assertEquals(newMockHasMetadata, idAwareResource.getResource());
+        assertEquals(newName, idAwareResource.getId());
 
     }
 }

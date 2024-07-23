@@ -113,7 +113,6 @@ public class K8SSecretApiTest {
         String key = "test-key";
         String decodedValue = "test-value";
 
-        // Mock the service's decode method
         when(service.decode(anyString(), anyString(), anyString())).thenReturn(decodedValue);
 
         mockMvc.perform(get("/api/k8s_secret/" + name + "/decode/" + key)
@@ -122,7 +121,5 @@ public class K8SSecretApiTest {
                 .andExpect(jsonPath("$.test-key").value(decodedValue));
 
     }
-
-
 
 }

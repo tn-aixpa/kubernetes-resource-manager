@@ -42,21 +42,16 @@ public class SecretDTOTest {
 
     @Test
     public void testGetData() {
-        // Stubbing behavior for mockData
         when(mockData.get("key1")).thenReturn("value1");
-
-        // Test that the DTO retrieves data correctly
         assertEquals("value1", secretDTO.getData().get("key1"));
     }
 
     @Test
     public void testSetData() {
-        // Prepare test data
         Map<String, String> testData = new HashMap<>();
         testData.put("key1", "value1");
         testData.put("key2", "value2");
 
-        // Set data and verify
         secretDTO.setData(testData);
         assertEquals("value1", secretDTO.getData().get("key1"));
         assertEquals("value2", secretDTO.getData().get("key2"));

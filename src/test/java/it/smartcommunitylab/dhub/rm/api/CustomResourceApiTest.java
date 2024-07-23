@@ -162,7 +162,6 @@ public class CustomResourceApiTest {
 
     @Test
     public void testAccessDeniedException() throws Exception {
-        // Simulate AccessDeniedException
         when(customResourceService.findById(crdId, id, namespace))
                 .thenThrow(new AccessDeniedException("Access is denied"));
 
@@ -176,7 +175,6 @@ public class CustomResourceApiTest {
 
     @Test
     public void testDataIntegrityViolationException() throws Exception {
-        // Simulate DataIntegrityViolationException
         when(customResourceService.findById(crdId, id, namespace))
                 .thenThrow(new DataIntegrityViolationException("Data integrity violation"));
 
@@ -196,7 +194,6 @@ public class CustomResourceApiTest {
         Set<ValidationMessage> set =  new HashSet<>();
         set.add(validationMessage);
 
-        // Simulate ValidationException
         when(customResourceService.findById(crdId, id, namespace))
                 .thenThrow(new ValidationException(set));
 
@@ -213,7 +210,6 @@ public class CustomResourceApiTest {
         status.setMessage("Error occurred in Kubernetes client");
         status.setCode(400);
 
-        // Create a KubernetesClientException instance with the status
         KubernetesClientException kubernetesClientException = new KubernetesClientException(status);
 
         when(customResourceService.findById(crdId, id, namespace))

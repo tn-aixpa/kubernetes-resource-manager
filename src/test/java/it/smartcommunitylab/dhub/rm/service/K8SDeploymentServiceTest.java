@@ -1,11 +1,11 @@
 package it.smartcommunitylab.dhub.rm.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -63,7 +63,7 @@ public class K8SDeploymentServiceTest {
 
         List<String> result = k8sDeploymentService.getLog(namespace, deploymentName);
 
-        Assertions.assertEquals(Arrays.asList("Log line 1", "Log line 2"), result);
+        assertEquals(Arrays.asList("Log line 1", "Log line 2"), result);
 
     }
 

@@ -9,18 +9,17 @@ import io.fabric8.kubernetes.client.dsl.BatchAPIGroupDSL;
 import io.fabric8.kubernetes.client.dsl.MixedOperation;
 import io.fabric8.kubernetes.client.dsl.ScalableResource;
 import io.fabric8.kubernetes.client.dsl.V1BatchAPIGroupDSL;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -61,16 +60,16 @@ public class K8SJobServiceTest {
         String deploymentName = "test-deployment";
         String expectedLog = "Log line 1\nLog line 2";
 
-        Mockito.when(mixedOperation.inNamespace(namespace)).thenReturn(mixedOperation);
-        Mockito.when(mixedOperation.withName(deploymentName)).thenReturn(scalableResource);
-        Mockito.when(scalableResource.getLog()).thenReturn(expectedLog);
+        when(mixedOperation.inNamespace(namespace)).thenReturn(mixedOperation);
+        when(mixedOperation.withName(deploymentName)).thenReturn(scalableResource);
+        when(scalableResource.getLog()).thenReturn(expectedLog);
 
-        Mockito.when(k8sJobService.getKubernetesClient().batch()).thenReturn(batchAPIGroupDSL);
-        Mockito.when(batchAPIGroupDSL.v1()).thenReturn(v1BatchAPIGroupDSL);
+        when(k8sJobService.getKubernetesClient().batch()).thenReturn(batchAPIGroupDSL);
+        when(batchAPIGroupDSL.v1()).thenReturn(v1BatchAPIGroupDSL);
 
         List<String> result = k8sJobService.getLog(namespace, deploymentName);
 
-        Assertions.assertEquals(Arrays.asList("Log line 1", "Log line 2"), result);
+        assertEquals(Arrays.asList("Log line 1", "Log line 2"), result);
 
     }
 

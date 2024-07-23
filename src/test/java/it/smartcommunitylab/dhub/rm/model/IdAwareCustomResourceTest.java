@@ -2,10 +2,11 @@ package it.smartcommunitylab.dhub.rm.model;
 
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class IdAwareCustomResourceTest {
 
@@ -25,8 +26,8 @@ public class IdAwareCustomResourceTest {
 
         idAwareCr = new IdAwareCustomResource(cr);
 
-        Assertions.assertEquals("test-crd", idAwareCr.getId());
-        Assertions.assertEquals(cr, idAwareCr.getCr());
+        assertEquals("test-crd", idAwareCr.getId());
+        assertEquals(cr, idAwareCr.getCr());
     }
 
 }

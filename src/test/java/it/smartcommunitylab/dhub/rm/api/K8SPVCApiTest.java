@@ -5,7 +5,6 @@ import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.PersistentVolumeClaim;
 import io.fabric8.kubernetes.api.model.PersistentVolumeClaimBuilder;
 import io.fabric8.kubernetes.api.model.storage.StorageClass;
-import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResource;
 import it.smartcommunitylab.dhub.rm.model.IdAwareResource;
 import it.smartcommunitylab.dhub.rm.model.dto.PersistentVolumeClaimDTO;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
@@ -25,10 +24,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;

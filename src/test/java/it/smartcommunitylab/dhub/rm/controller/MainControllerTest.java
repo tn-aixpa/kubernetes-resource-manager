@@ -17,7 +17,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Arrays;
 import java.util.HashMap;
 
 import static org.mockito.Mockito.when;
@@ -68,10 +67,8 @@ public class MainControllerTest {
 
         String[] scopes = {"scope1", "scope2"};
 
-        // Mocking ApplicationProperties
         when(applicationProperties.getUrl()).thenReturn("http://example.com");
 
-        // Mocking AuthenticationProperties
         AuthenticationProperties.OAuth2AuthenticationProperties oauth2 = new AuthenticationProperties.OAuth2AuthenticationProperties();
         oauth2.setIssuerUri("http://auth.example.com");
         oauth2.setAudience("client-id");

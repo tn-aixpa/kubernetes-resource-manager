@@ -1,6 +1,5 @@
 package it.smartcommunitylab.dhub.rm.service;
 
-import com.networknt.schema.ValidationMessage;
 import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.GenericKubernetesResourceList;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
@@ -10,7 +9,6 @@ import io.fabric8.kubernetes.client.dsl.NamespaceableResource;
 import io.fabric8.kubernetes.client.dsl.Resource;
 import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
 import it.smartcommunitylab.dhub.rm.SystemKeys;
-import it.smartcommunitylab.dhub.rm.exception.ValidationException;
 import it.smartcommunitylab.dhub.rm.model.CustomResourceSchema;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResource;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +25,6 @@ import org.springframework.security.access.AccessDeniedException;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.function.UnaryOperator;
 
 import static org.mockito.Mockito.*;

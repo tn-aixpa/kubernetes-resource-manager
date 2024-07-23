@@ -13,16 +13,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Method;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -89,22 +86,18 @@ public class K8SSecretServiceTest {
         ReflectionTestUtils.setField(k8sSecretService, "ownerFilters", "owner1,owner2");
         ReflectionTestUtils.setField(k8sSecretService, "nameFilters", "name1,name2");
 
-        // Call the method
         k8sSecretService.initFilters();
 
-        // Verify the annotations
         Map<String, String> annotations = k8sSecretService.annotations;
         assertEquals(2, annotations.size());
         assertEquals("value1", annotations.get("key1"));
         assertEquals("value2", annotations.get("key2"));
 
-        // Verify the owners
         Set<String> owners = k8sSecretService.owners;
         assertEquals(2, owners.size());
         assertTrue(owners.contains("owner1"));
         assertTrue(owners.contains("owner2"));
 
-        // Verify the names
         Set<String> names = k8sSecretService.names;
         assertEquals(3, names.size());
         assertTrue(names.contains("name1"));
@@ -190,7 +183,7 @@ public class K8SSecretServiceTest {
         IdAwareResource<Secret> result = k8sSecretService.add(namespace, secretDTO);
 
         assertEquals(secretId, result.getId());
-        Assertions.assertNotNull(result.getResource().getData().get(key));
+        assertNotNull(result.getResource().getData().get(key));
     }
 
     @Test
