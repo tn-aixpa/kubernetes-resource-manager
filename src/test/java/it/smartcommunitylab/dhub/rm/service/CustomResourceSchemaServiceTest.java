@@ -3,6 +3,7 @@ package it.smartcommunitylab.dhub.rm.service;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinition;
 import it.smartcommunitylab.dhub.rm.SystemKeys;
+import it.smartcommunitylab.dhub.rm.converter.DTOToSchemaConverter;
 import it.smartcommunitylab.dhub.rm.converter.SchemaToDTOConverter;
 import it.smartcommunitylab.dhub.rm.model.CustomResourceSchema;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResourceDefinition;
@@ -16,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -26,8 +28,7 @@ import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -45,6 +46,9 @@ public class CustomResourceSchemaServiceTest {
 
     @Mock
     AuthorizationService authService;
+
+    @Mock
+    DTOToSchemaConverter dtoToSchemaConverter;
 
     @InjectMocks
     CustomResourceSchemaService customResourceSchemaService;
@@ -72,7 +76,13 @@ public class CustomResourceSchemaServiceTest {
         Constructor<IdAwareCustomResourceDefinition> constructor =
                 IdAwareCustomResourceDefinition.class.getDeclaredConstructor();
         constructor.setAccessible(true);
-        IdAwareCustomResourceDefinition crd = constructor.newInstance();
+
+        ObjectMeta meta = new ObjectMeta();
+        meta.setName(crdName);
+        CustomResourceDefinition customResource = new CustomResourceDefinition();
+        customResource.setMetadata(meta);
+
+        IdAwareCustomResourceDefinition crd = new IdAwareCustomResourceDefinition(customResource);
 
         when(crdService.findAll(any(), eq(true), any())).thenReturn(new PageImpl<>(Collections.singletonList(crd)));
 
@@ -263,11 +273,14 @@ public class CustomResourceSchemaServiceTest {
         assertEquals("test-crd", addedDTO.getCrdId());
         assertEquals("v1", addedDTO.getVersion());
 
+        CustomResourceSchemaDTO addedDtoWithId = customResourceSchemaService.add("5", dtoToAdd);
+        Assertions.assertNotNull(addedDtoWithId);
+
         //
 
         CustomResourceSchemaDTO dtoNotAllowed = new CustomResourceSchemaDTO();
-        dtoToAdd.setCrdId("crd-not-allowed");
-        dtoToAdd.setVersion("v1");
+        dtoNotAllowed.setCrdId("crd-not-allowed");
+        dtoNotAllowed.setVersion("v1");
 
         lenient().when(authService.isCrdAllowed("crd-not-allowed")).thenReturn(false);
 
@@ -283,18 +296,39 @@ public class CustomResourceSchemaServiceTest {
     @Test
     public void testAddIllegalExceptionSchemaExist() {
 
+        CustomResourceSchema crWithId = new CustomResourceSchema();
+        crWithId.setId("1");
+
         when(authService.isCrdAllowed(crdName)).thenReturn(true);
 
-        when(customResourceSchemaRepository.findById("test-crd")).thenReturn(Optional.of(customResourceSchema));
-
+        when(customResourceSchemaRepository.findById("1")).thenReturn(Optional.of(crWithId));
 
         IllegalArgumentException exception1 = assertThrows(
                 IllegalArgumentException.class,
-                () -> customResourceSchemaService.add(crdName, customResourceSchemaDTO)
+                () -> customResourceSchemaService.add("1", customResourceSchemaDTO)
         );
 
         assertEquals(SystemKeys.ERROR_SCHEMA_EXISTS, exception1.getMessage());
+
     }
+
+    @Test
+    public void testAddIllegalExceptionNoCrd() {
+
+        CustomResourceSchemaDTO dtoNotExist = new CustomResourceSchemaDTO();
+        dtoNotExist.setCrdId("crd-not-exist");
+
+        lenient().when(authService.isCrdAllowed("crd-not-exist")).thenReturn(true);
+
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> customResourceSchemaService.add(null, dtoNotExist)
+        );
+
+        assertEquals(SystemKeys.ERROR_K8S_NO_CRD, exception.getMessage());
+
+    }
+
 
     @Test
     public void testUpdate() {
@@ -308,7 +342,29 @@ public class CustomResourceSchemaServiceTest {
         Assertions.assertNotNull(updatedSchemaDTO);
         assertEquals(crdName, updatedSchemaDTO.getCrdId());
         assertEquals(crdVersion, updatedSchemaDTO.getVersion());
+
+        //
+
+        NoSuchElementException exception = assertThrows(
+                NoSuchElementException.class,
+                () -> customResourceSchemaService.update(null, any(CustomResourceSchemaDTO.class))
+        );
+
+        assertEquals(SystemKeys.ERROR_NO_SCHEMA, exception.getMessage());
+
+        //
+
+        when(crdService.crdExists(crdName, crdVersion)).thenReturn(false);
+        IllegalArgumentException exception1 = assertThrows(
+                IllegalArgumentException.class,
+                () -> customResourceSchemaService.update(crdName, customResourceSchemaDTO)
+        );
+
+        assertEquals(SystemKeys.ERROR_K8S_NO_CRD, exception1.getMessage());
+
     }
+
+
 
     @Test
     public void testDelete(){
