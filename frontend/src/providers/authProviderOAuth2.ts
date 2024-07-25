@@ -2,6 +2,7 @@ import { UserManager, WebStorageStateStore } from 'oidc-client-ts';
 import { AuthProvider } from './authProvider';
 
 export const OAuth2AuthProvider = (
+    baseUrl: string,
     authority: string,
     clientId: string,
     redirectUri: string,
@@ -16,15 +17,17 @@ export const OAuth2AuthProvider = (
         loadUserInfo: true,
     });
 
-    return {
-        getAuthorization: async () => {
-            const user = await userManager.getUser();
-            if (user) {
-                return Promise.resolve('Bearer ' + user.access_token);
-            }
+    const oauthGetAuthorization = async () => {
+        const user = await userManager.getUser();
+        if (user) {
+            return Promise.resolve('Bearer ' + user.access_token);
+        }
 
-            return Promise.reject();
-        },
+        return Promise.reject();    
+    }
+
+    return {
+        getAuthorization: oauthGetAuthorization,
         login: () => {
             return userManager.signinRedirect();
         },
@@ -46,6 +49,7 @@ export const OAuth2AuthProvider = (
         // remove local credentials and notify the auth server that the user logged out
         logout: () => {
             userManager.removeUser();
+            sessionStorage.removeItem('user-permissions');
             return Promise.resolve();
         },
         // get the user's profile
@@ -58,8 +62,36 @@ export const OAuth2AuthProvider = (
             });
         },
         // get the user permissions (optional)
-        getPermissions: () => {
-            return Promise.resolve();
+        getPermissions: async () => {
+            if (sessionStorage.getItem('user-permissions')) {
+                const permissions = JSON.parse(sessionStorage.getItem('user-permissions')!);
+                permissions.canAccess = (resource: string, op: string) => (permissions[resource] && permissions[resource].indexOf(op) >= 0);
+                return Promise.resolve(permissions);
+            }
+
+            const request = new Request(baseUrl +'/api/user', {
+                method: 'GET',
+                headers: new Headers({
+                    'Content-Type': 'application/json',
+                    'Authorization': await oauthGetAuthorization(),
+                }),
+            });
+
+            return fetch(request)
+                .then(response => {
+                    if (response.status < 200 || response.status >= 300) {
+                        throw new Error(response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(permissions => {
+                    sessionStorage.setItem('user-permissions', JSON.stringify(permissions));
+                    permissions.canAccess = (resource: string, op: string) => (permissions[resource] && permissions[resource].indexOf(op) >= 0);
+                    return permissions;
+                })
+                .catch(() => {
+                    throw new Error('Network error');
+                });
         },
         handleCallback: async () => {
             // get an access token based on the query paramaters

@@ -23,6 +23,7 @@ server:
 
 # application
 application.url: ${APPLICATION_URL:}
+application.core-name: ${KRM_APPLICATION_CORE_NAME:dhcore}
 
 #kubernetes
 kubernetes:
@@ -53,6 +54,7 @@ auth:
   oauth2:
     issuer-uri: ${KRM_AUTH_OAUTH2_ISSUER:}
     audience: ${KRM_AUTH_OAUTH2_AUDIENCE:}
+    role-claim: ${KRM_AUTH_OATH2_ROLE_CLAIM:} 
 
 security.cors.origins: ${SECURITY_CORS_ORIGINS:}
 
@@ -69,3 +71,9 @@ management:
       enabled: true
     health:
       enabled: true
+
+access:
+  roles:
+    - role: ROLE_USER
+      resources: "*"
+

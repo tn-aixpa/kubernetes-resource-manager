@@ -21,7 +21,7 @@ import it.smartcommunitylab.dhub.rm.service.K8SSvcService;
 import jakarta.validation.constraints.Pattern;
 
 @RestController
-@PreAuthorize("hasAuthority('ROLE_USER')")
+@PreAuthorize("@authz.canAccess('k8s_service', 'list')")
 @SecurityRequirement(name = "basicAuth")
 @SecurityRequirement(name = "jwtAuth")
 @RequestMapping(SystemKeys.API_PATH + "/k8s_service")
@@ -34,6 +34,7 @@ public class K8SServiceApi {
     @Value("${kubernetes.namespace}")
     private String namespace;
 
+    @PreAuthorize("@authz.canAccess('k8s_service', 'list')")
     @GetMapping
     public Page<IdAwareResource<Service>> findAll(
         @RequestParam(required = false) Collection<String> id,
@@ -42,6 +43,7 @@ public class K8SServiceApi {
         return service.findAll(namespace, id, pageable);
     }
 
+    @PreAuthorize("@authz.canAccess('k8s_service', 'read')")
     @GetMapping("/{serviceId}")
     public IdAwareResource<Service> findById(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String serviceId) {
         return service.findById(namespace, serviceId);

@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 public class ApplicationProperties {
 
     private String url;
+    private String coreName;
 
     public String getUrl() {
         return url;
@@ -15,5 +16,13 @@ public class ApplicationProperties {
 
     public void setUrl(String applicationUrl) {
         this.url = applicationUrl;
+    }
+
+    public String getCoreName() {
+        return coreName;
+    }
+
+    public void setCoreName(String coreName) {
+        this.coreName = coreName;
     }
 }

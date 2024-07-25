@@ -22,6 +22,7 @@ import {
     SingleFieldList,
     ChipField,
     NumberInput,
+    usePermissions,
 } from 'react-admin';
 import { View } from '../index';
 import { ViewToolbar } from '../../components/ViewToolbar';
@@ -66,6 +67,25 @@ const validateData = (values: any) => {
     return errors;
 }
 
+const transformData = (data: any) => {
+    data.spec.tables = data.tables.filter((t: any) => !!t).join(',');
+
+    if (data.existingSecret) {
+        delete data.spec.connection.user;
+        delete data.spec.connection.password;
+    } else {
+        delete data.spec.connection.secretName;
+    }
+
+    if (data.spec.connection && (!data.spec.connection.port || data.spec.connection.port <= 0)) {
+        data.spec.connection.port = 32010;
+    }
+
+    return {
+        ...data
+    };
+}
+
 const CrCreate = () => {
     const { apiVersion, kind } = useCrTransform();
     const translate = useTranslate();
@@ -73,15 +93,8 @@ const CrCreate = () => {
     const tables: any[] = [];
    
     const transform = (data: any) => {
-        if (data.existingSecret) {
-            delete data.spec.connection.user;
-            delete data.spec.connection.password;
-        } else {
-            delete data.spec.connection.secretName;
-        }
-        data.spec.tables = data.tables.filter((t: any) => !!t).join(',');
         return {
-            ...data,
+            ...transformData(data),
             apiVersion: apiVersion,
             kind: kind,
         };
@@ -175,11 +188,6 @@ const CrCreate = () => {
                             <TextInput fullWidth source="spec.connection.jdbcProperties"/>
                         </Grid>
                     </Grid>
-                    <Grid container alignItems="center" spacing={2}>
-                        <Grid item xs={8}>
-                            <TextInput fullWidth source="spec.javaOptions"/>
-                        </Grid>
-                    </Grid>
 
                 </SimpleForm>
             </Create>
@@ -197,18 +205,6 @@ const CrEdit = () => {
     record.existingSecret = !!record.spec.connection && !!record.spec.connection.secretName;
     record.tables = record.spec.tables ? record.spec.tables.split(',') : [];
 
-    const transform = (data: any) => {
-        data.spec.tables = data.tables.filter((t: any) => !!t).join(',');
-        if (data.existingSecret) {
-            delete data.spec.connection.user;
-            delete data.spec.connection.password;
-        } else {
-            delete data.spec.secretName;
-        }
-
-        return data;
-
-    };
     return (
         <>
             <Breadcrumb />
@@ -217,7 +213,7 @@ const CrEdit = () => {
                 crName={CR_DREMIOREST}
                 crId={record.spec.database}
             />
-            <Edit actions={<EditTopToolbar hasYaml />} transform={transform} mutationMode='pessimistic'>
+            <Edit actions={<EditTopToolbar hasYaml />} transform={transformData} mutationMode='pessimistic'>
                 <SimpleForm toolbar={<ViewToolbar />} validate={validateData}>
                 <Grid container alignItems="center" spacing={2}>
                         <Grid item xs={4}>
@@ -284,11 +280,6 @@ const CrEdit = () => {
                             <TextInput fullWidth source="spec.connection.jdbcProperties"/>
                         </Grid>
                     </Grid>
-                    <Grid container alignItems="center" spacing={2}>
-                        <Grid item xs={8}>
-                            <TextInput fullWidth source="spec.javaOptions"/>
-                        </Grid>
-                    </Grid>
                 </SimpleForm>
             </Edit>
         </>
@@ -296,6 +287,9 @@ const CrEdit = () => {
 };
 
 const CrList = () => {
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess(CR_DREMIOREST, op)
+
     return (
         <>
             <Breadcrumb />
@@ -306,9 +300,9 @@ const CrList = () => {
                     <TextField source="spec.tables" />
                     <TextField source="status.state" />
                     <Box textAlign={'right'}>
-                        <EditButton />
-                        <ShowButton />
-                        <DeleteWithConfirmButton />
+                        {hasPermission('write') && <EditButton />}
+                        {hasPermission('read') && <ShowButton />}
+                        {hasPermission('write') && <DeleteWithConfirmButton />}
                     </Box>
                 </Datagrid>
             </List>
@@ -319,6 +313,9 @@ const CrList = () => {
 const CrShow = () => {
     const translate = useTranslate();
     const { record } = useShowController();
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess(CR_DREMIOREST, op)
+
     if (!record) return null;
 
     return (
@@ -329,7 +326,7 @@ const CrShow = () => {
                 crName={CR_DREMIOREST}
                 crId={record.spec.database}
             />
-            <Show actions={<ShowTopToolbar hasYaml />}>
+            <Show actions={<ShowTopToolbar hasYaml hasEdit={hasPermission('write')} hasDelete={hasPermission('write')} />}>
                 <SimpleShowLayout>
                 <TextField source="id" />
                 <TextField source="status.state" />
@@ -351,7 +348,6 @@ const CrShow = () => {
                     <TextField source="spec.connection.user" />
                     <TextField source="spec.connection.password" />
                     <TextField source="spec.connection.jdbcProperties" />
-                    <TextField source="spec.javaOptions" />
                 </SimpleShowLayout>
             </Show>
         </>

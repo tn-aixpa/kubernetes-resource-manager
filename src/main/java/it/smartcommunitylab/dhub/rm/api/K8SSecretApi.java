@@ -23,7 +23,7 @@ import it.smartcommunitylab.dhub.rm.model.IdAwareResource;
 import it.smartcommunitylab.dhub.rm.service.K8SSecretService;
 
 @RestController
-@PreAuthorize("hasAuthority('ROLE_USER')")
+@PreAuthorize("@authz.canAccess('k8s_secret', 'list')")
 @SecurityRequirement(name = "basicAuth")
 @SecurityRequirement(name = "jwtAuth")
 @RequestMapping(SystemKeys.API_PATH + "/k8s_secret")
@@ -36,6 +36,7 @@ public class K8SSecretApi {
     @Value("${kubernetes.namespace}")
     private String namespace;
 
+    @PreAuthorize("@authz.canAccess('k8s_secret', 'list')")
     @GetMapping
     public Page<IdAwareResource<Secret>> findAll(
         @RequestParam(required = false) Collection<String> id,
@@ -44,11 +45,13 @@ public class K8SSecretApi {
         return service.findAll(namespace, id, pageable);
     }
 
+    @PreAuthorize("@authz.canAccess('k8s_secret', 'read')")
     @GetMapping("/{secretId}")
     public IdAwareResource<Secret> findById(@PathVariable String secretId) {
         return service.findById(namespace, secretId);
     }
 
+    @PreAuthorize("@authz.canAccess('k8s_secret', 'read')")
     @GetMapping("/{secretId}/decode/{key:.*}")
     public Map<String, String> decodeSecret(@PathVariable String secretId, @PathVariable String key) {
         return Collections.singletonMap(key,  service.decode(namespace, secretId, key));

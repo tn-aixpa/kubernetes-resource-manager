@@ -16,7 +16,7 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 @Service
 public class K8SSvcService extends K8SResourceService<io.fabric8.kubernetes.api.model.Service> {
     
-    public K8SSvcService(KubernetesClient client, AuthorizationService authService) {
+    public K8SSvcService(KubernetesClient client, K8SAuthorizationService authService) {
         super(client, authService, 60);
     }
 

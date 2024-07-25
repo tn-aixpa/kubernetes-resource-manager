@@ -1,3 +1,5 @@
+import { Config } from './providers/configProvider';
+
 export const parseArray = (v: string) => {
     try {
         return v.split(",");
@@ -23,3 +25,28 @@ const formatJson = (v: any) => {
     return typeof v == 'string' ? v : JSON.stringify(v);
 };
 */
+
+
+
+export const labels2types = (labels?: any) => {
+
+    if (!labels) return [];
+
+    const corePrefix = Config.application.coreName;
+
+    if (labels['com.coder.resource']) return [{name: labels['app.kubernetes.io/name']}];
+    if (labels['nuclio.io/class']) return [{name: 'nuclio'}];
+    if (labels[corePrefix + '/runtime']) {
+        const res = [{name: 'core'}];
+        Object.keys(labels).forEach(l => {
+            if (l === corePrefix + '/runtime') res.push({name: 'runtime:' + labels[l]});
+            if (l === corePrefix + '/project') res.push({name: 'project:' + labels[l]});
+            // if (l === corePrefix + '-function') res.push({name: 'function:' + parseFunctionName(labels[l])});
+            // if (l === corePrefix + '/function') res.push({name: 'function:' + parseFunctionName(labels[l])});
+        });
+        return res;
+    }
+    if (labels['app.kubernetes.io/name'] === 'DremioRestServer') return [{name: 'DremioRestServer'}];
+    if (labels['app.kubernetes.io/name'] === 'Postgrest') return [{name: 'PostgREST'}];
+    // return '';
+}

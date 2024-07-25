@@ -8,6 +8,7 @@ import {
     Resource,
     defaultTheme,
     localStorageStore,
+    usePermissions,
 } from 'react-admin';
 import {
     SchemaList,
@@ -51,7 +52,7 @@ import { httpClientProvider } from './providers/httpClientProvider';
 import { K8SDeploymentList, K8SDeploymentShow } from './resources/k8s/k8s_deployment';
 import { K8SPvcCreate, K8SPvcList, K8SPvcShow } from './resources/k8s/k8s_pvc';
 import { K8SServiceList, K8SServiceShow } from './resources/k8s/k8s_service';
-import { K8SSecretCreate, K8SSecretList, K8SSecretShow } from './resources/k8s/k8s_secret';
+import { K8SSecretList, K8SSecretShow } from './resources/k8s/k8s_secret';
 import { K8SJobList, K8SJobShow } from './resources/k8s/k8s_job';
 
 console.log('Config', Config);
@@ -110,7 +111,8 @@ function App() {
 function DynamicAdminUI() {
     const [views, setViews] = useState<View[]>([]);
     const { crdIds } = useUpdateCrdIds();
-
+    const { permissions } = usePermissions();
+    const canAccess = (res: string, op: string) => permissions && permissions.canAccess(res, op)
 
     const viewsContext = useContext(ViewsContext);
 
@@ -160,42 +162,41 @@ function DynamicAdminUI() {
             <Resource
                 name="crs"
                 list={SchemaList}
-                edit={SchemaEdit}
-                create={SchemaCreate}
-                show={SchemaShow}
+                edit={canAccess('crs', 'write') ? SchemaEdit : <></>}
+                create={canAccess('crs', 'write') ? SchemaCreate : <></>}
+                show={canAccess('crs', 'read') ? SchemaShow : <></>}
                 icon={SettingsIcon}
             />
             <Resource name="crd" show={CrdShow} recordRepresentation="id" />
             <Resource
                 name="k8s_service"
-                list={K8SServiceList}
-                show={K8SServiceShow}
+                list={canAccess('k8s_service', 'list') ? K8SServiceList : <></>}
+                show={canAccess('k8s_service', 'read') ? K8SServiceShow : <></>}
                 icon={LinkIcon}
             />
             <Resource
                 name="k8s_deployment"
-                list={K8SDeploymentList}
-                show={K8SDeploymentShow}
+                list={canAccess('k8s_deployment', 'list') ? K8SDeploymentList : <></>}
+                show={canAccess('k8s_deployment', 'read') ? K8SDeploymentShow : <></>}
                 icon={AppIcon}
             />
             <Resource
                 name="k8s_job"
-                list={K8SJobList}
-                show={K8SJobShow}
+                list={canAccess('k8s_job', 'list') ?  K8SJobList : <></>}
+                show={canAccess('k8s_job', 'read') ? K8SJobShow : <></>}
                 icon={ModelTraininigIcon}
             />
             <Resource
                 name="k8s_pvc"
-                create={K8SPvcCreate}
-                list={K8SPvcList}
-                show={K8SPvcShow}
+                create={canAccess('k8s_pvc', 'write') ? K8SPvcCreate : <></>}
+                list={canAccess('k8s_pvc', 'list') ? K8SPvcList : <></>}
+                show={canAccess('k8s_pvc', 'read') ? K8SPvcShow : <></>}
                 icon={AlbumIcon}
             />
             <Resource
                 name="k8s_secret"
-                create={K8SSecretCreate}
-                list={K8SSecretList}
-                show={K8SSecretShow}
+                list={canAccess('k8s_secret', 'list') ? K8SSecretList : <></>}
+                show={canAccess('k8s_secret', 'read') ? K8SSecretShow  : <></>}
                 icon={KeyIcon}
             />
         </AdminUI>

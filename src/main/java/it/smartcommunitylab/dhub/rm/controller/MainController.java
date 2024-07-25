@@ -3,9 +3,13 @@ package it.smartcommunitylab.dhub.rm.controller;
 import it.smartcommunitylab.dhub.rm.SystemKeys;
 import it.smartcommunitylab.dhub.rm.config.ApplicationProperties;
 import it.smartcommunitylab.dhub.rm.config.AuthenticationProperties;
+import it.smartcommunitylab.dhub.rm.service.AccessControlService;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,14 +18,22 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @Controller
 public class MainController {
+
+    private static final Logger logger = LoggerFactory.getLogger(MainController.class);
 
     @Autowired
     AuthenticationProperties authenticationProperties;
 
     @Autowired
     ApplicationProperties applicationProperties;
+
+    @Autowired
+    AccessControlService acService;
 
     private static final String CONSOLE_CONTEXT = SystemKeys.CONSOLE_PATH;
 
@@ -61,6 +73,8 @@ public class MainController {
                 config.put("REACT_APP_SCOPE", String.join(" ", authenticationProperties.getOauth2().getScopes()));
             }
         }
+
+        config.put("REACT_APP_CORE_NAME", applicationProperties.getCoreName());
 
         model.addAttribute("config", config);
         return "console.html";

@@ -18,6 +18,7 @@ import {
     ArrayInput,
     SimpleFormIterator,
     useNotify,
+    usePermissions,
 } from 'react-admin';
 import { Box, Grid, Typography } from '@mui/material';
 import { Breadcrumb } from '@dslab/ra-breadcrumb';
@@ -98,8 +99,11 @@ const DataNumField = (props: any) => {
 };
     
     
-export const K8SSecretList = () => (
-    <>
+export const K8SSecretList = () => {
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess('k8s_secret', op)
+
+return <>
         <Breadcrumb />
         <List actions={false}>
             <Datagrid bulkActionButtons={false}>
@@ -107,12 +111,12 @@ export const K8SSecretList = () => (
                 <TextField source="type" />
                 <DataNumField label="resources.k8s_secret.fields.secretnum" />
                 <Box textAlign={'right'}>
-                    <ShowButton />
+                    {hasPermission('read') && <ShowButton />}
                 </Box>
             </Datagrid>
         </List>
     </>
-);
+};
 
 const DecodeButton = (props: any) => {
     const record = useRecordContext(props);

@@ -86,7 +86,7 @@ export const BasicAuthProvider = (loginUrl?: string): AuthProvider => {
         },
         // get the user permissions (optional)
         getPermissions: () => {
-            return Promise.resolve();
+            return Promise.resolve({canAccess: (resource: string, op: string) => true });
         },
     };
 };

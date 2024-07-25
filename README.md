@@ -23,6 +23,7 @@ auth:
   oauth2:
     issuer-uri: https://aac.platform.smartcommunitylab.it
     audience: client_id_for_auth2
+    role-claim: krmrole
 
 security.cors.origins: http://localhost:3000
 ```
@@ -53,6 +54,44 @@ Start the server:
 ```
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=local
 ```
+
+## Role-Based Access Control
+
+In case OAuth2.0 authentication is enabled and role claim is defined, the user roles will be taken from the value of the claim (a comma-separated array is expected). Otherwise the user will only be associated ROLE_USER role. In other cases the RBAC is not enabled.
+
+The permissions of the KRM may be defined at the level of a single resource  type. To associate different permissions to different roles, the
+properties should contain the following block:
+
+```
+access:
+  roles:
+    - role: ROLE_MY_ROLE
+      resources: k8s_service, k8s_secret::read, mycrd/example.com::write
+```
+
+In this way ``ROLE_MY_ROLE`` may perform the following operations:
+
+- any operation on the ``k8s_service`` resource 
+- list and read any K8S secret, 
+- modify, read, and list `` mycrd/example.com`` CRs.
+
+More specifically the following operations are supported
+
+- ``list`` - read the list of objects 
+- ``read`` - list and read any object
+- ``write`` - write (create, modify, and delete), read and list
+
+The syntax for the permission is the following: ``<resource>::<op>``. If operation is omitted, ``write`` all the operations are allowed. It is also possible to use
+``*`` wildcard both for resources and for the operations.
+
+To define the permissions on the K8S objects, the following resource type IDs are used:
+
+- k8s_service
+- k8s_job
+- k8s_pvc
+- k8s_secret
+- k8s_deployment
+
 
 ## Front-end
 Create a `.env.development` file under `frontend` and configure it as follows:

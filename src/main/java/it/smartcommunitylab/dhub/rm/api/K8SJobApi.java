@@ -24,7 +24,7 @@ import it.smartcommunitylab.dhub.rm.service.K8SJobService;
 import jakarta.validation.constraints.Pattern;
 
 @RestController
-@PreAuthorize("hasAuthority('ROLE_USER')")
+@PreAuthorize("@authz.canAccess('k8s_job', 'list')")
 @SecurityRequirement(name = "basicAuth")
 @SecurityRequirement(name = "jwtAuth")
 @RequestMapping(SystemKeys.API_PATH + "/k8s_job")
@@ -37,6 +37,7 @@ public class K8SJobApi {
     @Value("${kubernetes.namespace}")
     private String namespace;
 
+    @PreAuthorize("@authz.canAccess('k8s_job', 'list')")
     @GetMapping
     public Page<IdAwareResource<Job>> findAll(
         @RequestParam(required = false) Collection<String> id,
@@ -45,16 +46,19 @@ public class K8SJobApi {
         return service.findAll(namespace, id, pageable);
     }
 
+    @PreAuthorize("@authz.canAccess('k8s_job', 'read')")
     @GetMapping("/{jobId}")
     public IdAwareResource<Job> findById(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String jobId) {
         return service.findById(namespace, jobId);
     }
 
+    @PreAuthorize("@authz.canAccess('k8s_job', 'read')")
     @GetMapping("/{jobId}/log")
     public List<String> getLog(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String jobId) {
         return service.getLog(namespace, jobId);
     }
 
+    @PreAuthorize("@authz.canAccess('k8s_job', 'write')")
     @DeleteMapping("/{jobId}")
     public void  delete(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String jobId) {
         service.delete(namespace, jobId);

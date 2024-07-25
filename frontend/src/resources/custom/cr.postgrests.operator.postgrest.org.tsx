@@ -23,6 +23,7 @@ import {
     SingleFieldList,
     ChipField,
     NumberInput,
+    usePermissions,
 } from 'react-admin';
 import { View } from '../index';
 import { ViewToolbar } from '../../components/ViewToolbar';
@@ -62,17 +63,17 @@ const validateData = (values: any) => {
 
     }
     values.connection = values.connection || {};
-    if (!values.spec.connection.host) {
-        errors['spec.connection.host'] = 'ra.validation.required';
-    }
-    if (!values.spec.connection.database) {
-        errors['spec.connection.database'] = 'ra.validation.required';
-    }
     if (values.existingSecret) {
         if (!values.spec.connection.secretName) {
             errors['spec.connection.secretName'] = 'ra.validation.required';
         }
     } else {
+        if (!values.spec.connection.host) {
+            errors['spec.connection.host'] = 'ra.validation.required';
+        }
+        if (!values.spec.connection.database) {
+            errors['spec.connection.database'] = 'ra.validation.required';
+        }
         if (!values.spec.connection.user) {
             errors['spec.connection.user'] = 'ra.validation.required';
         }
@@ -83,6 +84,44 @@ const validateData = (values: any) => {
     return errors;
 }
 
+const transformData = (data: any) => {
+    if (data.existing) {
+        delete data.spec.tables;
+        delete data.spec.grants;
+    } else {
+        delete data.spec.anonRole;
+        data.spec.grants = data.grants.join(',');
+        data.spec.tables = data.tables.filter((t: any) => !!t);
+    }
+    if (data.existingSecret) {
+        delete data.spec.connection.user;
+        delete data.spec.connection.password;
+    } else {
+        delete data.spec.connection.secretName;
+    }
+    if (data.spec.connection) {
+        if (!data.spec.connection.port || data.spec.connection.port <= 0) {
+            data.spec.connection.port = 5432;
+        }
+
+        if (!data.spec.connection.host || data.spec.connection.host.trim() === '') {
+            delete data.spec.connection.host;
+        }
+
+        if (!data.spec.connection.database || data.spec.connection.database.trim() === '') {
+            delete data.spec.connection.database;
+        }
+
+        if (!data.spec.connection.extraParams || data.spec.connection.extraParams.trim() === '') {
+            delete data.spec.connection.extraParams;
+        }
+    }
+
+    return {
+        ...data
+    };
+}
+
 const CrCreate = () => {
     const { apiVersion, kind } = useCrTransform();
     const translate = useTranslate();
@@ -90,33 +129,11 @@ const CrCreate = () => {
     const tables: any[] = [];
    
     const transform = (data: any) => {
-        if (data.existing) {
-            delete data.spec.tables;
-            delete data.spec.grants;
-        } else {
-            delete data.spec.anonRole;
-            data.spec.grants = data.grants.join(',');
-            data.spec.tables = data.tables.filter((t: any) => !!t);
-        }
-        if (data.existingSecret) {
-            delete data.spec.connection.user;
-            delete data.spec.connection.password;
-        } else {
-            delete data.spec.connection.secretName;
-        }
-        if (data.spec.connection && (!data.spec.connection.port || data.spec.connection.port <= 0)) {
-            data.spec.connection.port = 5432;
-        }
-        if (data.spec.connection && (!data.spec.connection.extraParams || data.spec.connection.extraParams.trim() === '')) {
-            delete data.spec.connection.extraParams;
-        }
-
         return {
-            ...data,
+            ...transformData(data),
             apiVersion: apiVersion,
             kind: kind,
         };
-
     };
 
     const validate = (values: any) => {
@@ -198,40 +215,58 @@ const CrCreate = () => {
                             `resources.${CR_POSTGREST}.fields.spec.connection.title`
                         )}
                     </Typography>
-                    <Grid container alignItems="center" spacing={2}>
-                        <Grid item xs={4}>
-                            <TextInput fullWidth source="spec.connection.host" validate={required()} />
-                        </Grid>
-                        <Grid item xs={2}>
-                            <NumberInput fullWidth source="spec.connection.port"/>
-                        </Grid>
-                        <Grid item xs={2}>
-                            <TextInput fullWidth source="spec.connection.database" validate={required()} />
-                        </Grid>
-                        <Grid item xs={4}>
-                            <BooleanInput source="existingSecret" />
-                        </Grid>
-                    </Grid>
                     <FormDataConsumer>                            
                     {({ formData, ...rest }) => (
                     <>
                         {formData.existingSecret && (
-                            <Grid container alignItems="center" spacing={2}>
-                                <Grid item xs={8}>
-                                    <TextInput fullWidth source="spec.connection.secretName"  validate={required()} 
-                                     helperText={`resources.${CR_POSTGREST}.fields.spec.connection.secretNameHint`}/>
+                            <>
+                                <Grid container alignItems="center" spacing={2}>
+                                    <Grid item xs={4}>
+                                        <TextInput fullWidth source="spec.connection.host" helperText={`resources.${CR_POSTGREST}.fields.spec.connection.hostHint`}/>
+                                    </Grid>
+                                    <Grid item xs={2}>
+                                        <NumberInput fullWidth source="spec.connection.port"/>
+                                    </Grid>
+                                    <Grid item xs={2}>
+                                        <TextInput fullWidth source="spec.connection.database" helperText={`resources.${CR_POSTGREST}.fields.spec.connection.databaseHint`}/>
+                                    </Grid>
+                                    <Grid item xs={4}>
+                                        <BooleanInput source="existingSecret" />
+                                    </Grid>
                                 </Grid>
-                            </Grid>
+                                <Grid container alignItems="center" spacing={2}>
+                                    <Grid item xs={8}>
+                                        <TextInput fullWidth source="spec.connection.secretName"  validate={required()} 
+                                        helperText={`resources.${CR_POSTGREST}.fields.spec.connection.secretNameHint`}/>
+                                    </Grid>
+                                </Grid>
+                            </>
                         )}
                         {!formData.existingSecret && (
-                            <Grid container alignItems="center" spacing={2}>
-                                <Grid item xs={4}>
-                                    <TextInput fullWidth source="spec.connection.user"  validate={required()}/>
+                            <>
+                                <Grid container alignItems="center" spacing={2}>
+                                    <Grid item xs={4}>
+                                        <TextInput fullWidth source="spec.connection.host" validate={required()}/>
+                                    </Grid>
+                                    <Grid item xs={2}>
+                                        <NumberInput fullWidth source="spec.connection.port"/>
+                                    </Grid>
+                                    <Grid item xs={2}>
+                                        <TextInput fullWidth source="spec.connection.database" validate={required()}/>
+                                    </Grid>
+                                    <Grid item xs={4}>
+                                        <BooleanInput source="existingSecret" />
+                                    </Grid>
                                 </Grid>
-                                <Grid item xs={4}>
-                                    <TextInput type='password' fullWidth source="spec.connection.password"  validate={required()}/>
+                                <Grid container alignItems="center" spacing={2}>
+                                    <Grid item xs={4}>
+                                        <TextInput fullWidth source="spec.connection.user"  validate={required()}/>
+                                    </Grid>
+                                    <Grid item xs={4}>
+                                        <TextInput type='password' fullWidth source="spec.connection.password"  validate={required()}/>
+                                    </Grid>
                                 </Grid>
-                            </Grid>
+                            </>
                         )}
                     </>
                     )}
@@ -258,32 +293,7 @@ const CrEdit = () => {
     record.existingSecret = !!record.spec.connection && !!record.spec.connection.secretName;
     record.tables = record.spec.tables;
     record.grants = record.spec.grants ? record.spec.grants.split(',') : [];
-
-    const transform = (data: any) => {
-        if (data.existing) {
-            delete data.spec.tables;
-            delete data.spec.grants;
-        } else {
-            delete data.spec.anonRole;
-            data.spec.grants = data.grants.join(',');
-            data.spec.tables = data.tables.filter((t: any) => !!t);
-        }
-        if (data.existingSecret) {
-            delete data.spec.connection.user;
-            delete data.spec.connection.password;
-        } else {
-            delete data.spec.connection.secretName;
-        }
-        if (data.spec.connection && (!data.spec.connection.port || data.spec.connection.port <= 0)) {
-            data.spec.connection.port = 5432;
-        }
-        if (data.spec.connection && (!data.spec.connection.extraParams || data.spec.connection.extraParams.trim() === '')) {
-            delete data.spec.connection.extraParams;
-        }
-
-        return data;
-
-    };
+    
     return (
         <>
             <Breadcrumb />
@@ -292,7 +302,7 @@ const CrEdit = () => {
                 crName={CR_POSTGREST}
                 crId={record.spec.database}
             />
-            <Edit actions={<EditTopToolbar hasYaml />} transform={transform} mutationMode='pessimistic'>
+            <Edit actions={<EditTopToolbar hasYaml />} transform={transformData} mutationMode='pessimistic'>
                 <SimpleForm toolbar={<ViewToolbar />} validate={validateData}>
                 <Grid container alignItems="center" spacing={2}>
                         <Grid item xs={4}>
@@ -351,40 +361,58 @@ const CrEdit = () => {
                             `resources.${CR_POSTGREST}.fields.spec.connection.title`
                         )}
                     </Typography>
-                    <Grid container alignItems="center" spacing={2}>
-                        <Grid item xs={4}>
-                            <TextInput fullWidth source="spec.connection.host" validate={required()} />
-                        </Grid>
-                        <Grid item xs={2}>
-                            <NumberInput fullWidth source="spec.connection.port"/>
-                        </Grid>
-                        <Grid item xs={2}>
-                            <TextInput fullWidth source="spec.connection.database" validate={required()} />
-                        </Grid>
-                        <Grid item xs={4}>
-                            <BooleanInput source="existingSecret" />
-                        </Grid>
-                    </Grid>
                     <FormDataConsumer>                            
                     {({ formData, ...rest }) => (
                     <>
                         {formData.existingSecret && (
-                            <Grid container alignItems="center" spacing={2}>
-                                <Grid item xs={8}>
-                                    <TextInput fullWidth source="spec.connection.secretName"  validate={required()} 
-                                     helperText={`resources.${CR_POSTGREST}.fields.spec.connection.secretNameHint`}/>
+                            <>
+                                <Grid container alignItems="center" spacing={2}>
+                                    <Grid item xs={4}>
+                                        <TextInput fullWidth source="spec.connection.host" helperText={`resources.${CR_POSTGREST}.fields.spec.connection.hostHint`}/>
+                                    </Grid>
+                                    <Grid item xs={2}>
+                                        <NumberInput fullWidth source="spec.connection.port"/>
+                                    </Grid>
+                                    <Grid item xs={2}>
+                                        <TextInput fullWidth source="spec.connection.database" helperText={`resources.${CR_POSTGREST}.fields.spec.connection.databaseHint`}/>
+                                    </Grid>
+                                    <Grid item xs={4}>
+                                        <BooleanInput source="existingSecret" />
+                                    </Grid>
                                 </Grid>
-                            </Grid>
+                                <Grid container alignItems="center" spacing={2}>
+                                    <Grid item xs={8}>
+                                        <TextInput fullWidth source="spec.connection.secretName"  validate={required()} 
+                                        helperText={`resources.${CR_POSTGREST}.fields.spec.connection.secretNameHint`}/>
+                                    </Grid>
+                                </Grid>
+                            </>
                         )}
                         {!formData.existingSecret && (
-                            <Grid container alignItems="center" spacing={2}>
-                                <Grid item xs={4}>
-                                    <TextInput fullWidth source="spec.connection.user"  validate={required()}/>
+                            <>
+                                <Grid container alignItems="center" spacing={2}>
+                                    <Grid item xs={4}>
+                                        <TextInput fullWidth source="spec.connection.host" validate={required()}/>
+                                    </Grid>
+                                    <Grid item xs={2}>
+                                        <NumberInput fullWidth source="spec.connection.port"/>
+                                    </Grid>
+                                    <Grid item xs={2}>
+                                        <TextInput fullWidth source="spec.connection.database" validate={required()}/>
+                                    </Grid>
+                                    <Grid item xs={4}>
+                                        <BooleanInput source="existingSecret" />
+                                    </Grid>
                                 </Grid>
-                                <Grid item xs={4}>
-                                    <TextInput type='password' fullWidth source="spec.connection.password"  validate={required()}/>
+                                <Grid container alignItems="center" spacing={2}>
+                                    <Grid item xs={4}>
+                                        <TextInput fullWidth source="spec.connection.user"  validate={required()}/>
+                                    </Grid>
+                                    <Grid item xs={4}>
+                                        <TextInput type='password' fullWidth source="spec.connection.password"  validate={required()}/>
+                                    </Grid>
                                 </Grid>
-                            </Grid>
+                            </>
                         )}
                     </>
                     )}
@@ -401,11 +429,14 @@ const CrEdit = () => {
 };
 
 const CrList = () => {
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess(CR_POSTGREST, op)
+
     return (
         <>
             <Breadcrumb />
             <SimplePageTitle pageType="list" crName={CR_POSTGREST} />
-            <List actions={<ListTopToolbar />}>
+            <List actions={<ListTopToolbar hasCreate={hasPermission('write')}/>}>
                 <Datagrid>
                     <TextField source="id" />
                     <TextField source="spec.connection.database" />
@@ -415,9 +446,9 @@ const CrList = () => {
                     <TextField source="spec.tables" />
                     <TextField source="status.state" />
                     <Box textAlign={'right'}>
-                        <EditButton />
-                        <ShowButton />
-                        <DeleteWithConfirmButton />
+                        {hasPermission('write') && <EditButton />}
+                        {hasPermission('read') && <ShowButton />}
+                        {hasPermission('write') && <DeleteWithConfirmButton />}
                     </Box>
                 </Datagrid>
             </List>
@@ -428,6 +459,8 @@ const CrList = () => {
 const CrShow = () => {
     const { record } = useShowController();
     const translate = useTranslate();
+    const { permissions } = usePermissions();
+    const hasPermission = (op: string) => permissions && permissions.canAccess(CR_POSTGREST, op)
     if (!record) return null;
 
     return (
@@ -438,10 +471,11 @@ const CrShow = () => {
                 crName={CR_POSTGREST}
                 crId={record.spec.database}
             />
-            <Show actions={<ShowTopToolbar hasYaml />}>
+            <Show actions={<ShowTopToolbar hasYaml hasEdit={hasPermission('write')} hasDelete={hasPermission('write')}/>}>
                 <SimpleShowLayout>
                 <TextField source="id" />
                 <TextField source="status.state" />
+                <TextField source="status.message" />
                     <TextField source="spec.schema" />
                     <TextField source="spec.anonRole" />
                     <ArrayField label={`resources.${CR_POSTGREST}.fields.grants`} source="glabels" record={{

@@ -74,6 +74,7 @@ public class AuthenticationProperties {
         private String issuerUri;
         private String audience;
         private String[] scopes;
+        private String roleClaim;
 
         public String getIssuerUri() {
             return issuerUri;
@@ -102,5 +103,14 @@ public class AuthenticationProperties {
         public void setScopes(String[] scopes) {
             this.scopes = scopes;
         }
+
+        public String getRoleClaim() {
+            return roleClaim;
+        }
+
+        public void setRoleClaim(String roleClaim) {
+            this.roleClaim = roleClaim;
+        }
+        
     }
 }

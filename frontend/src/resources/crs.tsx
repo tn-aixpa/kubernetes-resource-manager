@@ -25,6 +25,7 @@ import {
     ReferenceField,
     useShowController,
     useEditController,
+    usePermissions,
 } from 'react-admin';
 import { useUpdateCrdIds } from '../hooks/useUpdateCrdIds';
 import { Box, Typography } from '@mui/material';
@@ -153,6 +154,8 @@ export const SchemaEdit = () => {
 export const SchemaList = () => {
     const notify = useNotify();
     const translate = useTranslate();
+    const { permissions } = usePermissions();
+    const canAccess = (op: string) => permissions && permissions.canAccess('crs', op)
 
     const { updateCrdIds } = useUpdateCrdIds();
 
@@ -170,15 +173,15 @@ export const SchemaList = () => {
             <Typography variant="subtitle1" sx={{ padding: '0px' }}>
                 {translate('resources.crs.listSubtitle')}
             </Typography>
-            <List actions={<ListTopToolbar />}>
+            <List actions={<ListTopToolbar hasCreate={canAccess('write')} />}>
                 <Datagrid bulkActionButtons={false}>
                     <TextField source="crdId" />
                     <TextField source="version" />
                     <Box textAlign={'right'}>
                         <CopyButton />
-                        <EditButton />
-                        <ShowButton />
-                        <DeleteWithConfirmButton mutationOptions={{ onSuccess }} />
+                        { canAccess('write') && <EditButton /> }
+                        { canAccess('read') && <ShowButton /> }
+                        { canAccess('write') && <DeleteWithConfirmButton mutationOptions={{ onSuccess }} /> }
                     </Box>
                 </Datagrid>
             </List>
@@ -189,6 +192,9 @@ export const SchemaList = () => {
 export const SchemaShow = () => {
     const translate = useTranslate();
     const { record } = useShowController();
+    const { permissions } = usePermissions();
+    const canAccess = (op: string) => permissions && permissions.canAccess('crs', op)
+
     if (!record) return null;
 
     return (
@@ -200,7 +206,7 @@ export const SchemaShow = () => {
                     recordRepresentation: record.id,
                 })}
             </Typography>
-            <Show actions={<ShowTopToolbar />}>
+            <Show actions={<ShowTopToolbar hasEdit={canAccess('write')} hasDelete={canAccess('write')}/>}>
                 <SimpleShowLayout>
                     <TextField source="id" />
                     <ReferenceField

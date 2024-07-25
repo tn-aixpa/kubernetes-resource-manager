@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@PreAuthorize("hasAuthority('ROLE_USER')")
 @SecurityRequirement(name = "basicAuth")
 @SecurityRequirement(name = "jwtAuth")
 @RequestMapping(SystemKeys.API_PATH)
@@ -36,6 +35,7 @@ public class CustomResourceApi {
     @Value("${kubernetes.namespace}")
     private String namespace;
 
+    @PreAuthorize("@authz.canAccess(#crdId, 'list')")
     @GetMapping("/{crdId}")
     public Page<IdAwareCustomResource> findAll(
         @PathVariable @Pattern(regexp = SystemKeys.REGEX_CRD_ID) String crdId,
@@ -45,6 +45,7 @@ public class CustomResourceApi {
         return service.findAll(crdId, namespace, id, pageable);
     }
 
+    @PreAuthorize("@authz.canAccess(#crdId, 'read')")
     @GetMapping("/{crdId}/{id}")
     public IdAwareCustomResource findById(
         @PathVariable @Pattern(regexp = SystemKeys.REGEX_CRD_ID) String crdId,
@@ -53,6 +54,7 @@ public class CustomResourceApi {
         return service.findById(crdId, id, namespace);
     }
 
+    @PreAuthorize("@authz.canAccess(#crdId, 'write')")
     @PostMapping("/{crdId}")
     public IdAwareCustomResource add(
         @PathVariable @Pattern(regexp = SystemKeys.REGEX_CRD_ID) String crdId,
@@ -61,6 +63,7 @@ public class CustomResourceApi {
         return service.add(crdId, request, namespace);
     }
 
+    @PreAuthorize("@authz.canAccess(#crdId, 'write')")
     @PutMapping("/{crdId}/{id}")
     public IdAwareCustomResource update(
         @PathVariable @Pattern(regexp = SystemKeys.REGEX_CRD_ID) String crdId,
@@ -70,6 +73,7 @@ public class CustomResourceApi {
         return service.update(crdId, id, request, namespace);
     }
 
+    @PreAuthorize("@authz.canAccess(#crdId, 'write')")
     @DeleteMapping("/{crdId}/{id}")
     public void delete(
         @PathVariable @Pattern(regexp = SystemKeys.REGEX_CRD_ID) String crdId,

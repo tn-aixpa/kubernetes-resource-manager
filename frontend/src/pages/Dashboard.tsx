@@ -4,6 +4,7 @@ import {
     EmptyClasses,
     ResourceDefinition,
     useGetList,
+    usePermissions,
     useResourceDefinitions,
     useTranslate,
 } from 'react-admin';
@@ -58,6 +59,8 @@ const AppDashboard = () => {
     const translate = useTranslate();
     const resources = useResourceDefinitions();
     const navigate = useNavigate();
+    const { permissions } = usePermissions();
+    const hasListPermission = (resource: string) => permissions && permissions.canAccess(resource, 'list')
 
     const cards: any[] = [];
     
@@ -66,7 +69,8 @@ const AppDashboard = () => {
             resource.name !== 'crd' &&
             resource.name !== 'crs' &&
             !resource.name.startsWith('k8s_') &&
-            resource.hasList
+            resource.hasList &&
+            hasListPermission(resource.name)
         ) {
             cards.push(
                 <Card key={resource.name}>
