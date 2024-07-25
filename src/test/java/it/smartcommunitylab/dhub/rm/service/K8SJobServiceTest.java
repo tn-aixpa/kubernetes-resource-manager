@@ -29,7 +29,7 @@ public class K8SJobServiceTest {
     KubernetesClient client;
 
     @Mock
-    AuthorizationService service;
+    K8SAuthorizationService service;
 
     @Mock
     BatchAPIGroupDSL batchAPIGroupDSL;

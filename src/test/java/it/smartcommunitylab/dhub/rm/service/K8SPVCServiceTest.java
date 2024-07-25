@@ -34,7 +34,7 @@ public class K8SPVCServiceTest {
     private KubernetesClient kubernetesClient;
 
     @Mock
-    private AuthorizationService authorizationService;
+    private K8SAuthorizationService authorizationService;
 
     @Mock
     private MixedOperation<PersistentVolumeClaim, PersistentVolumeClaimList, Resource<PersistentVolumeClaim>> persistentVolumeClaimOperation;

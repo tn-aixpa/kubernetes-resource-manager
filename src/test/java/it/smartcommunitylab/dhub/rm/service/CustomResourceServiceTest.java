@@ -37,7 +37,7 @@ public class CustomResourceServiceTest {
     private KubernetesClient kubernetesClient;
 
     @Mock
-    private AuthorizationService authorizationService;
+    private K8SAuthorizationService authorizationService;
 
     @Mock
     private CustomResourceDefinitionService crdService;

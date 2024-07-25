@@ -3,10 +3,7 @@ package it.smartcommunitylab.dhub.rm.api;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import it.smartcommunitylab.dhub.rm.model.IdAwareResource;
-import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
-import it.smartcommunitylab.dhub.rm.service.CustomResourceService;
-import it.smartcommunitylab.dhub.rm.service.K8SJobService;
-import it.smartcommunitylab.dhub.rm.service.K8SPVCService;
+import it.smartcommunitylab.dhub.rm.service.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -19,6 +16,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
@@ -60,6 +58,12 @@ public class K8SJobApiTest {
     @MockBean
     private K8SPVCService k8SPVCService;
 
+    @MockBean
+    private UserApi userApi;
+
+    @MockBean
+    private AccessControlService accessControlService;
+
     private final String name = "job";
     private final String namespace = "namespace";
 
@@ -77,9 +81,13 @@ public class K8SJobApiTest {
         job.setMetadata(meta);
 
         idAwareResource = new IdAwareResource<>(job);
+
+        when(accessControlService.canAccess(anyString(), any())).thenReturn(true);
+
     }
 
     @Test
+    @WithMockUser
     public void testFindAll() throws Exception {
 
         Page<IdAwareResource<Job>> page = new PageImpl<>(
@@ -100,6 +108,7 @@ public class K8SJobApiTest {
     }
 
     @Test
+    @WithMockUser
     public void testFindById() throws Exception {
 
         when(service.findById(anyString(), anyString())).thenReturn(idAwareResource);
@@ -111,6 +120,7 @@ public class K8SJobApiTest {
     }
 
     @Test
+    @WithMockUser
     public void testGetLog() throws Exception {
         List<String> list = new ArrayList<>();
         list.add("log1");
@@ -124,6 +134,7 @@ public class K8SJobApiTest {
     }
 
     @Test
+    @WithMockUser
     public void testDelete() throws Exception {
         doNothing().when(service).delete(ArgumentMatchers.eq(namespace), ArgumentMatchers.eq(name));
 

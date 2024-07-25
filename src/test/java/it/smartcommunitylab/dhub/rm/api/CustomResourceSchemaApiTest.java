@@ -3,6 +3,7 @@ package it.smartcommunitylab.dhub.rm.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.smartcommunitylab.dhub.rm.model.dto.CustomResourceSchemaDTO;
+import it.smartcommunitylab.dhub.rm.service.AccessControlService;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
 import it.smartcommunitylab.dhub.rm.service.K8SPVCService;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
@@ -45,6 +47,12 @@ public class CustomResourceSchemaApiTest {
     @MockBean
     private K8SPVCService k8SPVCService;
 
+    @MockBean
+    private UserApi userApi;
+
+    @MockBean
+    private AccessControlService accessControlService;
+
     private final String crdId = "test";
     private final String version = "v1";
 
@@ -57,9 +65,12 @@ public class CustomResourceSchemaApiTest {
         customResourceSchemaDTO.setCrdId(crdId);
         customResourceSchemaDTO.setVersion(version);
 
+        when(accessControlService.canAccess(anyString(), any())).thenReturn(true);
+
     }
 
     @Test
+    @WithMockUser
     public void testFindAll() throws Exception {
 
         Page<CustomResourceSchemaDTO> page = new PageImpl<>(
@@ -79,6 +90,7 @@ public class CustomResourceSchemaApiTest {
     }
 
     @Test
+    @WithMockUser
     public void testFindById() throws Exception {
 
         when(service.findById(ArgumentMatchers.eq(crdId))).thenReturn(customResourceSchemaDTO);
@@ -90,6 +102,7 @@ public class CustomResourceSchemaApiTest {
     }
 
     @Test
+    @WithMockUser
     public void testAdd() throws Exception {
 
         when(service.add(eq(null), any(CustomResourceSchemaDTO.class))).thenReturn(customResourceSchemaDTO);
@@ -104,6 +117,7 @@ public class CustomResourceSchemaApiTest {
 
 
     @Test
+    @WithMockUser
     public void testUpdate() throws Exception {
 
         when(service.update(eq(crdId), any(CustomResourceSchemaDTO.class))).thenReturn(customResourceSchemaDTO);
@@ -117,6 +131,7 @@ public class CustomResourceSchemaApiTest {
     }
 
     @Test
+    @WithMockUser
     public void testDelete() throws Exception {
         doNothing().when(service).delete(ArgumentMatchers.eq(crdId));
 
@@ -125,7 +140,5 @@ public class CustomResourceSchemaApiTest {
                 .andExpect(status().isOk());
 
     }
-
-
 
 }

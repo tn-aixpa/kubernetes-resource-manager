@@ -30,7 +30,7 @@ public class K8SSecretServiceTest {
     KubernetesClient client;
 
     @Mock
-    AuthorizationService authService;
+    K8SAuthorizationService authService;
 
     @Mock
     MixedOperation<Secret, SecretList, Resource<Secret>> secretOperation;

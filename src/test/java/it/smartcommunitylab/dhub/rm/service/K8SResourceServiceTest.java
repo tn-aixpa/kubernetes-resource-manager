@@ -26,7 +26,7 @@ public class K8SResourceServiceTest {
     KubernetesClient client;
 
     @Mock
-    AuthorizationService authService;
+    K8SAuthorizationService authService;
 
     private K8SResourceService<HasMetadata> k8SResourceService;
 

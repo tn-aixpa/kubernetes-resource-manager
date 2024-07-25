@@ -3,6 +3,7 @@ package it.smartcommunitylab.dhub.rm.api;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
 import it.smartcommunitylab.dhub.rm.model.IdAwareResource;
+import it.smartcommunitylab.dhub.rm.service.AccessControlService;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
 import it.smartcommunitylab.dhub.rm.service.K8SDeploymentService;
 import it.smartcommunitylab.dhub.rm.service.K8SPVCService;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
@@ -55,6 +57,12 @@ public class K8SDeploymentApiTest {
     @MockBean
     private K8SPVCService k8SPVCService;
 
+    @MockBean
+    private UserApi userApi;
+
+    @MockBean
+    private AccessControlService accessControlService;
+
     private final String name = "deployment";
     private final String namespace = "namespace";
 
@@ -70,9 +78,13 @@ public class K8SDeploymentApiTest {
 
         idAwareResource = new IdAwareResource<>(deployment);
 
+        when(accessControlService.canAccess(anyString(), any())).thenReturn(true);
+
+
     }
 
     @Test
+    @WithMockUser
     public void testFindAll() throws Exception {
 
         Page<IdAwareResource<Deployment>> page = new PageImpl<>(
@@ -93,6 +105,7 @@ public class K8SDeploymentApiTest {
     }
 
     @Test
+    @WithMockUser
     public void testFindById() throws Exception {
 
         when(service.findById(anyString(), anyString())).thenReturn(idAwareResource);
@@ -105,6 +118,7 @@ public class K8SDeploymentApiTest {
     }
 
     @Test
+    @WithMockUser
     public void testGetLog() throws Exception {
 
         List<String> list = new ArrayList<>();

@@ -4,10 +4,7 @@ import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.apiextensions.v1.CustomResourceDefinition;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResourceDefinition;
 import it.smartcommunitylab.dhub.rm.model.dto.CustomResourceSchemaDTO;
-import it.smartcommunitylab.dhub.rm.service.CustomResourceDefinitionService;
-import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
-import it.smartcommunitylab.dhub.rm.service.CustomResourceService;
-import it.smartcommunitylab.dhub.rm.service.K8SPVCService;
+import it.smartcommunitylab.dhub.rm.service.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
@@ -20,13 +17,13 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -51,6 +48,12 @@ public class CustomResourceDefinitionApiTest {
     @MockBean
     private K8SPVCService k8SPVCService;
 
+    @MockBean
+    private UserApi userApi;
+
+    @MockBean
+    private AccessControlService accessControlService;
+
     private final String name = "example.com";
     private final String crdId = "crs-dto.test";
     private final String version = "v1";
@@ -73,10 +76,14 @@ public class CustomResourceDefinitionApiTest {
         customResourceSchemaDTO.setCrdId(crdId);
         customResourceSchemaDTO.setVersion(version);
 
+        when(accessControlService.canAccess(anyString(), any())).thenReturn(true);
+
+
     }
 
 
     @Test
+    @WithMockUser
     public void testFindAll() throws Exception {
 
         Page<IdAwareCustomResourceDefinition> page = new PageImpl<>(
@@ -97,6 +104,7 @@ public class CustomResourceDefinitionApiTest {
     }
 
     @Test
+    @WithMockUser
     public void testFindById() throws Exception {
 
         when(customResourceDefinitionService.findById(name)).thenReturn(resource);
@@ -111,6 +119,7 @@ public class CustomResourceDefinitionApiTest {
     }
 
     @Test
+    @WithMockUser
     public void testFindSchemaForId() throws Exception {
 
         when(customResourceDefinitionService.fetchStoredVersionName(crdId)).thenReturn(version);
@@ -125,6 +134,7 @@ public class CustomResourceDefinitionApiTest {
     }
 
     @Test
+    @WithMockUser
     public void testFindSchemasForId() throws Exception {
 
         Page<CustomResourceSchemaDTO> page = new PageImpl<>(

@@ -7,6 +7,7 @@ import io.fabric8.kubernetes.api.model.PersistentVolumeClaimBuilder;
 import io.fabric8.kubernetes.api.model.storage.StorageClass;
 import it.smartcommunitylab.dhub.rm.model.IdAwareResource;
 import it.smartcommunitylab.dhub.rm.model.dto.PersistentVolumeClaimDTO;
+import it.smartcommunitylab.dhub.rm.service.AccessControlService;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceService;
 import it.smartcommunitylab.dhub.rm.service.K8SPVCService;
@@ -22,6 +23,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
@@ -54,6 +56,12 @@ public class K8SPVCApiTest {
     @MockBean
     CustomResourceSchemaService customResourceSchemaService;
 
+    @MockBean
+    private UserApi userApi;
+
+    @MockBean
+    private AccessControlService accessControlService;
+
     private final String name = "pvc";
     private final String namespace = "namespace";
 
@@ -67,9 +75,13 @@ public class K8SPVCApiTest {
                 .build();
 
         idAwareResource = new IdAwareResource<>(pvc);
+
+        when(accessControlService.canAccess(anyString(), any())).thenReturn(true);
+
     }
 
     @Test
+    @WithMockUser
     public void testFindAll() throws Exception {
 
         Page<IdAwareResource<PersistentVolumeClaim>> page = new PageImpl<>(
@@ -90,6 +102,7 @@ public class K8SPVCApiTest {
     }
 
     @Test
+    @WithMockUser
     public void testFindById() throws Exception {
 
         when(service.findById(anyString(), anyString())).thenReturn(idAwareResource);
@@ -102,6 +115,7 @@ public class K8SPVCApiTest {
     }
 
     @Test
+    @WithMockUser
     public void testAdd() throws Exception {
         PersistentVolumeClaimDTO pvcDTO = new PersistentVolumeClaimDTO();
         pvcDTO.setName(name);
@@ -118,6 +132,7 @@ public class K8SPVCApiTest {
 
 
     @Test
+    @WithMockUser
     public void testDelete() throws Exception {
         doNothing().when(service).delete(ArgumentMatchers.eq(namespace), ArgumentMatchers.eq(name));
 
@@ -127,6 +142,7 @@ public class K8SPVCApiTest {
     }
 
     @Test
+    @WithMockUser
     public void testGetStorageClasses() throws Exception {
 
         String storageName = "storage-name";

@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AuthorizationServiceTest {
 
     @InjectMocks
-    private AuthorizationService authorizationService;
+    private K8SAuthorizationService authorizationService;
 
     @BeforeEach
     public void setUp() throws Exception {

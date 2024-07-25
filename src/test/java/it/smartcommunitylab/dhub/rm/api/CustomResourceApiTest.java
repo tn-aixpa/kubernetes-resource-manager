@@ -5,6 +5,7 @@ import io.fabric8.kubernetes.api.model.GenericKubernetesResource;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.Status;
 import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResource;
+import it.smartcommunitylab.dhub.rm.service.AccessControlService;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceService;
 import it.smartcommunitylab.dhub.rm.service.K8SPVCService;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -30,6 +32,7 @@ import io.fabric8.kubernetes.client.KubernetesClientException;
 import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -52,6 +55,12 @@ public class CustomResourceApiTest {
     @MockBean
     private K8SPVCService k8sPVCService;
 
+    @MockBean
+    private UserApi userApi;
+
+    @MockBean
+    private AccessControlService accessControlService;
+
     private final String crdId = "example-crd.id";
     private final String namespace = "default";
     private final String name = "resource1";
@@ -72,9 +81,12 @@ public class CustomResourceApiTest {
         resource = new IdAwareCustomResource(genericResource);
         resource.setId(id);
 
+        when(accessControlService.canAccess(anyString(), any())).thenReturn(true);
+
     }
 
     @Test
+    @WithMockUser
     public void testFindAll() throws Exception {
 
         Page<IdAwareCustomResource> page = new PageImpl<>(
@@ -95,6 +107,7 @@ public class CustomResourceApiTest {
     }
 
     @Test
+    @WithMockUser
     public void testFindById() throws Exception {
 
         when(customResourceService.findById(crdId, id, namespace)).thenReturn(resource);
@@ -108,6 +121,7 @@ public class CustomResourceApiTest {
     }
 
     @Test
+    @WithMockUser
     public void testAdd() throws Exception {
 
         when(customResourceService.add(ArgumentMatchers.eq(crdId), any(IdAwareCustomResource.class), ArgumentMatchers.eq(namespace)))
@@ -123,6 +137,7 @@ public class CustomResourceApiTest {
     }
 
     @Test
+    @WithMockUser
     public void testUpdate() throws Exception {
 
         when(customResourceService.update(ArgumentMatchers.eq(crdId), ArgumentMatchers.eq(id), any(IdAwareCustomResource.class), ArgumentMatchers.eq(namespace)))
@@ -138,6 +153,7 @@ public class CustomResourceApiTest {
     }
 
     @Test
+    @WithMockUser
     public void testDelete() throws Exception {
         doNothing().when(customResourceService).delete(ArgumentMatchers.eq(crdId), ArgumentMatchers.eq(id), ArgumentMatchers.eq(namespace));
 
@@ -149,6 +165,7 @@ public class CustomResourceApiTest {
 
     //Test Exceptions
     @Test
+    @WithMockUser
     public void testFindByIdNotFound() throws Exception {
         when(customResourceService.findById(crdId, id, namespace)).thenThrow(new NoSuchElementException("Resource not found"));
 
@@ -161,6 +178,7 @@ public class CustomResourceApiTest {
     }
 
     @Test
+    @WithMockUser
     public void testAccessDeniedException() throws Exception {
         when(customResourceService.findById(crdId, id, namespace))
                 .thenThrow(new AccessDeniedException("Access is denied"));
@@ -174,6 +192,7 @@ public class CustomResourceApiTest {
     }
 
     @Test
+    @WithMockUser
     public void testDataIntegrityViolationException() throws Exception {
         when(customResourceService.findById(crdId, id, namespace))
                 .thenThrow(new DataIntegrityViolationException("Data integrity violation"));
@@ -187,6 +206,7 @@ public class CustomResourceApiTest {
     }
 
     @Test
+    @WithMockUser
     public void testValidationException() throws Exception {
         ValidationMessage validationMessage = new ValidationMessage.Builder()
                 .build();
@@ -205,6 +225,7 @@ public class CustomResourceApiTest {
     }
 
     @Test
+    @WithMockUser
     public void testKubernetesClientException() throws Exception {
         Status status = new Status();
         status.setMessage("Error occurred in Kubernetes client");

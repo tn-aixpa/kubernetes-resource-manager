@@ -45,7 +45,7 @@ public class CustomResourceSchemaServiceTest {
     CustomResourceDefinitionService crdService;
 
     @Mock
-    AuthorizationService authService;
+    K8SAuthorizationService authService;
 
     @Mock
     DTOToSchemaConverter dtoToSchemaConverter;

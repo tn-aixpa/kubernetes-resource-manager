@@ -3,8 +3,10 @@ package it.smartcommunitylab.dhub.rm.controller;
 import it.smartcommunitylab.dhub.rm.SystemKeys;
 import it.smartcommunitylab.dhub.rm.api.CustomResourceApi;
 import it.smartcommunitylab.dhub.rm.api.K8SPVCApi;
+import it.smartcommunitylab.dhub.rm.api.UserApi;
 import it.smartcommunitylab.dhub.rm.config.ApplicationProperties;
 import it.smartcommunitylab.dhub.rm.config.AuthenticationProperties;
+import it.smartcommunitylab.dhub.rm.service.AccessControlService;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
 import it.smartcommunitylab.dhub.rm.service.CustomResourceService;
 import it.smartcommunitylab.dhub.rm.service.K8SPVCService;
@@ -53,6 +55,12 @@ public class MainControllerTest {
     @MockBean
     ApplicationProperties applicationProperties;
 
+    @MockBean
+    private UserApi userApi;
+
+    @MockBean
+    private AccessControlService accessControlService;
+
     private static final String CONSOLE_CONTEXT = SystemKeys.CONSOLE_PATH;
 
     @Test
@@ -90,6 +98,7 @@ public class MainControllerTest {
                     put("REACT_APP_AUTHORITY", "http://auth.example.com");
                     put("REACT_APP_CLIENT_ID", "client-id");
                     put("REACT_APP_SCOPE", "scope1 scope2");
+                    put("REACT_APP_CORE_NAME", null);
                 }}));
     }
 }

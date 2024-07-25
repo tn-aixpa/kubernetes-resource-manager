@@ -3,10 +3,7 @@ package it.smartcommunitylab.dhub.rm.api;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.Secret;
 import it.smartcommunitylab.dhub.rm.model.IdAwareResource;
-import it.smartcommunitylab.dhub.rm.service.CustomResourceSchemaService;
-import it.smartcommunitylab.dhub.rm.service.CustomResourceService;
-import it.smartcommunitylab.dhub.rm.service.K8SPVCService;
-import it.smartcommunitylab.dhub.rm.service.K8SSecretService;
+import it.smartcommunitylab.dhub.rm.service.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +15,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
@@ -55,6 +53,12 @@ public class K8SSecretApiTest {
     @MockBean
     private K8SPVCService k8SPVCService;
 
+    @MockBean
+    private UserApi userApi;
+
+    @MockBean
+    private AccessControlService accessControlService;
+
     private final String name = "secret";
     private final String namespace = "namespace";
 
@@ -73,9 +77,12 @@ public class K8SSecretApiTest {
 
         idAwareResource = new IdAwareResource<>(secret);
 
+        when(accessControlService.canAccess(anyString(), any())).thenReturn(true);
+
     }
 
     @Test
+    @WithMockUser
     public void testFindAll() throws Exception {
 
         Page<IdAwareResource<Secret>> page = new PageImpl<>(
@@ -96,6 +103,7 @@ public class K8SSecretApiTest {
     }
 
     @Test
+    @WithMockUser
     public void testFindById() throws Exception {
 
         when(service.findById(anyString(), anyString())).thenReturn(idAwareResource);
@@ -108,6 +116,7 @@ public class K8SSecretApiTest {
     }
 
     @Test
+    @WithMockUser
     public void testDecodeSecret() throws Exception {
 
         String key = "test-key";
