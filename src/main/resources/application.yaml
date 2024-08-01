@@ -55,6 +55,7 @@ auth:
     issuer-uri: ${KRM_AUTH_OAUTH2_ISSUER:}
     audience: ${KRM_AUTH_OAUTH2_AUDIENCE:}
     role-claim: ${KRM_AUTH_OATH2_ROLE_CLAIM:} 
+    scopes: ${KRM_AUTH_OAUTH2_SCOPES:}
 
 security.cors.origins: ${SECURITY_CORS_ORIGINS:}
 
