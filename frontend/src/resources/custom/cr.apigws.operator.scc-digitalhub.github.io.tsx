@@ -21,6 +21,11 @@ import {
     NumberInput,
     useGetOne,
     usePermissions,
+    AutocompleteInput,
+    useRecordContext,
+    ArrayField,
+    SingleFieldList,
+    ChipField,
 } from 'react-admin';
 import { useFormContext, useWatch } from "react-hook-form";
 import {
@@ -36,6 +41,7 @@ import { Box, Grid, Typography } from '@mui/material';
 import { useEffect } from 'react';
 import CableIcon from '@mui/icons-material/Cable';
 import { Breadcrumb } from '@dslab/ra-breadcrumb';
+import { labels2types } from '../../utils';
 
 const CR_APIGATEWAYS = 'apigws.operator.scc-digitalhub.github.io';
 
@@ -80,10 +86,38 @@ const PortInput = () => {
     );
   };
   
+  const OptionRenderer = () => {
+    const record = useRecordContext();
+    const types = labels2types(record.metadata.labels);
+
+    return (
+        <Box sx={{  overflow: 'hidden' }}>
+            <Box sx={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{record.metadata.name}</Box>
+            {types ? (
+                <ArrayField source="types" record={{ types: types }} >
+                    <SingleFieldList linkType={false}>
+                        <ChipField source="name" size="small" />
+                    </SingleFieldList>
+                </ArrayField>
+            ) : (<></>)}
+        </Box>
+    );
+};
 
 const ApiGWForm = () => {
     const translate = useTranslate();
     const id  = useWatch({name: 'id'});   
+
+    // const optionText = (option: any) => {
+    //         return serviceName(option);
+    // }
+    const optionText = <OptionRenderer/>;
+    const inputText = (choice: any) => `${choice.metadata.name}`;
+    const matchSuggestion = (filter: string, choice: any) => {
+        return (
+            choice.metadata.name.toLowerCase().includes(filter.toLowerCase())
+        );
+    };
 
     return (
         <>
@@ -92,7 +126,9 @@ const ApiGWForm = () => {
                     <TextInput disabled={!!id} fullWidth source="metadata.name" validate={required()} />
                     </Grid>
                     <Grid item xs={4}>
-                    <ReferenceInput reference='k8s_service' perPage={1000} fullWidth source="spec.service" validate={required()}/>
+                    <ReferenceInput reference='k8s_service' perPage={1000} fullWidth source="spec.service" validate={required()}>
+                        <AutocompleteInput optionText={optionText} inputText={inputText} matchSuggestion={matchSuggestion}/>
+                    </ReferenceInput>
                     </Grid>
                     <Grid item xs={2}>
                     <FormDataConsumer>

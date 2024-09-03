@@ -37,12 +37,11 @@ export const labels2types = (labels?: any) => {
     if (labels['com.coder.resource']) return [{name: labels['app.kubernetes.io/name']}];
     if (labels['nuclio.io/class']) return [{name: 'nuclio'}];
     if (labels[corePrefix + '/runtime']) {
-        const res = [{name: 'core'}];
+        const res: any[] = [/*{name: 'core'}*/];
         Object.keys(labels).forEach(l => {
             if (l === corePrefix + '/runtime') res.push({name: 'runtime:' + labels[l]});
             if (l === corePrefix + '/project') res.push({name: 'project:' + labels[l]});
-            // if (l === corePrefix + '-function') res.push({name: 'function:' + parseFunctionName(labels[l])});
-            // if (l === corePrefix + '/function') res.push({name: 'function:' + parseFunctionName(labels[l])});
+            if (l === corePrefix + '/function') res.push({name: 'function:' + labels[l]});
         });
         return res;
     }
