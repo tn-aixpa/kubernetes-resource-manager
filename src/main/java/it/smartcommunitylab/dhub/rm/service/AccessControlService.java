@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import it.smartcommunitylab.dhub.rm.config.AuthenticationProperties;
 import it.smartcommunitylab.dhub.rm.config.RoleProperties;
-import it.smartcommunitylab.dhub.rm.model.IdAwareCustomResourceDefinition;
 import jakarta.annotation.PostConstruct;
 
 /**
@@ -28,8 +26,6 @@ import jakarta.annotation.PostConstruct;
  */
 @Service("authz")
 public class AccessControlService {
-
-    private static final String ROLE_ADMIN = "ROLE_ADMIN";
 
     public enum RESOURCE_OP {list, read, write, all}
 
@@ -51,11 +47,6 @@ public class AccessControlService {
     @PostConstruct
     public void initRoles() {
         if (roleProperties.getRoles() != null) {
-            // default admin role: all permitted
-            roleMap.put(ROLE_ADMIN, new HashMap<>());
-            for (String r: getFullResourceList()) {
-                addRole(roleMap.get(ROLE_ADMIN), r,  RESOURCE_OP.all);
-            }
 
             roleProperties.getRoles().forEach(role -> {
                 roleMap.put(role.getRole(), new HashMap<>());

@@ -92,6 +92,25 @@ To define the permissions on the K8S objects, the following resource type IDs ar
 - k8s_secret
 - k8s_deployment
 
+The default configuration defines two roles 
+
+- ``ROLE_USER`` with no access to resources
+- ``ROLE_ADMIN`` with full access to resources
+
+To overwrite these roles and permissions, it is possible to change the configuration in ``application.yaml`` or provide the corresponding environment variables as of Spring specification, e.g., 
+
+```
+ACCESS_ROLES_0_ROLE=ROLE_USER
+ACCESS_ROLES_0_RESOURCES=k8s_service
+ACCESS_ROLES_1_ROLE=ROLE_ADMIN
+ACCESS_ROLES_1_RESOURCES=*
+ACCESS_ROLES_2_ROLE=ROLE_K8S_MANAGER
+ACCESS_ROLES_2_RESOURCES=k8s_service,k8s_job,k8s_pvc,k8s_secret,k8s_deployment
+``` 
+
+will allow for the ``ROLE_USER`` access to the list of K8S services, keep ``ROLE_ADMIN`` full access to all resouces, and grant ``ROLE_k8S_MANAGER`` full access to all base K8S resources.
+
+
 
 ## Front-end
 Create a `.env.development` file under `frontend` and configure it as follows:
