@@ -24,6 +24,8 @@ public class K8SAuthorizationService {
     private String jobSelector;
     @Value("${kubernetes.selector.pvc}")
     private String pvcSelector;
+    @Value("${kubernetes.selector.quota}")
+    private String quotaSelector;
 
     public boolean isCrdAllowed(String crdId) {
         return allowedCrds.contains(crdId) || (allowedCrds.isEmpty() && !deniedCrds.contains(crdId));
@@ -43,6 +45,10 @@ public class K8SAuthorizationService {
 
     public String getPVCSelector() {
         return pvcSelector;
+    }
+
+    public String getQuotaSelector() {
+        return quotaSelector;
     }
 
 }

@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>it.smartcommunitylab.dhub</groupId>
 	<artifactId>resourcemanager</artifactId>
-	<version>1.2.1</version>
+	<version>1.2.2</version>
 	<name>resourcemanager</name>
 	<description>Resource Manager for DigitalHub</description>
 	<properties>

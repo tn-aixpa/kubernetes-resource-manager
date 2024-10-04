@@ -37,6 +37,7 @@ kubernetes:
     deployment: ${K8S_SELECTOR_DEPLOYMENT:}
     job: ${K8S_SELECTOR_JOB:}
     pvc: ${K8S_SELECTOR_PVC:}
+    quota: ${K8S_SELECTOR_QUOTA:}
   pvc:
     managed-by: ${K8S_PVC_MANAGED_BY:krm}
     storage-classes: ${K8S_PVC_STORAGE_CLASSES:krm}

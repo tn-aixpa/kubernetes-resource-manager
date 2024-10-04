@@ -28,6 +28,7 @@ import AppIcon from '@mui/icons-material/Apps';
 import AlbumIcon from '@mui/icons-material/Album';
 import KeyIcon from '@mui/icons-material/Key';
 import ModelTraininigIcon from '@mui/icons-material/ModelTraining';
+import PieChartIcon from '@mui/icons-material/PieChart';
 
 import MyLayout from './Layout';
 import AppDashboard from './pages/Dashboard';
@@ -54,6 +55,7 @@ import { K8SPvcCreate, K8SPvcList, K8SPvcShow } from './resources/k8s/k8s_pvc';
 import { K8SServiceList, K8SServiceShow } from './resources/k8s/k8s_service';
 import { K8SSecretList, K8SSecretShow } from './resources/k8s/k8s_secret';
 import { K8SJobList, K8SJobShow } from './resources/k8s/k8s_job';
+import { K8SQuotaList, K8SQuotaShow } from './resources/k8s/k8s_quota';
 
 console.log('Config', Config);
 
@@ -85,6 +87,7 @@ export const themeOptions = {
         },
         secondary: {
             main: '#DB6A13',
+            highlight: 'rgba(219,106,19, 0.3)'
         },
     },
     sidebar: {
@@ -198,6 +201,12 @@ function DynamicAdminUI() {
                 list={canAccess('k8s_secret', 'list') ? K8SSecretList : <></>}
                 show={canAccess('k8s_secret', 'read') ? K8SSecretShow  : <></>}
                 icon={KeyIcon}
+            />
+            <Resource
+                name="k8s_quota"
+                list={canAccess('k8s_quota', 'list') ? K8SQuotaList : <></>}
+                show={canAccess('k8s_quota', 'read') ? K8SQuotaShow : <></>}
+                icon={PieChartIcon}
             />
         </AdminUI>
     );

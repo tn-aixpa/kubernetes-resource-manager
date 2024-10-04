@@ -39,7 +39,7 @@ public class AccessControlService {
     // role -> resource -> operations
     private Map<String, Map<String, Set<RESOURCE_OP>>> roleMap = new HashMap<>();
 
-    private static final String[] K8S_RESOURCES = new String[]{"k8s_job", "k8s_service", "k8s_deployment", "k8s_secret", "k8s_pvc"};
+    private static final String[] K8S_RESOURCES = new String[]{"k8s_job", "k8s_service", "k8s_deployment", "k8s_secret", "k8s_pvc", "k8s_quota"};
 
     /**
      * Pre-build role model. Map role to list of resources and their permissions.

@@ -35,6 +35,7 @@ const MyMenu = (props: MenuProps) => {
             {permissions && permissions.canAccess('k8s_job', 'list') && <Menu.ResourceItem name={'k8s_job'} />  }                  
             {permissions && permissions.canAccess('k8s_pvc', 'list') && <Menu.ResourceItem name={'k8s_pvc'} /> }
             {permissions && permissions.canAccess('k8s_secret', 'list') && <Menu.ResourceItem name={'k8s_secret'} /> }
+            {permissions && permissions.canAccess('k8s_quota', 'list') && <Menu.ResourceItem name={'k8s_quota'} />}
             <div key="settings">
                 <Divider />
                 <Menu.ResourceItem name={'crs'} />

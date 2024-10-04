@@ -35,6 +35,7 @@ To control which standard resources are available to the Resource Manager, use t
 - `kubernetes.selector.deployment` (`K8S_SELECTOR_DEPLOYMENT`) defines the label selectors (separated by `|`) for filtering the K8S Deployments to read.
 - `kubernetes.selector.job` (`K8S_SELECTOR_JOB`) defines the label selectors (separated by `|`) for filtering the K8S Jobs to read.
 - `kubernetes.selector.pvc` (`K8S_SELECTOR_PVC`) defines the label selectors (separated by `|`) for filtering the K8S Persistent Volume Claims to read.
+- `kubernetes.selector.quota` (`K8S_SELECTOR_QUOTA`) defines the label selectors (separated by `|`) for filtering the K8S to read.
 
 KRM allows for accessing a subset of secrets. To define which secrets to access, it is possible to use the following properties
 
@@ -91,6 +92,7 @@ To define the permissions on the K8S objects, the following resource type IDs ar
 - k8s_pvc
 - k8s_secret
 - k8s_deployment
+- k8s_quota
 
 The default configuration defines two roles 
 

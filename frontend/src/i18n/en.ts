@@ -92,6 +92,21 @@ const messages = {
                 types: 'Types'
             },
         },
+        k8s_quota: {
+            name: 'Resource Quota |||| Resource Quotas',
+            fields: {
+                metadata: {
+                    creationTimestamp: 'Created',
+                    generation: 'Generation',
+                    name: 'Name',
+                    resourceVersion: 'Resource version',
+                    uid: 'UID',
+                },
+                resource: 'Resource',
+                used: 'Used',
+                limit: 'Limit',
+            },
+        },
         k8s_pvc: {
             name: 'Persistent Volume Claim |||| Persistent Volume Claims',
             fields: {
