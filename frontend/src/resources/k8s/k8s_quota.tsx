@@ -25,15 +25,16 @@ const resourceCritical = (used: string, limit: string) => {
 const QuotaPanel = () => {
     const record = useRecordContext();
     const data = record.status ? Object.keys(record.status.hard).map(k => ({resource: k, limit: record.status.hard[k], used: record.status.used[k]})) : [];
-    const rowSx = (record: any) => {
-        return resourceCritical(record.used, record.limit) ? { backgroundColor: themeOptions.palette.secondary.highlight } : {}
-    }
+    // TODO revise the implementation
+    // const rowSx = (record: any) => {
+    //     return resourceCritical(record.used, record.limit) ? { backgroundColor: themeOptions.palette.secondary.highlight } : {}
+    // }
 
     return <Datagrid data={data} bulkActionButtons={false} sx={{
             "& .RaDatagrid-headerCell": {
                 fontWeight: "bolder",
             },
-        }} rowStyle={rowSx}>
+        }} >
             <TextField source="resource" sortable={false} />
             <TextField source="used" sortable={false} />
             <TextField source="limit" sortable={false} />
