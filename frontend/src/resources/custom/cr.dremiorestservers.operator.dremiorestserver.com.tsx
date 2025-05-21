@@ -294,7 +294,7 @@ const CrList = () => {
         <>
             <Breadcrumb />
             <SimplePageTitle pageType="list" crName={CR_DREMIOREST} />
-            <List actions={<ListTopToolbar />}>
+            <List actions={<ListTopToolbar hasCreate={hasPermission('write')}  />} hasCreate={hasPermission('write')}>
                 <Datagrid>
                     <TextField source="id" />
                     <TextField source="spec.tables" />

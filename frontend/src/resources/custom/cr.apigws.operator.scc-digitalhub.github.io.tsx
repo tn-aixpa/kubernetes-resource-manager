@@ -287,8 +287,8 @@ const CrList = () => {
         <>
             <Breadcrumb />
             <SimplePageTitle pageType="list" crName={CR_APIGATEWAYS} />
-            <List actions={<ListTopToolbar />}>
-                <Datagrid>
+            <List actions={<ListTopToolbar hasCreate={hasPermission('write')}/>} hasCreate={hasPermission('write')}>
+                <Datagrid >
                     <TextField source="id" />
                     <TextField source="spec.service" />
                     <TextField source="spec.host" />
@@ -298,7 +298,7 @@ const CrList = () => {
                     <Box textAlign={'right'}>
                         {hasPermission('write') && <EditButton />}
                         {hasPermission('read') && <ShowButton />}
-                        <DeleteWithConfirmButton />
+                        {hasPermission('write') && <DeleteWithConfirmButton />}
                     </Box>
                 </Datagrid>
             </List>

@@ -174,7 +174,7 @@ const CrList = () => {
             </Tabs>
             <S3TabPanel value={value} index={0}>
                 <SimplePageTitle pageType="list" crName={CR_MINIO_BUCKETS} />
-                <List actions={<ListTopToolbar hasCreate={hasPermission('write')}/>}>
+                <List actions={<ListTopToolbar hasCreate={hasPermission('write')}/>} hasCreate={hasPermission('write')}>
                     <Datagrid>
                         <TextField source="id" />
                         <TextField source="spec.name" />
@@ -247,7 +247,7 @@ const S3Users = () => {
             <TopToolbar>
             {hasPermission('write') && <CreateButton resource={CR_MINIO_USERS}></CreateButton>}
             </TopToolbar>
-            }>
+            } hasCreate={hasPermission('write')}>
             <Datagrid
                 data={data}
                 total={total}
@@ -292,8 +292,8 @@ const S3Policies = () => {
             <List resource={CR_MINIO_POLICIES} actions={
             <TopToolbar>
             {hasPermission('write') && <CreateButton resource={CR_MINIO_POLICIES}></CreateButton>}
-            </TopToolbar>                
-            }>
+            </TopToolbar>       
+            } hasCreate={hasPermission('write')}>
             <Datagrid
                 data={data}
                 total={total}
