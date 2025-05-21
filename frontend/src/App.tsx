@@ -149,6 +149,7 @@ function DynamicAdminUI() {
             loginPage={Login}
             layout={MyLayout}
             requireAuth={true}
+            disableTelemetry={true}
         >
             {views.map((v: any) => (
                 <Resource
