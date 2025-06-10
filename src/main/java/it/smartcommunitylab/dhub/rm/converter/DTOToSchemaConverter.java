@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 package it.smartcommunitylab.dhub.rm.converter;
 
 import com.fasterxml.jackson.core.type.TypeReference;

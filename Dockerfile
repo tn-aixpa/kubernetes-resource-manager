@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 FROM maven:3-eclipse-temurin-17 as mvn
 ARG GITHUB_TOKEN
 ENV TOKEN=$GITHUB_TOKEN

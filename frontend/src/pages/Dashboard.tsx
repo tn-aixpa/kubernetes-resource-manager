@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 import { Card, CardContent, CardHeader, Grid, Typography } from '@mui/material';
 import {
     Button,

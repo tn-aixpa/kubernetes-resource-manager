@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 package it.smartcommunitylab.dhub.rm.model;
 
 import it.smartcommunitylab.dhub.rm.converter.MapConverter;

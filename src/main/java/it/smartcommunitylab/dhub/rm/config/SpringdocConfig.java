@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 package it.smartcommunitylab.dhub.rm.config;
 
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;

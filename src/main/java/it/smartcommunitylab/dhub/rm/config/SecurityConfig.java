@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 package it.smartcommunitylab.dhub.rm.config;
 
 import it.smartcommunitylab.dhub.rm.SystemKeys;
