@@ -21,6 +21,17 @@ import it.smartcommunitylab.dhub.rm.model.IdAwareResource;
 import it.smartcommunitylab.dhub.rm.service.K8SSvcService;
 import jakarta.validation.constraints.Pattern;
 
+/**
+ * Controller for managing K8S Service resources.
+ * 
+ * <p>
+ * This API provides operations to list, read, create, update and delete K8S Service resources.
+ * </p>
+ * 
+ * <p>
+ * The API is secured through Basic Authentication and JWT.
+ * </p>
+ */
 @RestController
 @PreAuthorize("@authz.canAccess('k8s_service', 'list')")
 @SecurityRequirement(name = "basicAuth")
@@ -35,6 +46,13 @@ public class K8SServiceApi {
     @Value("${kubernetes.namespace}")
     private String namespace;
 
+    /**
+     * List all K8S Service resources.
+     * 
+     * @param id optional list of IDs for filtering
+     * @param pageable pagination parameters
+     * @return a page of K8S Service resources
+     */
     @PreAuthorize("@authz.canAccess('k8s_service', 'list')")
     @GetMapping
     public Page<IdAwareResource<Service>> findAll(
@@ -44,6 +62,12 @@ public class K8SServiceApi {
         return service.findAll(namespace, id, pageable);
     }
 
+    /**
+     * Get a single K8S Service resource by ID.
+     * 
+     * @param serviceId ID of the resource
+     * @return a single K8S Service resource
+     */
     @PreAuthorize("@authz.canAccess('k8s_service', 'read')")
     @GetMapping("/{serviceId}")
     public IdAwareResource<Service> findById(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String serviceId) {

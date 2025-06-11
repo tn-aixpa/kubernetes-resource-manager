@@ -29,6 +29,9 @@ import it.smartcommunitylab.dhub.rm.service.K8SPVCService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 
+/**
+ * Controller for managing Persistent Volume Claims (PVCs) in K8S
+ */
 @RestController
 @PreAuthorize("@authz.canAccess('k8s_pvc', 'list')")
 @SecurityRequirement(name = "basicAuth")
@@ -37,12 +40,24 @@ import jakarta.validation.constraints.Pattern;
 @Validated
 public class K8SPVCApi {
 
+    /**
+     * Service for managing PVCs
+     */
     @Autowired
     private K8SPVCService service;
     
+    /**
+     * Namespace to use for all operations
+     */
     @Value("${kubernetes.namespace}")
     private String namespace;
 
+    /**
+     * List all PVCs
+     * @param id
+     * @param pageable
+     * @return
+     */
     @PreAuthorize("@authz.canAccess('k8s_pvc', 'list')")
     @GetMapping("/k8s_pvc")
     public Page<IdAwareResource<PersistentVolumeClaim>> findAll(
@@ -52,12 +67,22 @@ public class K8SPVCApi {
         return service.findAll(namespace, id, pageable);
     }
 
+    /**
+     * Get a single PVC by id
+     * @param pvcId
+     * @return
+     */
     @PreAuthorize("@authz.canAccess('k8s_pvc', 'read')")
     @GetMapping("/k8s_pvc/{pvcId}")
     public IdAwareResource<PersistentVolumeClaim> findById(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String pvcId) {
         return service.findById(namespace, pvcId);
     }
 
+    /**
+     * Create a new PVC
+     * @param request
+     * @return
+     */
     @PreAuthorize("@authz.canAccess('k8s_pvc', 'write')")
     @PostMapping("/k8s_pvc")
     public IdAwareResource<PersistentVolumeClaim> add(
@@ -66,6 +91,10 @@ public class K8SPVCApi {
         return service.add(namespace, request);
     }
 
+    /**
+     * Delete an existing PVC
+     * @param pvcId
+     */
     @PreAuthorize("@authz.canAccess('k8s_pvc', 'write')")
     @DeleteMapping("/k8s_pvc/{pvcId}")
     public void delete(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String pvcId) {
@@ -73,6 +102,12 @@ public class K8SPVCApi {
     }
 
     
+    /**
+     * List all available Storage Classes
+     * @param id
+     * @param pageable
+     * @return
+     */
     @GetMapping("/k8s_storageclass")
     @PreAuthorize("@authz.canAccess('k8s_pvc', 'list')")
     public Page<IdAwareResource<StorageClass>> getStorageClasses(

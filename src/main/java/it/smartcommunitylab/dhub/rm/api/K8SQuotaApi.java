@@ -21,6 +21,10 @@ import it.smartcommunitylab.dhub.rm.model.IdAwareResource;
 import it.smartcommunitylab.dhub.rm.service.K8SQuotaService;
 import jakarta.validation.constraints.Pattern;
 
+/**
+ * API for managing K8S Quota resources.
+ *
+ */
 @RestController
 @PreAuthorize("@authz.canAccess('k8s_quota', 'list')")
 @SecurityRequirement(name = "basicAuth")
@@ -29,12 +33,25 @@ import jakarta.validation.constraints.Pattern;
 @Validated
 public class K8SQuotaApi {
 
+    /**
+     * Service for K8S Quota
+     */
     @Autowired
     private K8SQuotaService service;
     
+    /**
+     * Default namespace for k8s resources
+     */
     @Value("${kubernetes.namespace}")
     private String namespace;
 
+    /**
+     * List K8S Quota resources matching given criteria.
+     * 
+     * @param id optional list of IDs for filtering
+     * @param pageable pagination params
+     * @return list of K8S Quota resources
+     */
     @PreAuthorize("@authz.canAccess('k8s_quota', 'list')")
     @GetMapping
     public Page<IdAwareResource<ResourceQuota>> findAll(
@@ -44,6 +61,12 @@ public class K8SQuotaApi {
         return service.findAll(namespace, id, pageable);
     }
 
+    /**
+     * Get single K8S Quota resource by ID.
+     * 
+     * @param quotaId ID of the resource
+     * @return K8S Quota resource
+     */
     @PreAuthorize("@authz.canAccess('k8s_quota', 'read')")
     @GetMapping("/{quotaId}")
     public IdAwareResource<ResourceQuota> findById(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String quotaId) {

@@ -9,8 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,13 +17,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+/**
+ * This controller handles the root URL and redirects to the console.
+ * <p>
+ * The controller also handles the console URL and adds the configuration
+ * to the model that is needed by the React application.
+ * <p>
+ * The configuration includes the application URL, the API URL, the context
+ * path, the authentication method and the OAuth2 configuration.
+ */
 @Controller
 public class MainController {
-
-    private static final Logger logger = LoggerFactory.getLogger(MainController.class);
 
     @Autowired
     AuthenticationProperties authenticationProperties;
@@ -43,6 +45,15 @@ public class MainController {
         return new ModelAndView("redirect:" + CONSOLE_CONTEXT + "/");
     }
 
+    /**
+     * Handles the console URL and adds the configuration to the model.
+     * 
+     * @param model
+     *            the model to add the configuration to
+     * @param request
+     *            the HTTP request
+     * @return the name of the view
+     */
     @GetMapping(value = { CONSOLE_CONTEXT, CONSOLE_CONTEXT + "/**" })
     public String console(Model model, HttpServletRequest request) {
         String requestUrl = ServletUriComponentsBuilder
@@ -55,7 +66,7 @@ public class MainController {
             ? applicationProperties.getUrl()
             : requestUrl;
 
-        //build config
+        // build config
         Map<String, String> config = new HashMap<>();
         config.put("REACT_APP_APPLICATION_URL", applicationUrl);
         config.put("REACT_APP_API_URL", "");

@@ -24,6 +24,14 @@ import it.smartcommunitylab.dhub.rm.model.IdAwareResource;
 import it.smartcommunitylab.dhub.rm.service.K8SJobService;
 import jakarta.validation.constraints.Pattern;
 
+/**
+ * API for K8S Job
+ * 
+ * <p>
+ * This API provides operations to manipulate K8S Job
+ * </p>
+ * 
+ */
 @RestController
 @PreAuthorize("@authz.canAccess('k8s_job', 'list')")
 @SecurityRequirement(name = "basicAuth")
@@ -32,12 +40,27 @@ import jakarta.validation.constraints.Pattern;
 @Validated
 public class K8SJobApi {
 
+    /**
+     * Service for K8S Job
+     */
     @Autowired
     private K8SJobService service;
-    
+
+    /**
+     * K8S namespace
+     */
     @Value("${kubernetes.namespace}")
     private String namespace;
 
+    /**
+     * Get the list of all K8S Job
+     * 
+     * @param id
+     *            the id of the K8S Job
+     * @param pageable
+     *            the pagination information
+     * @return the list of K8S Job
+     */
     @PreAuthorize("@authz.canAccess('k8s_job', 'list')")
     @GetMapping
     public Page<IdAwareResource<Job>> findAll(
@@ -47,21 +70,41 @@ public class K8SJobApi {
         return service.findAll(namespace, id, pageable);
     }
 
+    /**
+     * Get a K8S Job by its id
+     * 
+     * @param jobId
+     *            the id of the K8S Job
+     * @return the K8S Job
+     */
     @PreAuthorize("@authz.canAccess('k8s_job', 'read')")
     @GetMapping("/{jobId}")
     public IdAwareResource<Job> findById(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String jobId) {
         return service.findById(namespace, jobId);
     }
 
+    /**
+     * Get the log of a K8S Job
+     * 
+     * @param jobId
+     *            the id of the K8S Job
+     * @return the log of the K8S Job
+     */
     @PreAuthorize("@authz.canAccess('k8s_job', 'read')")
     @GetMapping("/{jobId}/log")
     public List<String> getLog(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String jobId) {
         return service.getLog(namespace, jobId);
     }
 
+    /**
+     * Delete a K8S Job
+     * 
+     * @param jobId
+     *            the id of the K8S Job
+     */
     @PreAuthorize("@authz.canAccess('k8s_job', 'write')")
     @DeleteMapping("/{jobId}")
-    public void  delete(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String jobId) {
+    public void delete(@PathVariable @Pattern(regexp = SystemKeys.REGEX_CR_ID) String jobId) {
         service.delete(namespace, jobId);
     }
 }
