@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: © 2025 DSLab - Fondazione Bruno Kessler
+//
+// SPDX-License-Identifier: Apache-2.0
+
 import crPostgres from '../resources/custom/cr.postgres.db.movetokube.com';
 import crPostgresUsers from '../resources/custom/cr.postgresusers.db.movetokube.com';
 import crPostgrest from '../resources/custom/cr.postgrests.operator.postgrest.org';
