@@ -1,6 +1,6 @@
 # K8S Resource Manager
 
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/scc-digitalhub/repo-template/release.yaml?event=release) [![license](https://img.shields.io/badge/license-Apache%202.0-blue)](https://github.com/scc-digitalhub/kubernetes-resource-manager/LICENSE) ![GitHub Release](https://img.shields.io/github/v/release/scc-digitalhub/kubernetes-resource-manager)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/scc-digitalhub/kubernetes-resource-manager/release.yaml?event=release) [![license](https://img.shields.io/badge/license-Apache%202.0-blue)](https://github.com/scc-digitalhub/kubernetes-resource-manager/LICENSE) ![GitHub Release](https://img.shields.io/github/v/release/scc-digitalhub/kubernetes-resource-manager)
 ![Status](https://img.shields.io/badge/status-stable-gold)
 
 A manager for resources in Kubernetes. The tool allows for monitoring and managing some of the standard Kubernetes resources (PersistentVolumeClaim, Services, Deployments, Jobs, and Secrets) as well as for managing a selection of Custom Resources.
@@ -223,7 +223,7 @@ The current release is the supported version. Security fixes are released togeth
 
 If you discover a security vulnerability in this project, please do not open a public issue.
 
-Instead, report it privately by emailing us at dslab@fbk.eu. Include as much detail as possible to help us understand and address the issue quickly and responsibly.
+Instead, report it privately by emailing us at [digitalhub@fbk.eu](mailto:digitalhub@fbk.eu). Include as much detail as possible to help us understand and address the issue quickly and responsibly.
 
 ## Contributing
 
@@ -241,7 +241,7 @@ We appreciate contributions and help in improving the project!
 
 This project is developed and maintained by **DSLab – Fondazione Bruno Kessler**, with contributions from the open source community. A complete list of contributors is available in the project’s commit history and pull requests.
 
-For questions or inquiries, please contact: [dslab@fbk.eu](mailto:dslab@fbk.eu)
+For questions or inquiries, please contact: [digitalhub@fbk.eu](mailto:digitalhub@fbk.eu)
 
 ## Copyright and license
 
