@@ -133,6 +133,7 @@ Front-end configuration properties:
 - ``REACT_APP_CLIENT_ID`` OAuth2.0 client id  (if enabled)
 - ``REACT_APP_AUTH_CALLBACK_PATH``  OAauth2.0 callback address  (if enabled)
 - ``REACT_APP_SCOPE`` OAuth2.0 scopes  (if enabled)
+- ``REACT_APP_SOURCE`` reference to the project source code repo
 
 ### Role-Based Access Control
 

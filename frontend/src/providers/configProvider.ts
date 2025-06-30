@@ -41,12 +41,15 @@ const OAUTH2_SCOPE =
 const CORE_NAME = (globalThis as any).REACT_APP_CORE_NAME || process.env.REACT_APP_CORE_NAME;
 //build full config
 
+const SOURCE = (globalThis as any).REACT_APP_SOURCE || process.env.REACT_APP_SOURCE || 'https://github.com/scc-digitalhub/kubernetes-resource-manager';
+
 export const Config = {
     application: {
         contextPath: CONTEXT_PATH,
         applicationUrl: APPLICATION_URL,
         apiUrl: API_URL,
         coreName: CORE_NAME,
+        source: SOURCE,
     },
     authentication: {
         type: AUTH_TYPE,

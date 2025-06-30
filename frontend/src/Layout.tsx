@@ -12,6 +12,7 @@ import {
     useResourceDefinitions,
 } from 'react-admin';
 import { Divider } from '@mui/material';
+import CustomAppBar from './AppBar';
 
 const MyMenu = (props: MenuProps) => {
     const resources = useResourceDefinitions();
@@ -48,6 +49,6 @@ const MyMenu = (props: MenuProps) => {
     );
 };
 
-const MyLayout = (props: LayoutProps) => <Layout {...props} menu={MyMenu} />;
+const MyLayout = (props: LayoutProps) => <Layout {...props} menu={MyMenu} appBar={CustomAppBar} />;
 
 export default MyLayout;
